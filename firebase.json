@@ -1,0 +1,21 @@
+{
+  "functions": {
+    "predeploy": [
+      "npm run build"
+    ],
+    "source": "."
+  },
+  "hosting": {
+    "public": "static",
+    "rewrites": [
+      {
+        "source": "/graphql",
+        "function": "graphql"
+      },
+      {
+        "source": "**",
+        "function": "server"
+      }
+    ]
+  }
+}
