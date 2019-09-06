@@ -51,12 +51,21 @@
 
 	img.logo {
 		height: 1.7em;
+		margin-bottom: -0.6em;
 	}
 </style>
 
 <nav>
 	<ul>
-		<li><a class='{segment === undefined ? "selected" : ""}' href='.'><img class='logo' src='snapstats.svg' alt='snapstats' /></a></li>
+		<li>
+			<a class='{segment === undefined ? "selected" : ""}' href='.'>
+				<picture>
+					<source srcset="snapstats@2x.png 2x,
+									snapstats.png 1x" />
+					<img class='logo' src='snapstats.png' alt='snapstats' />
+				</picture>
+			</a>
+		</li>
 		<li><a class='{segment === 'snaps' ? 'selected' : ''}' href='snaps'>snaps</a></li>
 		<li><a class='{segment === 'bases' ? 'selected' : ''}' href='bases'>bases</a></li>
 		<li><a class='{segment === 'channels' ? 'selected' : ''}' href='channels'>channels</a></li>

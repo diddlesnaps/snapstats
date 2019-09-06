@@ -1,9 +1,16 @@
 {
   "functions": {
     "predeploy": [
-      "npm run build"
+      "npm install",
+      "npm run build",
+      "npm prune --production"
     ],
-    "source": "."
+    "source": ".",
+    "ignore": [
+      ".git/**",
+      "cypress",
+      "src/**"
+    ]
   },
   "hosting": {
     "public": "static",

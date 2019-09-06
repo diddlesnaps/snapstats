@@ -4,6 +4,7 @@
     let icon_url;
     
     $: icon_url = `https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,h_92/${snap.icon_url}`;
+    $: icon2x_url = `https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,h_184/${snap.icon_url}`;
 </script>
 
 <style>
@@ -46,7 +47,10 @@
 
 <div class='grid'>
     {#if snap.icon_url}
-        <img height="92" class='icon' src={icon_url} alt={`Icon of ${snap.title}`} loading="lazy" />
+        <picture>
+            <source srcset={`${icon2x_url} 2x, ${icon_url} 1x`} />
+            <img height="92" class='icon' src={icon_url} alt={`Icon of ${snap.title}`} loading="lazy" />
+        </picture>
     {/if}
     <p class='title'>
         <a href={`snaps/${snap.package_name}`}>
