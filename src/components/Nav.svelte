@@ -1,5 +1,27 @@
 <script>
+    import {onMount} from 'svelte';
+
 	export let segment;
+
+    let share_enabled;
+    
+    onMount(async () => {
+        share_enabled = !!navigator.share;
+    });
+
+    function share() {
+        if (navigator.share) {
+            navigator.share({
+                title: document.title || 'Snap store statistics',
+                text: document.head.querySelector('meta[name="description"]').content || 'Check it out on snapstats',
+                url: document.URL,
+            })
+            .then(() => console.log('Successful share'))
+            .catch((error) => console.log('Error sharing', error));
+        } else {
+            
+        }
+    }
 </script>
 
 <style>
@@ -53,6 +75,7 @@
 		height: 1.7em;
 		margin-bottom: -0.6em;
 	}
+
 </style>
 
 <nav>
@@ -71,5 +94,6 @@
 		<li><a class='{segment === 'channels' ? 'selected' : ''}' href='channels'>channels</a></li>
 		<li><a class='{segment === 'confinements' ? 'selected' : ''}' href='confinements'>confinements</a></li>
 		<li><a class='{segment === 'licenses' ? 'selected' : ''}' href='licenses'>licenses</a></li>
+        <li style='{share_enabled ? 'display: initial' : 'display: none'}'><a on:click={share}>share this page</a></li>
 	</ul>
 </nav>
