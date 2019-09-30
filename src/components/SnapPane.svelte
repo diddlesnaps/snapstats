@@ -47,9 +47,9 @@
 
 <div class='grid'>
     {#if snap.icon_url}
-        <picture>
+        <picture class='icon'>
             <source srcset={`${icon2x_url} 2x, ${icon_url} 1x`} />
-            <img height="92" class='icon' src={icon_url} alt={`Icon of ${snap.title}`} loading="lazy" />
+            <img width="92" height="92" src={icon_url} alt={`Icon of ${snap.title}`} loading="lazy" />
         </picture>
     {/if}
     <p class='title'>
