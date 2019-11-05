@@ -35,7 +35,7 @@
     "ignore-styles": "^5.0.1",
     "lodash.escaperegexp": "^4.1.2",
     "merge-graphql-schemas": "^1.7.0",
-    "mongoose": "^5.6.8",
+    "mongoose": "^5.7.5",
     "node-fetch": "^2.6.0",
     "paginator": "^1.0.0",
     "random-js": "^2.1.0",
