@@ -71,20 +71,22 @@ export default {
 				'__fetch': 'require("node-fetch")',
 				'http://localhost:3000/graphql': dev ? 'http://localhost:3000/graphql' : 'https://snapstats.org/graphql',
 			}),
-			svelte({
-				generate: 'ssr',
-				dev
-			}),
-			resolve({
-				dedupe
-			}),
-			commonjs(),
 			replace({
-				'__sapper__/build': '.',
+				'"__sapper__/build"': 'process.cwd()',
+				'delimiters': ['',''],
 			}),
 			!dev && replace({
-				'process.send': 'false',
-			})
+				'!emitted_basepath && process.send': 'false',
+				'delimiters': ['',''],
+			}),
+			svelte({
+				generate: 'ssr',
+				dev,
+			}),
+			resolve({
+				dedupe,
+			}),
+			commonjs(),
 		],
 		external: Object.keys(pkg.dependencies).concat(
 			require('module').builtinModules || Object.keys(process.binding('natives'))
