@@ -81,7 +81,6 @@ export default {
 			commonjs(),
 			replace({
 				'__sapper__/build': '.',
-				'console.error(err)': 'console.dir(err)',
 			}),
 			!dev && replace({
 				'process.send': 'false',
