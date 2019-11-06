@@ -50,6 +50,9 @@
     "@babel/plugin-transform-runtime": "^7.0.0",
     "@babel/preset-env": "^7.5.5",
     "@babel/runtime": "^7.0.0",
+    "@types/express": "^4.17.2",
+    "@types/mongoose": "^5.5.29",
+    "@types/node-fetch": "^2.5.3",
     "npm-run-all": "^4.1.5",
     "rollup": "^1.12.0",
     "rollup-plugin-babel": "^4.0.2",
@@ -59,7 +62,7 @@
     "rollup-plugin-svelte": "^5.0.1",
     "rollup-plugin-terser": "^4.0.4",
     "sapper": "^0.27.0",
-    "svelte-apollo": "^0.3.0",
-    "svelte": "^3.0.0"
+    "svelte": "^3.0.0",
+    "svelte-apollo": "^0.3.0"
   }
 }

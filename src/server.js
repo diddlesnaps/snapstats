@@ -36,7 +36,7 @@ const expressGraphQLServer = expressGraphQL({
 const app = express() // You can also use Express
 app.use(compression({ threshold: 0 }))
 
-if (PORT) {
+if (PORT && dev) {
   app.use(sirv('static', { dev }))
   app.use('/graphql', expressGraphQLServer);
 	app.listen(PORT, err => {
