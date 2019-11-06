@@ -81,7 +81,11 @@ export default {
 			commonjs(),
 			replace({
 				'__sapper__/build': '.',
+				'console.error(err)': 'console.dir(err)',
 			}),
+			!dev && replace({
+				'process.send': 'false',
+			})
 		],
 		external: Object.keys(pkg.dependencies).concat(
 			require('module').builtinModules || Object.keys(process.binding('natives'))

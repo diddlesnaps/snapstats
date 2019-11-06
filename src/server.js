@@ -1,49 +1,97 @@
 import * as functions from 'firebase-functions';
 
-import sirv from 'sirv';
-import compression from 'compression';
-import * as sapper from '@sapper/server';
-import mongoose from 'mongoose';
-import express from 'express';
-import expressGraphQL from "express-graphql";
-
-import { schema } from "./graphql";
 import { collectStats, collectRatings, thinStats } from './collector.js';
 
 const { PORT, NODE_ENV } = process.env;
 const dev = NODE_ENV === 'development';
 
-const mongoUrl = process.env.MONGO_URL || functions.config().mongo.url || 'mongodb://localhost/snapstats';
-// Connect to MongoDB with Mongoose.
-mongoose
-  .connect(
-    mongoUrl,
-    {
-      useCreateIndex: true,
-      useNewUrlParser: true,
-      reconnectTries: Number.MAX_VALUE,
-      reconnectInterval: 500,
-      connectTimeoutMS: 10000,
-    }
-  )
-  .catch((err) => console.log(`Mongo failed to connect: ${err.toString()}`));
+const connectDB = async () => {
+  // Connect to MongoDB with Mongoose.
+  const mongoose = (await import('mongoose')).default;
+  const mongoUrl = process.env.MONGO_URL || functions.config().mongo.url || 'mongodb://localhost/snapstats';
+  mongoose
+    .connect(
+      mongoUrl,
+      {
+        useCreateIndex: true,
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        reconnectTries: Number.MAX_VALUE,
+        reconnectInterval: 500,
+        connectTimeoutMS: 10000,
+      }
+    )
+    .catch((err) => console.log(`Mongo failed to connect: ${err.toString()}`));
 
-const expressGraphQLServer = expressGraphQL({
-  schema,
-  graphiql: true,
-});
-
-const app = express() // You can also use Express
-app.use(compression({ threshold: 0 }))
-
-if (PORT && dev) {
-  app.use(sirv('static', { dev }))
-  app.use('/graphql', expressGraphQLServer);
-	app.listen(PORT, err => {
-		if (err) console.log('error', err);
-  });
+  return mongoose;
 }
 
-app.use(sapper.middleware());
+const getGraphQL = async (...args) => {
+  const expressGraphQL = (await import('express-graphql')).default;
+  const {schema} = await import("./graphql");
 
-export {app, expressGraphQLServer, collectStats, collectRatings, thinStats};
+  const mongoose = await connectDB();
+  await expressGraphQL({
+    schema,
+    graphiql: true,
+  })(...args);
+  mongoose.disconnect();
+}
+
+const getApp = async (...args) => {
+  // try {
+  const {default: express} = await import('express');
+  const {default: sirv} = await import('sirv');
+  const {default: compression} = await import('compression');
+  const sapper = await import('@sapper/server');
+
+  const app = express() // You can also use Express
+
+  app.use(compression({ threshold: 0 }));
+
+  if (dev) {
+    app.use(sirv('static', { dev }));
+    app.use('/graphql', getGraphQL);
+  }
+
+  app.use(sapper.middleware());
+
+  if (dev) {
+    app.listen(3000, err => {
+      if (err) console.log('error', err);
+    });
+    return app;
+  } else {
+    return app(...args);
+  }
+}
+
+const getCollectStats = async (...args) => {
+  const mongoose = await connectDB();
+  await collectStats(...args);
+  mongoose.disconnect();
+}
+
+const getCollectRatings = async (...args) => {
+  const mongoose = await connectDB();
+  await collectRatings(...args);
+  mongoose.disconnect();
+}
+
+const getThinStats = async (...args) => {
+  const mongoose = await connectDB();
+  await thinStats(...args);
+  mongoose.disconnect();
+}
+
+if (dev) {
+  getApp();
+}
+
+export {
+  getApp,
+  getGraphQL,
+  getCollectStats,
+  getCollectRatings,
+  getThinStats,
+};
