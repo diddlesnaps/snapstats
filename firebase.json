@@ -1,15 +1,11 @@
 {
   "functions": {
-    "predeploy": [
-      "npm install",
-      "npm run build",
-      "npm prune --production"
-    ],
-    "source": ".",
+    "source": "__sapper__/build",
     "ignore": [
       ".git/**",
       "cypress",
-      "src/**"
+      "src/**",
+      ".runtimeconfig.json"
     ]
   },
   "hosting": {
@@ -22,6 +18,23 @@
       {
         "source": "**",
         "function": "server"
+      }
+    ],
+    "redirects": [
+      {
+        "source": "/snapstatsorg/us-central1/server/client/:asset",
+        "destination": "/client/:asset",
+        "type": "302"
+      },
+      {
+        "source": "/snapstatsorg/us-central1/server/favicons/:asset",
+        "destination": "/favicons/:asset",
+        "type": "301"
+      },
+      {
+        "source": "/snapstatsorg/us-central1/server/:asset",
+        "destination": "/:asset",
+        "type": "301"
       }
     ]
   }

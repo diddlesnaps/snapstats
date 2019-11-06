@@ -2,8 +2,8 @@
 /node_modules/
 /src/node_modules/@sapper/
 yarn-error.log
+firebase-debug.log
 /cypress/screenshots/
 /__sapper__/
 .runtimeconfig.json
 .firebase
-.firebaserc

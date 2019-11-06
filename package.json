@@ -1,5 +1,5 @@
 {
-  "name": "TODO",
+  "name": "snapstats",
   "description": "TODO",
   "version": "0.0.1",
   "engines": {
@@ -7,9 +7,10 @@
   },
   "scripts": {
     "dev": "sapper dev",
-    "build": "sapper build --legacy",
+    "build": "sapper build --legacy && cp package*.json __sapper__/build/ && npm install --production --prefix __sapper__/build && cp index-prod.js __sapper__/build/index.js",
     "export": "sapper export --legacy",
     "start": "node __sapper__/build",
+    "firebase:start": "cp .runtimeconfig.json __sapper__/build/ && firebase serve",
     "cy:run": "cypress run",
     "cy:open": "cypress open",
     "test": "run-p --race dev cy:run"
