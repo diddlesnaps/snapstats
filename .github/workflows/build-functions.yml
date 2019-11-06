@@ -38,6 +38,7 @@ jobs:
         uses: actions/download-artifact@master
         with:
           name: dist
+          path: __sapper__/build
       - name: Deploy to Firebase
         uses: w9jds/firebase-action@master
         with:
