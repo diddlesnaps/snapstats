@@ -1,7 +1,5 @@
 import * as functions from 'firebase-functions';
 
-import { collectStats, collectRatings, thinStats } from './collector.js';
-
 const { PORT, NODE_ENV } = process.env;
 const dev = NODE_ENV === 'development';
 
@@ -68,19 +66,28 @@ const getApp = async (...args) => {
 
 const getCollectStats = async (...args) => {
   const mongoose = await connectDB();
+  const {collectStats} = (await import('./collectors/collectStats'));
   await collectStats(...args);
   mongoose.disconnect();
 }
 
 const getCollectRatings = async (...args) => {
   const mongoose = await connectDB();
+  const {collectStats} = (await import('./collectors/collectStats'));
   await collectRatings(...args);
   mongoose.disconnect();
 }
 
-const getThinStats = async (...args) => {
+const getThinSnaps = async (...args) => {
   const mongoose = await connectDB();
-  await thinStats(...args);
+  const {thinSnaps} = (await import('./collectors/thinSnaps'));
+  await ThinSnaps(...args);
+  mongoose.disconnect();
+}
+const getThinCounts = async (...args) => {
+  const mongoose = await connectDB();
+  const {thinCounts} = (await import('./collectors/thinCounts'));
+  await ThinCounts(...args);
   mongoose.disconnect();
 }
 
@@ -93,5 +100,6 @@ export {
   getGraphQL,
   getCollectStats,
   getCollectRatings,
-  getThinStats,
+  getThinSnaps,
+  getThinCounts,
 };
