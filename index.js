@@ -1,10 +1,8 @@
 const functions = require('firebase-functions');
-const fs = require('fs');
-const isProd = !fs.existsSync('src');
 
 process.env.NODE_ENV = process.env.NODE_ENV || 'production';
 
-const filename = isProd ? './server/server' : './__sapper__/build/server/server';
+const filename = process.env.NODE_ENV === 'production' ? './server/server' : './__sapper__/build/server/server';
 const entrypoint = require(filename);
 
 const server = functions.runWith({
