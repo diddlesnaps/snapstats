@@ -4,7 +4,8 @@
     "ignore": [
       ".package*.json",
       ".runtimeconfig.json"
-    ]
+    ],
+    "predeploy": "sed -i \\'s^const build_dir = \"\\.\"^const\\ build_dir = \"__sapper__/build\"^\\' __sapper__/build/server/server.js"
   },
   "hosting": {
     "public": "static",
