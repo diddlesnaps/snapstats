@@ -79,6 +79,9 @@ export default {
 				dedupe
 			}),
 			commonjs(),
+			replace({
+				'__sapper__/build': '.',
+			}),
 		],
 		external: Object.keys(pkg.dependencies).concat(
 			require('module').builtinModules || Object.keys(process.binding('natives'))

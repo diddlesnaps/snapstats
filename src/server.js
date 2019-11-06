@@ -46,26 +46,4 @@ if (PORT && dev) {
 
 app.use(sapper.middleware());
 
-export const server = functions.runWith({
-  timeoutSeconds: 45,
-  memory: '256MB',
-}).https.onRequest(app);
-
-export const graphql = functions.runWith({
-  timeoutSeconds: 30,
-  memory: '256MB',
-}).https.onRequest(expressGraphQLServer);
-
-export const hourlyStats = functions.runWith({
-  timeoutSeconds: 300,
-  memory: '512MB'
-}).pubsub.schedule('every 4 hours').onRun(collectStats(false));
-// export const dailyStats = functions.pubsub.schedule('every 24 hours').onRun(collectStats(true));
-export const dailyRatings = functions.runWith({
-  timeoutSeconds: 30,
-  memory: '128MB',
-}).pubsub.schedule('every 24 hours').onRun(collectRatings);
-export const dailyThinning = functions.runWith({
-  timeoutSeconds: 300,
-  memory: '512MB',
-}).pubsub.schedule('48 23 * * *').onRun(thinStats);
+export {app, expressGraphQLServer, collectStats, collectRatings, thinStats};
