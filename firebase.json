@@ -2,9 +2,7 @@
   "functions": {
     "source": "__sapper__/build",
     "ignore": [
-      ".git/**",
-      "cypress",
-      "src/**",
+      ".package*.json",
       ".runtimeconfig.json"
     ]
   },
