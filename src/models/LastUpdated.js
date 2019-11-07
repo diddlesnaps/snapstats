@@ -6,6 +6,10 @@ const LastUpdatedSchema = new Schema({
         required: true,
         default: Date.now,
     },
+    isDaily: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 export const LastUpdatedModel = model("LastUpdated", LastUpdatedSchema);

@@ -26,6 +26,10 @@ const DeveloperCountsSchema = new Schema({
         required: true,
         default: Date.now,
     },
+    isDaily: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 export const DeveloperCountsModel = model("DeveloperCounts", DeveloperCountsSchema);

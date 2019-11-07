@@ -64,16 +64,16 @@ const getApp = async (...args) => {
   }
 }
 
-const getCollectStats = async (...args) => {
+const getCollectStats = (isDaily) => async (...args) => {
   const mongoose = await connectDB();
   const {collectStats} = (await import('./collectors/collectStats'));
-  await collectStats(...args);
+  await collectStats(isDaily)(...args);
   mongoose.disconnect();
 }
 
 const getCollectRatings = async (...args) => {
   const mongoose = await connectDB();
-  const {collectStats} = (await import('./collectors/collectStats'));
+  const {collectRatings} = (await import('./collectors/collectStats'));
   await collectRatings(...args);
   mongoose.disconnect();
 }
@@ -81,13 +81,13 @@ const getCollectRatings = async (...args) => {
 const getThinSnaps = async (...args) => {
   const mongoose = await connectDB();
   const {thinSnaps} = (await import('./collectors/thinSnaps'));
-  await ThinSnaps(...args);
+  await thinSnaps(...args);
   mongoose.disconnect();
 }
 const getThinCounts = async (...args) => {
   const mongoose = await connectDB();
   const {thinCounts} = (await import('./collectors/thinCounts'));
-  await ThinCounts(...args);
+  await thinCounts(...args);
   mongoose.disconnect();
 }
 

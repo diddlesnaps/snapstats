@@ -85,6 +85,10 @@ const SnapsSchema = new Schema({
     categories: {
         type: [String],
     },
+    isDaily: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 export const SnapsModel = model("Snaps", SnapsSchema);

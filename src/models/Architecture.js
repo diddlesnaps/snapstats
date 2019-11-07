@@ -16,6 +16,10 @@ const ArchitecturesSchema = new Schema({
         required: true,
         default: Date.now,
     },
+    isDaily: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 export const ArchitecturesModel = model("Architecture", ArchitecturesSchema);

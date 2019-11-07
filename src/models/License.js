@@ -16,6 +16,10 @@ const LicensesSchema = new Schema({
         required: true,
         default: Date.now,
     },
+    isDaily: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 export const LicensesModel = model("Licenses", LicensesSchema);

@@ -16,6 +16,10 @@ const ChannelsSchema = new Schema({
         required: true,
         default: Date.now,
     },
+    isDaily: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 export const ChannelsModel = model("Channels", ChannelsSchema);

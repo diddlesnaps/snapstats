@@ -26,7 +26,9 @@ export const collectRatings = async () => {
             }
         ));
 
-        await RatingsModel.bulkWrite(tasks)
+        if (!denysave) {
+            await RatingsModel.bulkWrite(tasks)
+        }
     } catch(err) {
         console.error(err.toString());
     }

@@ -1,4 +1,3 @@
-import {LastUpdatedModel} from '../models/LastUpdated';
 import {SnapsModel} from '../models/Snaps';
 
 import {promisify} from '../graphql/resolvers/promisify';
@@ -6,29 +5,19 @@ import {promisify} from '../graphql/resolvers/promisify';
 const denysave = process.env.denysave === 'true' ? true : false;
 
 export const thinSnaps = async () => {
-    const date = new Date();
-    const fromDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0);
-    console.log(`Thinning Snaps at ${date.toLocaleString()}`);
     try {
-        const lastUpdatedDoc = await LastUpdatedModel.findOne();
+        console.log(`Thinning Snaps at ${(new Date()).toLocaleString()}`);
 
-        let date = Date.now() - 3600;
-        let comparator = '$lt';
-        if (lastUpdatedDoc) {
-            date = lastUpdatedDoc.date;
-            comparator = '$ne';
-        }
-
-        const docsModel = await promisify(SnapsModel.find({
-            snapshot_date: { [comparator]: date },
+        const docs = await promisify(SnapsModel.find({
+            $not: { isDaily: true }
         }));
         if (!denysave) {
             await promisify(SnapsModel.deleteMany({
                 _id: { $in: docs.map(doc => doc._id) },
             }));
         }
+        console.log(`Snaps thinning completed at ${(new Date()).toLocaleString()}`);
     } catch (err) {
         console.error(err);
     }
-    console.log(`Snaps thinning completed at ${new Date().toLocaleString()}`);
 }

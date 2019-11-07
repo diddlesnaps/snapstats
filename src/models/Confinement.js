@@ -16,6 +16,10 @@ const ConfinementsSchema = new Schema({
         required: true,
         default: Date.now,
     },
+    isDaily: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 export const ConfinementsModel = model("Confinements", ConfinementsSchema);

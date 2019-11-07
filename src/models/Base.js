@@ -16,6 +16,10 @@ const BasesSchema = new Schema({
         required: true,
         default: Date.now,
     },
+    isDaily: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 export const BasesModel = model("Bases", BasesSchema);
