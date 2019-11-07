@@ -104,7 +104,7 @@ export const collectStats = (isDaily = false) => async () => {
                     .map(addIsDaily)
                 ).catch(err => console.error(`licenses: ${err.toString()}`)),
 
-                SnapsModel.bulkWrite(
+                SnapsModel.insertMany(
                     snaps.map(snap => (snap.name) ? snap : { ...snap, name: 'unset' })
                     .map(addDate('snapshot_date'))
                     .map(addIsDaily)
