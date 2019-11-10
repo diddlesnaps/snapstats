@@ -30,11 +30,11 @@ const dailyRatings = functions.runWith({
 }).pubsub.schedule('every 24 hours').onRun((...args) => entrypoint.getCollectRatings(...args));
 const dailyThinSnaps = functions.runWith({
     timeoutSeconds: 300,
-    memory: '256MB',
+    memory: '512MB',
 }).pubsub.schedule('48 23 * * *').onRun((...args) => entrypoint.getThinSnaps(...args));
 const dailyThinCounts = functions.runWith({
     timeoutSeconds: 300,
-    memory: '256MB',
+    memory: '512MB',
 }).pubsub.schedule('53 23 * * *').onRun((...args) => entrypoint.getThinCounts(...args));
 
 module.exports = {server, graphql, hourlyStats, dailyStats, dailyRatings, dailyThinSnaps, dailyThinCounts};
