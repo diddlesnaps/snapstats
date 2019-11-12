@@ -8,11 +8,8 @@ export const thinSnaps = async () => {
     try {
         console.log(`Thinning Snaps at ${(new Date()).toLocaleString()}`);
 
-        const docs = await promisify(SnapsModel.find({ isDaily: { $ne: true } }));
         if (!denysave) {
-            await promisify(SnapsModel.deleteMany({
-                _id: { $in: docs.map(doc => doc._id) },
-            }));
+            await promisify(SnapsModel.deleteMany({ isDaily: { $ne: true } }));
         }
         console.log(`Snaps thinning completed at ${(new Date()).toLocaleString()}`);
     } catch (err) {
