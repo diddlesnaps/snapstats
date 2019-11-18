@@ -7,12 +7,12 @@ const entrypoint = require(filename);
 
 const server = functions.runWith({
     timeoutSeconds: 45,
-    memory: '256MB',
+    memory: '128MB',
 }).https.onRequest((...args) => entrypoint.getApp(...args));
 
 const graphql = functions.runWith({
     timeoutSeconds: 30,
-    memory: '256MB',
+    memory: '128MB',
 }).https.onRequest((...args) => entrypoint.getGraphQL(...args));
 
 const hourlyStats = functions.runWith({
@@ -30,11 +30,11 @@ const dailyRatings = functions.runWith({
 }).pubsub.schedule('every 24 hours').onRun((...args) => entrypoint.getCollectRatings(...args));
 const dailyThinSnaps = functions.runWith({
     timeoutSeconds: 300,
-    memory: '512MB',
+    memory: '128MB',
 }).pubsub.schedule('48 23 * * *').onRun((...args) => entrypoint.getThinSnaps(...args));
 const dailyThinCounts = functions.runWith({
     timeoutSeconds: 300,
-    memory: '512MB',
+    memory: '128MB',
 }).pubsub.schedule('53 23 * * *').onRun((...args) => entrypoint.getThinCounts(...args));
 
 module.exports = {server, graphql, hourlyStats, dailyStats, dailyRatings, dailyThinSnaps, dailyThinCounts};

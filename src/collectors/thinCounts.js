@@ -26,10 +26,7 @@ export const thinCounts = async () => {
                 SnapCountsModel,
             ]) {
                 promises.push(
-                    model.find({ isDaily: { $ne: true } })
-                    .then(docs => promisify(model.deleteMany({
-                        _id: { $in: docs.map(doc => doc._id) },
-                    })))
+                    promisify(model.deleteMany({ isDaily: { $ne: true } }))
                 );
             }
 
