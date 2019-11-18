@@ -134,7 +134,7 @@
     {:then result}
         <title>{result.data.snapByName.title || result.data.snapByName.package_name}</title>
         <meta name="description"
-            content="{`${result.data.snapByName.title || result.data.snapByName.package_name} from the public Snap Store shown on SnapStats.org`}" />
+            content="{`${result.data.snapByName.title || result.data.snapByName.package_name}: ${result.data.snapByName.summary}`}" />
     
         {@html '<script type="application/ld+json">' +
             JSON.stringify({
@@ -200,8 +200,7 @@
                             Architectures supported:
                             {#if result.data.snapByName.architecture}
                                 {result.data.snapByName.architecture.join(', ')}
-                            {/if}
-                            {#if !result.data.snapByName.architecture}
+                            {:else}
                                 none
                             {/if}
                         </li>
