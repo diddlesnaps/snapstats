@@ -38,6 +38,7 @@
 </script>
 
 <script>
+    import('fslightbox');
     import { restore, query } from 'svelte-apollo';
 
 	export let cache;
@@ -254,7 +255,7 @@
                 {#each result.data.snapByName.screenshot_urls.filter(
                     url => !url.match(/\/banner(-icon)?_\w{7}.(png|jpg)$/)
                 ) as screenshot}
-                    <a href={`https://res.cloudinary.com/canonical/image/fetch/${screenshot}`}>
+                    <a data-fslightbox="screenshots" href={`https://res.cloudinary.com/canonical/image/fetch/${screenshot}`}>
                         <img loading="lazy" height="240"
                             src={`https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,h_240/${screenshot}`}
                             alt={`${result.data.snapByName.title || result.data.snapByName.package_name} screenshot`} />

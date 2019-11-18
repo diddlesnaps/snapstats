@@ -108,6 +108,7 @@
 {#await $data}
     <p>Loading...</p>
 {:then result}
+    <h2>Search results:</h2>
     {#if q}
         <SnapList snaps={result.data.findSnapsByName} />
         <Pagination count={result.data.findSnapsByNameCount.count} {limit} {offset} {getPageUrl} />

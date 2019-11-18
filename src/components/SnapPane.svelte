@@ -29,9 +29,11 @@
 }
 
 .icon {
+    grid-area: icon;
+}
+.icon img {
     width: 92px;
     height: 92px;
-    grid-area: icon;
 }
 
 .title {
@@ -47,10 +49,12 @@
 
 <div class='grid'>
     {#if snap.icon_url}
-        <picture class='icon'>
-            <source srcset={`${icon2x_url} 2x, ${icon_url} 1x`} />
-            <img width="92" height="92" src={icon_url} alt={`Icon of ${snap.title}`} loading="lazy" />
-        </picture>
+        <a class='icon' href={`snaps/${snap.package_name}`}>
+            <picture>
+                <source srcset={`${icon2x_url} 2x, ${icon_url} 1x`} />
+                <img width="92" height="92" src={icon_url} alt={`Icon of ${snap.title}`} loading="lazy" />
+            </picture>
+        </a>
     {/if}
     <p class='title'>
         <a href={`snaps/${snap.package_name}`}>

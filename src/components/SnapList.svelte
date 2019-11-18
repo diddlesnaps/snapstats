@@ -26,7 +26,7 @@
 
 <div>
     {#if snaps}
-    <ul class='snaps'>
+    <ul class='snaps' aria-label="Snap packages">
         {#each snaps as snap}
             <li>
                 <SnapPane {snap}/>
