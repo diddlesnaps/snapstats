@@ -148,6 +148,7 @@
 				</picture>
 			</a>
 		</li>
+		<li><a class='{segment === 'about' ? 'selected' : ''}' href='about'>about</a></li>
 		<li><a class='{segment === 'snaps' ? 'selected' : ''}' href='snaps'>snaps</a></li>
 		<li><a class='{segment === 'bases' ? 'selected' : ''}' href='bases'>bases</a></li>
 		<li><a class='{segment === 'channels' ? 'selected' : ''}' href='channels'>channels</a></li>
