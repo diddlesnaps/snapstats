@@ -74,6 +74,12 @@
     let getPageUrl = (page) => `snaps?q=${q}&offset=${limit*page}&limit=${limit}`;
 
     $: data.refetch({q, offset, limit});
+
+    function submit(e) {
+        firebase.analytics().logEvent('search', {
+            search_term: this.querySelector('input[name=q]').value,
+        });
+    }
 </script>
 
 <style>
@@ -96,7 +102,7 @@
 
 <h1>Search the snap store</h1>
 <div class='search'>
-    <form method="get">
+    <form method="get" on:submit={submit}>
         <input name="offset" type="hidden" value='0' />
         <input name="limit" type="hidden" value={limit} />
         <label for="search">Enter a term to search</label>

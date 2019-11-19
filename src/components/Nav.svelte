@@ -9,24 +9,39 @@
         share_enabled = !!navigator.share;
 	});
 	
-	function showNotice(message) {
-		let notice = document.createElement('div');
-		notice.innerText = message;
-		notice.style.position = 'absolute';
-		notice.style.top = '56px';
-		notice.style.left = '50%';
-		notice.style.width = '500px';
-		notice.style.marginLeft = '-250px';
-		notice.style.backgroundColor = '#cfe';
-		notice.style.padding = '1.5rem';
-		notice.style.fontSize = '1.6rem';
-		notice.style.zIndex = 2;
-		document.body.prepend(notice);
-		notice.focus();
+	function showNotice(message, isError = false) {
+		return function(error = null) {
+			let notice = document.createElement('div');
+			notice.innerText = message;
+			notice.style.position = 'absolute';
+			notice.style.top = '56px';
+			notice.style.left = '50%';
+			notice.style.width = '500px';
+			notice.style.marginLeft = '-250px';
+			notice.style.backgroundColor = '#cfe';
+			notice.style.padding = '1.5rem';
+			notice.style.fontSize = '1.6rem';
+			notice.style.zIndex = 2;
+			document.body.prepend(notice);
+			notice.focus();
 
-		window.setTimeout(() => {
-			document.body.removeChild(notice);
-		}, 20000);
+			window.setTimeout(() => {
+				document.body.removeChild(notice);
+			}, 20000);
+
+			if (isError) {
+				console.log('Error sharing', error);
+			}
+		}
+	}
+
+	function logShare(url) {
+		return function() {
+			firebase.analytics().logEvent('share', {
+				'content_type': 'page',
+				'item_id': url,
+			});
+		};
 	}
 
     function share(e) {
@@ -40,21 +55,13 @@
                 text,
                 url,
             })
-            .then(() => console.log('Successful share'))
-            .catch((error) => {
-				showNotice('An error occurred while trying to share this page...');
-				console.log('Error sharing', error);
-			});
+            .then(logShare(url))
+            .catch(showNotice('An error occurred while trying to share this page...', true));
         } else {
 			navigator.clipboard.writeText(`${title}: ${text} (${url})`)
-			.then(() => {
-				showNotice(`The URL for this page has been copied to your device's Clipboard. Use the 'paste' feature of your device to share it with a friend or another app.`);
-				console.log('Successful copy to clipboard');
-			})
-			.catch((error) => {
-				showNotice('An error occurred while trying to share this page...');
-				console.log('Error copying to clipboard', error);
-			});
+			.then(logShare(url))
+			.then(showNotice(`The URL for this page has been copied to your device's Clipboard. Use the 'paste' feature of your device to share it with a friend or another app.`, false))
+			.catch(showNotice('An error occurred while trying to share this page...', true));
 		}
     }
 </script>
