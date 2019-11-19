@@ -43,6 +43,9 @@ const getApp = async (...args) => {
   const {default: compression} = await import('compression');
   const sapper = await import('@sapper/server');
 
+  const { JSDOM } = await import('jsdom');
+  global.window = (new JSDOM('')).window;
+
   const app = express() // You can also use Express
 
   app.use(compression({ threshold: 0 }));

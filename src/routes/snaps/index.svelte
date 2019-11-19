@@ -58,14 +58,16 @@
 </script>
 
 <script>
-    import { restore, query } from 'svelte-apollo';
+	import { setClient, restore, query } from 'svelte-apollo';
 
     export let q;
     export let offset;
     export let limit;
-    export let cache;
+	export let cache;
 
 	restore(client, q ? searchQuery : latestQuery, cache.data);
+	setClient(client);
+
     let data = query(client, {
         query: q ? searchQuery : latestQuery,
         variables: {q, offset, limit}

@@ -28,22 +28,45 @@
     export async function preload(page, session) {
         const {slug} = page.params;
 
-        return {
-            cache: await client.query({
-                query: q,
-                variables: {slug},
-            })
-        };
+        return { cache: await client.query({ query: q, variables: {slug} }) };
     }
 </script>
 
 <script>
-    import('fslightbox');
-    import { restore, query } from 'svelte-apollo';
+    if (process.browser) {
+        import('fslightbox');
+    }
+    import marked from 'marked';
+    import createDOMPurify from 'dompurify';
+    const DOMPurify = createDOMPurify(window);
+    const DOMPurifyOpts = {
+        ALLOWED_TAGS: [
+            'a',
+            'p', '#text', 'br', 'code',
+            'em', 'strong', 'b', 'i',
+            'li', 'ul', 'ol',
+            'table', 'tr', 'td', 'tbody', 'thead',
+            'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+        ],
+        KEEP_CONTENT: true,
+    };
+
+    DOMPurify.addHook('afterSanitizeAttributes', function(node) {
+        if (node.hasAttribute('href')) {
+            const href = node.getAttribute('href');
+            if (href.startsWith('.') || href.startsWith('#')) {
+                node.removeAttribute('href');
+            }
+            node.setAttribute('rel', 'nofollow ugc');
+        }
+    });
+
+	import { setClient, restore, query } from 'svelte-apollo';
 
 	export let cache;
 
 	restore(client, q, cache.data);
+	setClient(client);
 	let data = query(client, { query: q });
 </script>
 
@@ -246,7 +269,7 @@
             </aside>
         {/if}
 
-        {@html result.data.snapByName.description}
+        {@html DOMPurify.sanitize(marked(result.data.snapByName.description), DOMPurifyOpts)}
 
         {#if result.data.snapByName.screenshot_urls.filter(
             url => !url.match(/\/banner(-icon)?_\w{7}.(png|jpg)$/)

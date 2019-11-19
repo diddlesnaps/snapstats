@@ -50,11 +50,12 @@
 </script>
 
 <script>
-	import { restore, query } from 'svelte-apollo';
+	import { setClient, restore, query } from 'svelte-apollo';
 
 	export let cache;
 
 	restore(client, q, cache.data);
+	setClient(client);
 	let data = query(client, { query: q });
 </script>
 

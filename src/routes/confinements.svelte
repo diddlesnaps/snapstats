@@ -4,8 +4,8 @@
 	import Timeline from '../components/Timeline.svelte';
 
 	import client from '../apollo';
+	import { gql } from 'apollo-boost';
 
-	import { gql } from 'apollo-boost'; 
 	const q = gql`
 		query {
 			confinementsByDate(query:{}){
@@ -31,11 +31,12 @@
 </script>
 
 <script>
-	import { restore, query } from 'svelte-apollo';
+	import { setClient, restore, query } from 'svelte-apollo';
 
 	export let cache;
 
 	restore(client, q, cache.data);
+	setClient(client);
 	let data = query(client, { query: q });
 </script>
 
