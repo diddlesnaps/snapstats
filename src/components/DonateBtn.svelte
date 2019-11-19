@@ -1,6 +1,6 @@
 <script>
     function logConversion(e) {
-        firebase.analytics().logEvent('donate-banner-click');
+        firebase.analytics().logEvent('donate_banner_click');
     }
 </script>
 
