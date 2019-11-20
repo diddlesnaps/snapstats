@@ -76,7 +76,7 @@ const getCollectStats = (isDaily) => async (...args) => {
 
 const getCollectRatings = async (...args) => {
   const mongoose = await connectDB();
-  const {collectRatings} = (await import('./collectors/collectStats'));
+  const {collectRatings} = (await import('./collectors/collectRatings'));
   await collectRatings(...args);
   mongoose.disconnect();
 }

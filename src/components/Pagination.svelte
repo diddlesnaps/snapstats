@@ -1,7 +1,7 @@
 <script>
     import Paginator from 'paginator';
 
-    export let getPageUrl = (i) => '#';
+    export let getPageUrl = () => '#';
 
     export let limit;
     export let offset
