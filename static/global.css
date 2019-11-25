@@ -1,3 +1,20 @@
+@keyframes outline-blink {
+	0%,49% {
+		outline: 2px solid #f00;
+	}
+	50%,100% {
+		outline: 0;
+	}
+}
+@keyframes pseudo-outline-blink {
+	0%,49% {
+		box-shadow: 0 0 0 2px #fff, 0 0 0 4px #f00;
+	}
+	50%,100% {
+		box-shadow: 0 0 0 2px #fff, 0 0 0 4px #fff;
+	}
+}
+
 body {
 	margin: 0;
 	font-family: Roboto, -apple-system, BlinkMacSystemFont, Segoe UI, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
@@ -19,6 +36,15 @@ h1 {
 a {
 	color: inherit;
 }
+a:focus {
+	animation: 2s outline-blink infinite;
+	outline-offset: 2px;
+	position: relative;
+}
+
+::-moz-focus-inner {
+	border: 0;
+}
 
 code {
 	font-family: menlo, inconsolata, monospace;
@@ -37,4 +63,9 @@ code {
 
 input {
 	font-family: Roboto, -apple-system, BlinkMacSystemFont, Segoe UI, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+	border: 2px solid #000;
+}
+input:focus {
+	animation: 1.2s pseudo-outline-blink infinite;
+	outline: 0;
 }

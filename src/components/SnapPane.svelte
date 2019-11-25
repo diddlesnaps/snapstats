@@ -12,20 +12,11 @@
     display: grid;
     margin: 1em 0;
     gap: 0.4em 1em;
-    grid-template-columns: 1fr;
-    grid-template-rows: auto auto auto;
+    grid-template-columns: 92px 1fr;
+    grid-template-rows: auto auto;
     grid-template-areas:
-        "icon"
-        "title"
-        "summary";
-}
-@media only screen and (min-width: 280px) {
-    .grid {
-        grid-template-columns: 92px 1fr;
-        grid-template-areas:
-            "icon title"
-            "icon summary";
-    }
+        "icon title"
+        "icon summary";
 }
 
 .icon {

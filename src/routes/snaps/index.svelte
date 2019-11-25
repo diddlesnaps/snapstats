@@ -87,13 +87,12 @@
 <style>
 .search input {
     border-radius: 2rem;
-    border: 0;
-    box-shadow: 0px 2px 10px -2px;
+    box-sizing: border-box;
     display: block;
     font-size: 1.5rem;
-    margin: 6rem 4rem;
+    margin: 4rem 0;
     padding: 1rem 2rem;
-    width: calc(100% - 8rem);
+    width: 100%;
 }
 </style>
 

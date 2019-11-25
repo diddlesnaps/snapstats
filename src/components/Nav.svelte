@@ -109,7 +109,7 @@
 		box-sizing: border-box;
 	}
 	a:focus {
-		border: 2px solid red;
+		outline-offset: -2px;
 	}
 
 	input.sharebtn {
