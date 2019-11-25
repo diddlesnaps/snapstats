@@ -42,7 +42,7 @@
     const DOMPurifyOpts = {
         ALLOWED_TAGS: [
             'a',
-            'p', '#text', 'br', 'code',
+            'p', '#text', 'br', 'code', 'pre',
             'em', 'strong', 'b', 'i',
             'li', 'ul', 'ol',
             'table', 'tr', 'td', 'tbody', 'thead',
