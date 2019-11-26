@@ -31,6 +31,6 @@ const dailyRatings = functions.runWith({
 const dailyThinStats = functions.runWith({
     timeoutSeconds: 300,
     memory: '128MB',
-}).pubsub.schedule('48 23 * * *').onRun((...args) => entrypoint.getThinSnaps(...args));
+}).pubsub.schedule('48 23 * * *').onRun((...args) => entrypoint.getThinStats(...args));
 
-module.exports = {server, graphql, hourlyStats, dailyStats, dailyRatings, dailyThinSnaps, dailyThinCounts};
+module.exports = {server, graphql, hourlyStats, dailyStats, dailyRatings, dailyThinStats};

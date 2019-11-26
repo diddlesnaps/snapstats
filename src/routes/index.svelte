@@ -94,14 +94,24 @@
 {:then result}
 	<h1>Total snaps count</h1>
 	<p>
-		There are <strong>{result.data.snapCountsByDate[0].snapCounts[0].total || 0}</strong> snaps currently in the store, of which <strong>{(result.data.snapCountsByDate[0].snapCounts[0].total || 0) - (result.data.snapCountsByDate[0].snapCounts[0].filtered || 0)}</strong> appear to be test or hello-world snaps. Test and hello-world snaps are identified by a name that begins with <code>hello-</code> or <code>test-</code>, or a name that ends with <code>-test</code>. All other statistics on this site exclude those test or hello-world snaps.
+		{#if (result.data.snapCountsByDate.length > 0 && result.data.snapCountsByDate[0].snapCounts.length > 0)}
+			There are <strong>{result.data.snapCountsByDate[0].snapCounts[0].total || 0}</strong> snaps currently in the store, of which <strong>{(result.data.snapCountsByDate[0].snapCounts[0].total || 0) - (result.data.snapCountsByDate[0].snapCounts[0].filtered || 0)}</strong> appear to be test or hello-world snaps. Test and hello-world snaps are identified by a name that begins with <code>hello-</code> or <code>test-</code>, or a name that ends with <code>-test</code>. All other statistics on this site exclude those test or hello-world snaps.
+		{:else}
+			There are an unknown number of snaps currently in the store.
+		{/if}
 	</p>
 
 	<h2>The six most-recently added snaps</h2>
 	<SnapList snaps={result.data.snapsByDate} />
 
 	<h2>Developers</h2>
-	<p>There are <strong>{result.data.developerCountsByDate[0].developerCounts[0].total || 0}</strong> developers who have published at least one snap.</p>
+	<p>
+		{#if (result.data.developerCountsByDate.length > 0 && result.data.developerCountsByDate[0].developerCounts.length > 0)}
+			There are <strong>{result.data.developerCountsByDate[0].developerCounts[0].total || 0}</strong> developers who have published at least one snap.
+		{:else}
+			There are an unknown number of developers who have published at least one snap.
+		{/if}		
+	</p>
 	<h3>Developer Averages</h3>
 	<p>
 		Developers with published snaps have each published an average (<a href="https://en.wikipedia.org/wiki/Arithmetic_mean">mean</a>) of <strong>{result.data.developerCountsByDate[0].developerCounts[0].mean || 0}</strong> snaps.

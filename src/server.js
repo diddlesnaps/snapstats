@@ -81,16 +81,10 @@ const getCollectRatings = async (...args) => {
   mongoose.disconnect();
 }
 
-const getThinSnaps = async (...args) => {
+const getThinStats = async (...args) => {
   const mongoose = await connectDB();
-  const {thinSnaps} = (await import('./collectors/thinSnaps'));
+  const {thinSnaps} = (await import('./collectors/thinStats'));
   await thinSnaps(...args);
-  mongoose.disconnect();
-}
-const getThinCounts = async (...args) => {
-  const mongoose = await connectDB();
-  const {thinCounts} = (await import('./collectors/thinCounts'));
-  await thinCounts(...args);
   mongoose.disconnect();
 }
 
@@ -103,6 +97,5 @@ export {
   getGraphQL,
   getCollectStats,
   getCollectRatings,
-  getThinSnaps,
-  getThinCounts,
+  getThinStats,
 };
