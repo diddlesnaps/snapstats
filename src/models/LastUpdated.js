@@ -6,9 +6,10 @@ const LastUpdatedSchema = new Schema({
         required: true,
         default: Date.now,
     },
-    isDaily: {
-        type: Boolean,
-        default: false,
+    dailyDate: {
+        type: Date,
+        required: true,
+        default: Date.now,
     },
 });
 

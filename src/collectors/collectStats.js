@@ -3,20 +3,14 @@ import {BasesModel} from '../models/Base';
 import {ChannelsModel} from '../models/Channel';
 import {ConfinementsModel} from '../models/Confinement';
 import {DeveloperCountsModel} from '../models/DeveloperCount';
-import {LastUpdatedModel} from '../models/LastUpdated';
 import {LicensesModel} from '../models/License';
 import {SnapCountsModel} from '../models/SnapCount';
 import {SnapsModel} from '../models/Snaps';
 
 import getStats from '../snapstore-api';
+import {updateLastUpdated} from './updateLastUpdated';
 
 const denysave = process.env.denysave === 'true' ? true : false;
-
-const updateLastUpdated = async (date) => {
-    const lastUpdatedDoc = (await LastUpdatedModel.findOne()) || new LastUpdatedModel({date});
-    lastUpdatedDoc.date = date;
-    await lastUpdatedDoc.save();
-};
 
 export const collectStats = (isDaily = false) => async () => {
     const date = Date.now();
@@ -122,7 +116,7 @@ export const collectStats = (isDaily = false) => async () => {
             ];
 
             await Promise.all(promises);
-            await updateLastUpdated(date);
+            await updateLastUpdated(date, isDaily);
         }
         // console.debug({
         //     architectures,
