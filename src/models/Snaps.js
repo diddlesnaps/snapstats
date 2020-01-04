@@ -57,7 +57,7 @@ const SnapsSchema = new Schema({
         type: String,
         required: true,
     },
-    developer_validation: {
+    developer_validation: { // 'unproven' or 'verified'
         type: String,
     },
     publisher: { // human-readable

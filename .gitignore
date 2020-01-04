@@ -7,3 +7,5 @@ firebase-debug.log
 /__sapper__/
 .runtimeconfig.json
 .firebase
+.envrc
+

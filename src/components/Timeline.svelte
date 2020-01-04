@@ -150,6 +150,8 @@
 </style>
 
 <svelte:window on:resize={render} />
+
+<h3>{title}</h3>
 <svg bind:this={chart} width="1000" height="500" class="chart"></svg>
 <div class="legend">
     <ul>

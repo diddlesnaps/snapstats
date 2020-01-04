@@ -10,6 +10,8 @@
                 contact
                 date_published
                 description
+                developer_name
+                developer_validation
                 icon_url
                 last_updated
                 license
@@ -150,6 +152,10 @@
     margin: 0 1rem;
     padding: 0;
 }
+
+.verified {
+    color: #2a2;
+}
 </style>
 
 <svelte:head>
@@ -167,7 +173,7 @@
                 "datePublished": new Date(result.data.snapByName.date_published).toISOString(),
                 "dateModified": new Date(result.data.snapByName.last_updated).toISOString(),
                 "name" : result.data.snapByName.title || result.data.snapByName.package_name,
-                "publisher": result.data.snapByName.publisher,
+                "publisher": result.data.snapByName.developer_name || result.data.snapByName.publisher,
                 "applicationCategory": result.data.snapByName.categories,
                 "softwareVersion": result.data.snapByName.version,
                 "description": result.data.snapByName.summary,
@@ -214,6 +220,9 @@
             result.data.snapByName.license ||
             result.data.snapByName.website ||
             result.data.snapByName.contact ||
+            result.data.snapByName.publisher ||
+            result.data.snapByName.developer_name ||
+            result.data.snapByName.developer_validation ||
             result.data.snapByName.date_published ||
             result.data.snapByName.last_updated
         }
@@ -247,6 +256,14 @@
                     {#if result.data.snapByName.contact}
                         <li>
                             Snap support contact: <a href={result.data.snapByName.contact}>{result.data.snapByName.contact}</a>
+                        </li>
+                    {/if}
+                    {#if result.data.snapByName.developer_name || result.data.snapByName.publisher}
+                        <li>
+                            Published to the Snap Store by {result.data.snapByName.developer_name || result.data.snapByName.publisher}
+                            {#if result.data.snapByName.developer_validation === 'verified'}
+                                <span class="verified">✔️️ (Author is verified)</span>
+                            {/if}
                         </li>
                     {/if}
                     {#if result.data.snapByName.date_published}
