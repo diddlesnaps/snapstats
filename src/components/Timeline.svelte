@@ -9,8 +9,7 @@
     let chart;
     let legend = '';
 
-    let svg, x, y, xAxis, yAxis, dim, chartWrapper, line, width, height, margin = {};
-    let paths = [], colors = [], colorsByName = {};
+    let colors = [];
 
     const twister = MersenneTwister19937.seed(823212621);
 
