@@ -22,7 +22,7 @@ export async function get(req, res, next) {
         { url: '/licenses', changefreq: EnumChangefreq.DAILY },
     ];
     try {
-        let {data} = await await client.query({ query: q });
+        let {data} = await client.query({ query: q });
         if (!data) {
             return res.status(500).end();
         }
