@@ -6,7 +6,7 @@ on:
     paths:
       - .firebaserc
       - firebase.json
-      - index-prod.js
+      - index.js
       - package*.json
       - rollup.config.js
       - src/**
