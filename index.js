@@ -7,12 +7,12 @@ const entrypoint = require(filename);
 
 const server = functions.runWith({
     timeoutSeconds: 45,
-    memory: '256MB',
+    memory: '512MB',
 }).https.onRequest((...args) => entrypoint.getApp(...args));
 
 const graphql = functions.runWith({
     timeoutSeconds: 30,
-    memory: '256MB',
+    memory: '512MB',
 }).https.onRequest((...args) => entrypoint.getGraphQL(...args));
 
 const hourlyStats = functions.runWith({
