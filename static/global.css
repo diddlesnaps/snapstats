@@ -73,3 +73,21 @@ input:focus {
 	animation: 1.2s pseudo-outline-blink infinite;
 	outline: 0;
 }
+
+
+.legend ul {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-around;
+}
+.legend-item {
+	list-style: none;
+	width: 10rem;
+	padding-left: 0;
+}
+.legend-item .line {
+	display: inline-block;
+	width: 2rem;
+	height: 2px;
+	vertical-align: middle;
+}
