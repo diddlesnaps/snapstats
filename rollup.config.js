@@ -22,7 +22,7 @@ export default {
 			replace({
 				'process.browser': true,
 				'process.env.NODE_ENV': JSON.stringify(mode),
-				'__fetch': 'fetch',
+				'__fetch': 'window.fetch',
 				'http://localhost:3000/graphql': dev ? 'http://localhost:3000/graphql' : 'https://snapstats.org/graphql',
 			}),
 			svelte({
