@@ -6,36 +6,54 @@ const snapsByDateFn = (snapshot_date) => {
     return SnapsModel.find({ snapshot_date });
 };
 
-const searchSnapsFn = (args, snapshot_date) => {
+const searchSnapsByBaseFn = (args, snapshot_date) => {
+    const base = escapeRegExp(args.base)
+    return searchSnapsFn({
+        base_snap: { $regex: base, $options: 'i' }
+    }, snapshot_date);
+};
+const searchSnapsByNameFn = (args, snapshot_date) => {
     const name = escapeRegExp(args.name)
-    return SnapsModel.find({
-        snapshot_date,
+    return searchSnapsFn({
         $or: [
             { name: { $regex: name, $options: 'i' } },
             { title: { $regex: name, $options: 'i' } },
         ],
+    }, snapshot_date);
+};
+const searchSnapsFn = (args, snapshot_date) => {
+    return SnapsModel.find({
+        snapshot_date,
+        ...args,
     });
+};
+
+const findSnapsQueryFn = (searchHandlerFn) => async (_, args) => {
+    const updated = await LastUpdatedModel.findOne({});
+    if (!updated) {
+        return [];
+    }
+    return await searchHandlerFn(args, updated.date)
+    .skip(args.query.offset || 0)
+    .limit(args.query.limit || 6)
+}
+
+const findSnapsCountFn = (searchSnapsFn) => async (_, args) => {
+    const updated = await LastUpdatedModel.findOne({});
+    if (!updated) {
+        return [];
+    }
+    return await searchSnapsFn(args, updated.date)
+    .skip(args.query.offset || 0)
+    .limit(args.query.limit || 6)
 };
 
 export default {
     Query: {
-        findSnapsByName: async (_, args) => {
-            const updated = await LastUpdatedModel.findOne({});
-            if (!updated) {
-                return [];
-            }
-            return await searchSnapsFn(args, updated.date)
-            .skip(args.query.offset || 0)
-            .limit(args.query.limit || 6)
-        },
-        findSnapsByNameCount: async (_, args) => {
-            const updated = await LastUpdatedModel.findOne({});
-            if (!updated) {
-                return [];
-            }
-            const count = await searchSnapsFn(args, updated.date).countDocuments();
-            return {count}
-        },
+        findSnapsByName: findSnapsQueryFn(searchSnapsByNameFn),
+        findSnapsByNameCount: findSnapsCountFn(searchSnapsByNameFn),
+        findSnapsByBase: findSnapsQueryFn(searchSnapsByBaseFn),
+        findSnapsByBaseCount: findSnapsCountFn(searchSnapsByBaseFn),
         snapByName: async (_, args) => {
             const updated = await LastUpdatedModel.findOne({});
             if (!updated) {

@@ -30,6 +30,8 @@ export const schema = `
     type Query {
         findSnapsByName(name: String!, query: Pagination!): [Snap]
         findSnapsByNameCount(name: String!): PaginationCount
+        findSnapsByBase(base: String!, query: Pagination!): [Snap]
+        findSnapsByBaseCount(base: String!): PaginationCount
         snapByName(name: String!, query: Pagination): Snap
         snapById(snap_id: String!, query: Pagination): Snap
         snapsByDate(query: Pagination!): [Snap]
