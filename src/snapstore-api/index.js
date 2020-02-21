@@ -19,7 +19,7 @@ export default () => {
             return newCarry;
         }, []).map((snap) => ({
             ...snap,
-            base_snap: snap.base,
+            base_snap: snap.base || 'core',
         }));
 
         const architecture_counts = getCounts('architecture', non_hello_or_test_snaps);
@@ -38,9 +38,8 @@ export default () => {
         Object.keys(base_counts).forEach((key) => bases_total += base_counts[key]);
 
         const mapCounts = (cnts) => (key) => ({name: key, count: cnts[key]});
-        const fixCore = (fn) => (key) => (key === 'undefined') ? fn('core') : fn(key);
 
-        const bases = sort(Object.keys(base_counts).map(fixCore(mapCounts(base_counts))));
+        const bases = sort(Object.keys(base_counts).map(mapCounts(base_counts)));
         const architectures = sort(Object.keys(architecture_counts).map(mapCounts(architecture_counts)));
         const licenses = sort(Object.keys(license_counts).map(mapCounts(license_counts)));
         const confinements = sort(Object.keys(confinement_counts).map(mapCounts(confinement_counts)));
