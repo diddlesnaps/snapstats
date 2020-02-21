@@ -37,11 +37,10 @@ export default () => {
         let bases_total = 0;
         Object.keys(base_counts).forEach((key) => bases_total += base_counts[key]);
 
-        const mapCounts = (cnts) => (key) => { return {name: key, count: cnts[key]} }
+        const mapCounts = (cnts) => (key) => ({name: key, count: cnts[key]});
+        const fixCore = (fn) => (key) => (key === 'undefined') ? fn('core') : fn(key);
 
-        let bases = Object.keys(base_counts).map(mapCounts(base_counts));
-        bases.push({ name: 'core', count: non_hello_or_test_snaps.length - bases_total });
-        bases = sort(bases);
+        const bases = sort(Object.keys(base_counts).map(fixCore(mapCounts(base_counts))));
         const architectures = sort(Object.keys(architecture_counts).map(mapCounts(architecture_counts)));
         const licenses = sort(Object.keys(license_counts).map(mapCounts(license_counts)));
         const confinements = sort(Object.keys(confinement_counts).map(mapCounts(confinement_counts)));
