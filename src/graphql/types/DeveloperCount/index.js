@@ -19,6 +19,10 @@ export const schema = `
         mean: Float!
     }
 
+    type DeveloperNames {
+        _id: String!
+    }
+
     type Query {
         developerCount(_id: ID!): DeveloperCount
         developerCountCount: PaginationCount
@@ -27,7 +31,8 @@ export const schema = `
         developerCountTimeline(from: Date): [DeveloperCountTimeline]
         developerCountTimelineCount: PaginationCount
 
-        validatedDeveloperCount: PaginationCount
+        verifiedDevelopers: [DeveloperNames]
+        verifiedDeveloperCount: PaginationCount
     }
 
     type Mutation {

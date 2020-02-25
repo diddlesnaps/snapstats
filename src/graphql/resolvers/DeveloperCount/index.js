@@ -50,6 +50,22 @@ export default {
             { '$sort': { '_id': 1 } },
         ])),
 
+        verifiedDevelopers: async () => {
+            const updated = await LastUpdatedModel.findOne({});
+            if (!updated) {
+                return {count: 0};
+            }
+            const snapshot_date = updated.date;
+            return promisify(SnapsModel.aggregate([
+                { $match: {
+                    snapshot_date,
+                    developer_validation: 'verified',
+                } },
+                { $group: {
+                    _id: '$developer_name',
+                } },
+            ]))
+        },
         validatedDeveloperCount: async (_, args) => {
             const updated = await LastUpdatedModel.findOne({});
             if (!updated) {
