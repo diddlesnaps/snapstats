@@ -6,27 +6,52 @@ const snapsByDateFn = (snapshot_date) => {
     return SnapsModel.find({ snapshot_date });
 };
 
-const searchSnapsByBaseFn = (args, snapshot_date) => {
-    const base = escapeRegExp(args.base)
-    return searchSnapsFn({
-        base_snap: { $regex: base, $options: 'i' }
-    }, snapshot_date);
-};
-const searchSnapsByNameFn = (args, snapshot_date) => {
-    const name = escapeRegExp(args.name)
-    return searchSnapsFn({
-        $or: [
-            { name: { $regex: name, $options: 'i' } },
-            { title: { $regex: name, $options: 'i' } },
-        ],
-    }, snapshot_date);
-};
 const searchSnapsFn = (args, snapshot_date) => {
-    return SnapsModel.find({
-        snapshot_date,
-        ...args,
-    });
-};
+    let query = { snapshot_date, $and: [] }
+
+    if (args.name) {
+        const name = escapeRegExp(args.name)
+
+        query.$and.push({$or: [
+            {name: {$regex: name, $options: 'i'}},
+            {title: {$regex: name, $options: 'i'}},
+            {package_name: {$regex: name, $options: 'i'}},
+        ]})
+    }
+
+    if (args.publisherOrDeveloper) {
+        const publisherOrDeveloper = escapeRegExp(args.publisherOrDeveloper)
+
+        let publisherOrDeveloperQuery = []
+        publisherOrDeveloperQuery.push({publisher: {$regex: publisherOrDeveloper, $options: 'i'}})
+        publisherOrDeveloperQuery.push({developer_name: {$regex: publisherOrDeveloper, $options: 'i'}})
+
+        query.$and.push({$or: [publisherOrDeveloperQuery]})
+    }
+
+    if (args.base) {
+        query.$and.push({base_snap: args.base})
+    }
+    if (args.architecture) {
+        query.$and.push({architecture: args.architecture})
+    }
+    if (args.categories) {
+        query.$and.push({categories: {$in: args.categories}})
+    }
+    if (args.license) {
+        query.$and.push({license: args.license})
+    }
+
+    if (typeof args.developerValidated !== 'undefined') {
+        if (args.developerValidated === true) {
+            query.$and.push({developer_validation: 'verified'})
+        } else {
+            query.$and.push({developer_validation: 'unproven'})
+        }
+    }
+
+    return SnapsModel.find(query);
+}
 
 const findSnapsQueryFn = (searchHandlerFn) => async (_, args) => {
     const updated = await LastUpdatedModel.findOne({});
@@ -43,17 +68,19 @@ const findSnapsCountFn = (searchSnapsFn) => async (_, args) => {
     if (!updated) {
         return [];
     }
-    return await searchSnapsFn(args, updated.date)
-    .skip(args.query.offset || 0)
-    .limit(args.query.limit || 6)
-};
+    return {
+        count: (await searchSnapsFn(args, updated.date).countDocuments()) || 0,
+    }
+}
 
 export default {
     Query: {
-        findSnapsByName: findSnapsQueryFn(searchSnapsByNameFn),
-        findSnapsByNameCount: findSnapsCountFn(searchSnapsByNameFn),
-        findSnapsByBase: findSnapsQueryFn(searchSnapsByBaseFn),
-        findSnapsByBaseCount: findSnapsCountFn(searchSnapsByBaseFn),
+        findSnaps: findSnapsQueryFn(searchSnapsFn),
+        findSnapsCount: findSnapsCountFn(searchSnapsFn),
+        findSnapsByName: findSnapsQueryFn(searchSnapsFn),
+        findSnapsByNameCount: findSnapsCountFn(searchSnapsFn),
+        findSnapsByBase: findSnapsQueryFn(searchSnapsFn),
+        findSnapsByBaseCount: findSnapsCountFn(searchSnapsFn),
         snapByName: async (_, args) => {
             const updated = await LastUpdatedModel.findOne({});
             if (!updated) {

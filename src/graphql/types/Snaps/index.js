@@ -28,6 +28,8 @@ export const schema = `
     }
 
     type Query {
+        findSnaps(name: String, publisherOrDeveloper: String, base: String, architecture: String, categories: String, license: String, developerValidated: Boolean, query: Pagination!): [Snap]
+        findSnapsCount(name: String, publisherOrDeveloper: String, base: String, architecture: String, categories: String, license: String, developerValidated: Boolean): PaginationCount
         findSnapsByName(name: String!, query: Pagination!): [Snap]
         findSnapsByNameCount(name: String!): PaginationCount
         findSnapsByBase(base: String!, query: Pagination!): [Snap]
