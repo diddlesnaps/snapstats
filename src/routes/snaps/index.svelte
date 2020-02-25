@@ -101,6 +101,8 @@
     <meta name="description" content="Search the Snap Store listings on SnapStats.org" />
 
     <meta property="og:site_name" content="Snapstats.org" />
+	<meta property="fb:appid" content="2603641926537298" />
+	<meta property="og:type" content="website" />
     <meta property="og:url" content="https://snapstats.org/snaps" />
     <meta property="og:title" content="Search the Snap Store" />
     <meta property="og:description" content="Search the Snap Store listings on SnapStats.org" />

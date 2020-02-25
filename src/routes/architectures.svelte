@@ -69,6 +69,8 @@
 	<meta name="description" content="Statistics about Snap Package supported architecture distribution within the Snap Store for Linux" />
 
 	<meta property="og:site_name" content="Snapstats.org" />
+	<meta property="fb:appid" content="2603641926537298" />
+	<meta property="og:type" content="website" />
     <meta property="og:url" content="https://snapstats.org/snaps" />
     <meta property="og:title" content="Snap Store architectures statistics | Snapstats.org" />
     <meta property="og:description" content="Statistics about Snap Package supported architecture distribution within the Snap Store for Linux" />
