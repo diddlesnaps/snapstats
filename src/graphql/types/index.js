@@ -5,7 +5,7 @@ import { schema as BaseSchema } from "./Base";
 import { schema as ChannelSchema } from "./Channel";
 import { schema as ConfinementSchema } from "./Confinement";
 import { schema as DateTypeSchema } from "./Date";
-import { schema as DeveloperCountSchema } from "./DeveloperCount";
+import { schema as DevelopersSchema } from "./Developers";
 import { schema as LicenseSchema } from "./License";
 import { schema as PaginationSchema } from "./Pagination";
 import { schema as PriceTypeSchema } from "./Price";
@@ -18,7 +18,7 @@ const _typeDefs = [
     ChannelSchema,
     ConfinementSchema,
     DateTypeSchema,
-    DeveloperCountSchema,
+    DevelopersSchema,
     LicenseSchema,
     PaginationSchema,
     PriceTypeSchema,

@@ -5,7 +5,7 @@ import Base from "./Base";
 import Channel from "./Channel";
 import Confinement from "./Confinement";
 import DateType from "./Date";
-import DeveloperCount from "./DeveloperCount";
+import Developers from "./Developers";
 import License from "./License";
 import SnapCount from "./SnapCount";
 import Snaps from "./Snaps";
@@ -16,7 +16,7 @@ const resolvers = [
     Channel,
     Confinement,
     DateType,
-    DeveloperCount,
+    Developers,
     License,
     SnapCount,
     Snaps,

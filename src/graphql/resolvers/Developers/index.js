@@ -66,7 +66,7 @@ export default {
                 } },
             ]))
         },
-        validatedDeveloperCount: async (_, args) => {
+        verifiedDeveloperCount: async (_, args) => {
             const updated = await LastUpdatedModel.findOne({});
             if (!updated) {
                 return {count: 0};
