@@ -167,7 +167,7 @@
         <meta name="description" content="{result.data.snapByName.summary}" />
 
         <meta property="og:site_name" content="Snapstats.org" />
-	    <meta property="fb:appid" content="2603641926537298" />
+	    <meta property="fb:app_id" content="2603641926537298" />
 	    <meta property="og:type" content="snap:{result.data.snapByName.package_name}" />
         <meta property="og:url" content="https://snapstats.org/snaps/{result.data.snapByName.package_name}" />
         <meta property="og:title" content="{result.data.snapByName.title || result.data.snapByName.package_name}" />
