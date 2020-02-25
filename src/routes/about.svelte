@@ -3,17 +3,17 @@
 </script>
 
 <svelte:head>
-	<title>About snapstats</title>
+	<title>About Snapstats</title>
 </svelte:head>
 
-<h1>About snapstats</h1>
+<h1>About Snapstats</h1>
 
 <p>
 	Snapstats is a project by Daniel Llewellyn, aka diddledan, a prolific
 	snapcrafter	(creator of snap packages). The site catalogues all the
 	publically visible Snap package information and aggregates some
 	statistics about the available packages. The statistics and latest
-	snaps are synchronised from the public Snap Store every 4 hours.
+	Snaps are synchronised from the public Snap Store every 4 hours.
 </p>
 <p>
 	You can find out more about the Snap Store at <a href="https://snapcraft.io/">Snapcraft.io</a>.

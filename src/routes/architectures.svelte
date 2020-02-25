@@ -65,7 +65,7 @@
 </style>
 
 <svelte:head>
-	<title>Snap store architectures statistics</title>
+	<title>Snap Store architectures statistics</title>
 	<meta name="description" content="Statistics about Snap Package supported architecture distribution within the Snap Store for Linux" />
 </svelte:head>
 

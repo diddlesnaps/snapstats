@@ -65,7 +65,7 @@
 </style>
 
 <svelte:head>
-	<title>Snap store channels statistics</title>
+	<title>Snap Store channels statistics</title>
 	<meta name="description" content="Statistics about Snap Package channels within the Snap Store for Linux" />
 </svelte:head>
 

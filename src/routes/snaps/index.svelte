@@ -97,11 +97,11 @@
 </style>
 
 <svelte:head>
-	<title>Search the snap store</title>
-    <meta name="description" content="Search the snap store listings on SnapStats.org" />
+	<title>Search the Snap Store</title>
+    <meta name="description" content="Search the Snap Store listings on SnapStats.org" />
 </svelte:head>
 
-<h1>Search the snap store</h1>
+<h1>Search the Snap Store</h1>
 <div class='search'>
     <form method="get" on:submit={submit}>
         <input name="offset" type="hidden" value='0' />
