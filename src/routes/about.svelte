@@ -27,8 +27,8 @@
 
 <p>
 	Snapstats.org is a project by Daniel Llewellyn, aka diddledan, a prolific
-	snapcrafter	(creator of snap packages). The site catalogues all the
-	publically visible Snap package information and aggregates some
+	Snapcrafter (creator of snap packages). The site catalogues all the
+	publicly visible Snap package information and aggregates some
 	statistics about the available packages. The statistics and latest
 	Snaps are synchronised from the public Snap Store every 4 hours.
 </p>

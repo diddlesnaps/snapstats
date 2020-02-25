@@ -13,6 +13,11 @@
 		margin: 0 auto;
 		box-sizing: border-box;
 	}
+	footer {
+		display: flex;
+		justify-content: center;
+		padding: 2rem 0;
+	}
 </style>
 
 <Nav {segment}/>
@@ -20,3 +25,7 @@
 <main>
 	<slot></slot>
 </main>
+
+<footer>
+	<a href='privacy'>Privacy policy</a>
+</footer>
