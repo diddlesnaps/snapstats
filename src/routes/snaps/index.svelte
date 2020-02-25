@@ -99,6 +99,20 @@
 <svelte:head>
 	<title>Search the Snap Store</title>
     <meta name="description" content="Search the Snap Store listings on SnapStats.org" />
+
+    <meta property="og:site_name" content="Snapstats.org" />
+    <meta property="og:url" content="https://snapstats.org/snaps" />
+    <meta property="og:title" content="Search the Snap Store" />
+    <meta property="og:description" content="Search the Snap Store listings on SnapStats.org" />
+    <meta property="og:image" content="https://snapstats.org/favicons/android-icon-512x512.png" />
+    <meta property="og:image:secure_url" content="https://snapstats.org/favicons/android-icon-512x512.png" />
+    <meta property="og:image:width" content="512" />
+    <meta property="og:image:height" content="512" />
+    <meta property="og:image:alt" content="Icon of Snapstats.org" />
+
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@diddledan" />
+    <meta name="twitter:creator" content="@diddledan" />
 </svelte:head>
 
 <h1>Search the Snap Store</h1>

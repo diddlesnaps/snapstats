@@ -15,6 +15,7 @@
                 icon_url
                 last_updated
                 license
+                name
                 package_name
                 publisher
                 ratings_average
@@ -65,11 +66,11 @@
 
 	import { setClient, restore, query } from 'svelte-apollo';
 
-	export let cache;
+    export let cache;
 
 	restore(client, q, cache.data);
 	setClient(client);
-	let data = query(client, { query: q });
+    let data = query(client, { query: q });
 </script>
 
 <style>
@@ -163,9 +164,21 @@
         <title>Loading snap details...</title>
     {:then result}
         <title>{result.data.snapByName.title || result.data.snapByName.package_name}</title>
-        <meta name="description"
-            content="{`${result.data.snapByName.title || result.data.snapByName.package_name}: ${result.data.snapByName.summary}`}" />
-    
+        <meta name="description" content="{result.data.snapByName.summary}" />
+
+        <meta property="og:site_name" content="Snapstats.org" />
+        <meta property="og:url" content="https://snapstats.org/snaps/{result.data.snapByName.package_name}" />
+        <meta property="og:title" content="{result.data.snapByName.title || result.data.snapByName.package_name}" />
+        <meta property="og:description" content="{result.data.snapByName.summary}" />
+        <meta property="og:image" content="{result.data.snapByName.icon_url}" />
+        <meta property="og:image:secure_url" content="{result.data.snapByName.icon_url}" />
+        <meta property="og:image:width" content="512" />
+        <meta property="og:image:height" content="512" />
+        <meta property="og:image:alt" content="Icon of {result.data.snapByName.title || result.data.snapByName.package_name}" />
+
+        <meta name="twitter:card" content="app" />
+        <meta name="twitter:site" content="@diddledan" />
+
         {@html '<script type="application/ld+json">' +
             JSON.stringify({
                 "@context" : "http://schema.org",
@@ -173,6 +186,7 @@
                 "datePublished": new Date(result.data.snapByName.date_published).toISOString(),
                 "dateModified": new Date(result.data.snapByName.last_updated).toISOString(),
                 "name" : result.data.snapByName.title || result.data.snapByName.package_name,
+                "image" : result.data.snapByName.icon_url,
                 "publisher": result.data.snapByName.developer_name || result.data.snapByName.publisher,
                 "applicationCategory": result.data.snapByName.categories,
                 "softwareVersion": result.data.snapByName.version,

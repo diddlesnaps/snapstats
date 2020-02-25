@@ -3,13 +3,28 @@
 </script>
 
 <svelte:head>
-	<title>About Snapstats</title>
+	<title>About Snapstats.org</title>
+	<meta name="description" content="Find out about the Snapstats.org website" />
+
+	<meta property="og:site_name" content="Snapstats.org" />
+    <meta property="og:url" content="https://snapstats.org/snaps" />
+    <meta property="og:title" content="About Snapstats.org" />
+    <meta property="og:description" content="Find out about the Snapstats.org website" />
+    <meta property="og:image" content="https://snapstats.org/favicons/android-icon-512x512.png" />
+    <meta property="og:image:secure_url" content="https://snapstats.org/favicons/android-icon-512x512.png" />
+    <meta property="og:image:width" content="512" />
+    <meta property="og:image:height" content="512" />
+    <meta property="og:image:alt" content="Icon of Snapstats.org" />
+
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@diddledan" />
+    <meta name="twitter:creator" content="@diddledan" />
 </svelte:head>
 
-<h1>About Snapstats</h1>
+<h1>About Snapstats.org</h1>
 
 <p>
-	Snapstats is a project by Daniel Llewellyn, aka diddledan, a prolific
+	Snapstats.org is a project by Daniel Llewellyn, aka diddledan, a prolific
 	snapcrafter	(creator of snap packages). The site catalogues all the
 	publically visible Snap package information and aggregates some
 	statistics about the available packages. The statistics and latest

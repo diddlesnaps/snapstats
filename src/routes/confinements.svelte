@@ -65,8 +65,22 @@
 </style>
 
 <svelte:head>
-	<title>Snap Store confinements statistics</title>
+	<title>Snap Store confinements statistics | Snapstats.org</title>
 	<meta name="description" content="Statistics about Snap Package confinement mechanisms within the Snap Store for Linux" />
+
+	<meta property="og:site_name" content="Snapstats.org" />
+    <meta property="og:url" content="https://snapstats.org/snaps" />
+    <meta property="og:title" content="Snap Store confinements statistics | Snapstats.org" />
+    <meta property="og:description" content="Statistics about Snap Package confinement mechanisms within the Snap Store for Linux" />
+    <meta property="og:image" content="https://snapstats.org/favicons/android-icon-512x512.png" />
+    <meta property="og:image:secure_url" content="https://snapstats.org/favicons/android-icon-512x512.png" />
+    <meta property="og:image:width" content="512" />
+    <meta property="og:image:height" content="512" />
+    <meta property="og:image:alt" content="Icon of Snapstats.org" />
+
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@diddledan" />
+    <meta name="twitter:creator" content="@diddledan" />
 </svelte:head>
 
 <div>
