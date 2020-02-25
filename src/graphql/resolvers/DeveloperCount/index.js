@@ -1,4 +1,5 @@
 import { DeveloperCountsModel } from "../../../models/DeveloperCount";
+import { SnapsModel } from "../../../models/Snaps";
 import { LastUpdatedModel } from '../../../models/LastUpdated';
 import { promisify } from '../promisify';
 import { documentCount } from '../documentCount';
@@ -48,5 +49,26 @@ export default {
             } },
             { '$sort': { '_id': 1 } },
         ])),
+
+        validatedDeveloperCount: async (_, args) => {
+            const updated = await LastUpdatedModel.findOne({});
+            if (!updated) {
+                return {count: 0};
+            }
+            const snapshot_date = updated.date;
+            const developerCounts = await promisify(SnapsModel.aggregate([
+                { $match: {
+                    snapshot_date,
+                    developer_validation: 'verified',
+                } },
+                { $group: {
+                    _id: 'count',
+                    uniqueDevelopers: { $addToSet: '$developer_name' }
+                } },
+                { $project: { count: { $size: '$uniqueDevelopers' } } }
+            ]))
+            const {count} = developerCounts.shift()
+            return {count}
+        },
     },
 };

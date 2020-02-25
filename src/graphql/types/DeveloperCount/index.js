@@ -26,6 +26,8 @@ export const schema = `
         developerCountsByDate(query: Pagination!): [DeveloperCountsByDate]
         developerCountTimeline(from: Date): [DeveloperCountTimeline]
         developerCountTimelineCount: PaginationCount
+
+        validatedDeveloperCount: PaginationCount
     }
 
     type Mutation {
