@@ -86,6 +86,13 @@ const getThinStats = async (...args) => {
   mongoose.disconnect();
 }
 
+const getNewSnapsSubscriber = async (...args) => {
+  const mongoose = await connectDB();
+  const {newSnapsSubscriber} = (await import('./pubsub/newSnaps'));
+  await newSnapsSubscriber(...args);
+  mongoose.disconnect();
+}
+
 if (dev) {
   getApp();
 }
@@ -96,4 +103,5 @@ export {
   getCollectStats,
   getCollectRatings,
   getThinStats,
+  getNewSnapsSubscriber,
 };

@@ -5,6 +5,8 @@ process.env.NODE_ENV = process.env.NODE_ENV || 'production';
 const filename = process.env.NODE_ENV === 'production' ? './server/server' : './__sapper__/build/server/server';
 const entrypoint = require(filename);
 
+const newSnapsPubsubTopic = functions.config().pubsub.newsnaps_topic
+
 const server = functions.runWith({
     timeoutSeconds: 45,
     memory: '256MB',
@@ -18,7 +20,7 @@ const graphql = functions.runWith({
 const hourlyStats = functions.runWith({
     timeoutSeconds: 300,
     memory: '512MB'
-}).pubsub.schedule('every 4 hours').onRun((...args) => entrypoint.getCollectStats(false)(...args));
+}).pubsub.schedule('hourly').onRun((...args) => entrypoint.getCollectStats(false)(...args));
 const dailyStats = functions.runWith({
     timeoutSeconds: 300,
     memory: '512MB'
@@ -33,4 +35,17 @@ const dailyThinStats = functions.runWith({
     memory: '128MB',
 }).pubsub.schedule('48 23 * * *').onRun((...args) => entrypoint.getThinStats(...args));
 
-module.exports = {server, graphql, hourlyStats, dailyStats, dailyRatings, dailyThinStats};
+const newSnapSubscriber = functions.runWith({
+    timeoutSeconds: 30,
+    memory: '128MB',
+}).pubsub.topic(newSnapsPubsubTopic).onPublish((...args) => entrypoint.getNewSnapsSubscriber(...args));
+
+module.exports = {
+    server,
+    graphql,
+    hourlyStats,
+    dailyStats,
+    dailyRatings,
+    dailyThinStats,
+    newSnapSubscriber,
+};

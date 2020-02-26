@@ -1,3 +1,6 @@
+import * as functions from 'firebase-functions';
+import {PubSub} from '@google-cloud/pubsub';
+
 import {ArchitecturesModel} from '../models/Architecture';
 import {BasesModel} from '../models/Base';
 import {ChannelsModel} from '../models/Channel';
@@ -9,6 +12,7 @@ import {SnapsModel} from '../models/Snaps';
 
 import getStats from '../snapstore-api';
 import {updateLastUpdated} from './updateLastUpdated';
+import { LastUpdatedModel } from '../models/LastUpdated';
 
 const denysave = process.env.denysave === 'true' ? true : false;
 
@@ -20,6 +24,7 @@ export const collectStats = (isDaily = false) => async () => {
         if (!stats) {
             throw new Error(`No data returned from getStats().`);
         }
+        const previousSnapshot = await LastUpdatedModel.findOne({})
         const {
             architectures,
             bases,
@@ -67,7 +72,7 @@ export const collectStats = (isDaily = false) => async () => {
         }
 
         if (!denysave) {
-            const promises = [
+            let promises = [
                 ArchitecturesModel.insertMany(
                     architectures.map(architecture => (architecture.name) ? architecture : { ...architecture, name: 'unset' })
                     .map(addDate())
@@ -117,16 +122,27 @@ export const collectStats = (isDaily = false) => async () => {
 
             await Promise.all(promises);
             await updateLastUpdated(date, isDaily);
+
+            const pubsub = new PubSub()
+            const newSnapsPubsubTopic = pubsub.topic(functions.config().pubsub.newsnaps_topic)
+
+            await Promise.allSettled(snaps
+                .filter(snap => snap.date_published > previousSnapshot.date)
+                .map(async snap => {
+                    const messageObject = {
+                        data: {
+                            name: snap.title,
+                            slug: snap.package_name,
+                        },
+                    }
+                    const messageBuffer = Buffer.from(JSON.stringify(messageObject), 'utf8')
+                    try {
+                        return newSnapsPubsubTopic.publish(messageBuffer);
+                    } catch (e) {
+                        return console.error(`New Snap PubSub publish error: ${e}`);
+                    }
+                }))
         }
-        // console.debug({
-        //     architectures,
-        //     bases,
-        //     channels,
-        //     confinements,
-        //     licenses,
-        //     developer_counts,
-        //     snap_counts,
-        // });
     } catch (err) {
         console.error(err.toString());
     }
