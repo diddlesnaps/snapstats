@@ -126,7 +126,7 @@ export const collectStats = (isDaily = false) => async () => {
             const pubsub = new PubSub()
             const newSnapsPubsubTopic = pubsub.topic(functions.config().pubsub.newsnaps_topic)
 
-            await Promise.allSettled(snaps
+            await Promise.all(snaps
                 .filter(snap => snap.date_published > previousSnapshot.date)
                 .map(async snap => {
                     const messageObject = {
