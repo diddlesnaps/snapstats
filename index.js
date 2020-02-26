@@ -20,7 +20,7 @@ const graphql = functions.runWith({
 const hourlyStats = functions.runWith({
     timeoutSeconds: 300,
     memory: '512MB'
-}).pubsub.schedule('every 1 hour').onRun((...args) => entrypoint.getCollectStats(false)(...args));
+}).pubsub.schedule('every 30 minutes').onRun((...args) => entrypoint.getCollectStats(false)(...args));
 const dailyStats = functions.runWith({
     timeoutSeconds: 300,
     memory: '512MB'
