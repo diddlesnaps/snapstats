@@ -46,6 +46,6 @@ export const newSnapsSubscriber = async (message) => {
             }).catch(e => console.error(e)))
         }
 
-        await Promise.allSettled(promises)
+        await Promise.all(promises)
     }
 }
