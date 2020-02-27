@@ -129,15 +129,13 @@ export const collectStats = (isDaily = false) => async () => {
             await Promise.all(snaps
                 .filter(snap => new Date(snap.date_published) > previousSnapshot.date)
                 .map(async snap => {
-                    const messageObject = {
-                        data: {
-                            name: snap.title,
-                            slug: snap.package_name,
-                        },
+                    const data = {
+                        name: snap.title,
+                        slug: snap.package_name,
                     }
-                    const messageBuffer = Buffer.from(JSON.stringify(messageObject), 'utf8')
+                    const dataBuffer = Buffer.from(JSON.stringify(data), 'utf8')
                     try {
-                        return newSnapsPubsubTopic.publish(messageBuffer);
+                        return newSnapsPubsubTopic.publish(dataBuffer);
                     } catch (e) {
                         return console.error(`New Snap PubSub publish error: ${e}`);
                     }

@@ -13,18 +13,13 @@ const twitter_consumer_secret = process.env.TWIT_APP_SECRET || functions.config(
 const twitter_access_token = process.env.TWIT_APP_ID || functions.config().twitter.access_token
 const twitter_access_secret = process.env.TWIT_APP_SECRET || functions.config().twitter.access_secret
 
-export const newSnapsSubscriber = async (data, context) => {
-    const pubSubMessage = data;
-    const jsonData = pubSubMessage.data
-        ? JSON.parse(Buffer.from(pubSubMessage.data, 'base64').toString())
-        : undefined;
+export const newSnapsSubscriber = async (message) => {
+    if (message.json.name && message.json.slug) {
+        console.log(`Publishing new snap: ${message.json.name} (${message.json.slug})`)
+        const url = `https://snapstats.org/snaps/${message.json.slug}`
+        let body = `${message.json.name} has just been added to the Linux Snap Store`
 
-    if (name) {
-        console.log(`Publishing new snap: ${jsonData.name} (${jsonData.slug})`);
-        const url = `https://snapstats.org/snaps/${jsonData.slug}`
-        const body = `${jsonData.name} has just been added to the Snap Store`
-
-        let promises = [];
+        let promises = []
 
         // if (fb_app_id && fb_app_secret && fb_page_id && page_token) {
         //     promises.push(fetch(`https://graph.facebook.com/v6.0/${fb_page_id}/feed`, {
@@ -39,6 +34,7 @@ export const newSnapsSubscriber = async (data, context) => {
 
         if (twitter_consumer_key && twitter_consumer_secret
         && twitter_access_token && twitter_access_secret) {
+            body = `${message.json.name} has just been added to the #Linux #Snap Store. #Snapcraft #${message.json.slug}`
             let twitter = new Twitter({
                 consumer_key: twitter_consumer_key,
                 consumer_secret: twitter_consumer_secret,
