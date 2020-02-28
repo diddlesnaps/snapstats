@@ -6,6 +6,7 @@
 	<title>Snapstats.org privacy policy</title>
 	<meta name="description" content="Snapstats.org privacy policy" />
 
+    <!-- Facebook -->
 	<meta property="og:site_name" content="Snapstats.org" />
 	<meta property="fb:app_id" content="2603641926537298" />
 	<meta property="og:type" content="website" />
@@ -18,9 +19,12 @@
     <meta property="og:image:height" content="512" />
     <meta property="og:image:alt" content="Icon of Snapstats.org" />
 
+    <!-- Twitter -->
     <meta name="twitter:card" content="summary" />
-    <meta name="twitter:site" content="@diddledan" />
+    <meta name="twitter:site" content="@snapstats_org" />
     <meta name="twitter:creator" content="@diddledan" />
+    <meta name="twitter:title" content="Snapstats.org privacy policy" />
+    <meta name="twitter:description" content="Snapstats.org privacy policy" />
 </svelte:head>
 
 <h1>Snapstats.org privacy policy</h1>

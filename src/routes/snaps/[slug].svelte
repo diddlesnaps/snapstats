@@ -166,6 +166,7 @@
         <title>{result.data.snapByName.title || result.data.snapByName.package_name}</title>
         <meta name="description" content="{result.data.snapByName.summary}" />
 
+        <!-- Facebook -->
         <meta property="og:site_name" content="Snapstats.org" />
 	    <meta property="fb:app_id" content="2603641926537298" />
 	    <meta property="og:type" content="product" />
@@ -178,9 +179,15 @@
         <meta property="og:image:height" content="512" />
         <meta property="og:image:alt" content="Icon of {result.data.snapByName.title || result.data.snapByName.package_name}" />
 
+        <!-- Twitter -->
         <meta name="twitter:card" content="app" />
-        <meta name="twitter:site" content="@diddledan" />
+        <meta name="twitter:site" content="@snapstats_org" />
+        <meta name="twitter:title" content="{result.data.snapByName.title || result.data.snapByName.package_name}" />
+        <meta name="twitter:description" content="{result.data.snapByName.summary}" />
+        <meta name="twitter:image" content="{result.data.snapByName.icon_url}" />
+        <meta name="twitter:image:alt" content="Icon of {result.data.snapByName.title || result.data.snapByName.package_name}" />
 
+        <!-- Schema.org -->
         {@html '<script type="application/ld+json">' +
             JSON.stringify({
                 "@context" : "http://schema.org",

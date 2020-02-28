@@ -68,6 +68,7 @@
 	<title>Snap Store architectures statistics | Snapstats.org</title>
 	<meta name="description" content="Statistics about Snap Package supported architecture distribution within the Snap Store for Linux" />
 
+	<!-- Facebook -->
 	<meta property="og:site_name" content="Snapstats.org" />
 	<meta property="fb:app_id" content="2603641926537298" />
 	<meta property="og:type" content="website" />
@@ -80,9 +81,13 @@
     <meta property="og:image:height" content="512" />
     <meta property="og:image:alt" content="Icon of Snapstats.org" />
 
+	<!-- Twitter -->
     <meta name="twitter:card" content="summary" />
-    <meta name="twitter:site" content="@diddledan" />
+    <meta name="twitter:site" content="@snapstats_org" />
     <meta name="twitter:creator" content="@diddledan" />
+    <meta name="twitter:title" content="Snap Store architectures statistics | Snapstats.org" />
+    <meta name="twitter:description" content="Statistics about Snap Package supported architecture distribution within the Snap Store for Linux" />
+
 </svelte:head>
 
 <div>
