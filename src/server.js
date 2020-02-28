@@ -46,6 +46,10 @@ const getApp = async (...args) => {
 
   const app = express() // You can also use Express
 
+  app.use((req, res, next) => {
+    res.set('Cache-Control', 'public, max-age=600, s-maxage=900')
+    return next()
+  })
   app.use(compression({ threshold: 0 }));
 
   if (dev) {
