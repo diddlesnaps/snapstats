@@ -25,6 +25,7 @@
     <meta name="twitter:creator" content="@diddledan" />
     <meta name="twitter:title" content="Snapstats.org privacy policy" />
     <meta name="twitter:description" content="Snapstats.org privacy policy" />
+    <meta name="twitter:image" content="https://snapstats.org/favicons/android-icon-512x512.png" />
 </svelte:head>
 
 <h1>Snapstats.org privacy policy</h1>

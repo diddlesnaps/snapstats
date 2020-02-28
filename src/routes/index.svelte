@@ -117,6 +117,7 @@
     <meta name="twitter:creator" content="@diddledan" />
     <meta name="twitter:title" content="Snapstats.org Snap Store statistics" />
     <meta name="twitter:description" content="Statistics about Snap Packages within the Snap Store for Linux" />
+    <meta name="twitter:image" content="https://snapstats.org/favicons/android-icon-512x512.png" />
 </svelte:head>
 
 <div>

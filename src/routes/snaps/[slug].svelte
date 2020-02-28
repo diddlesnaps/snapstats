@@ -180,7 +180,7 @@
         <meta property="og:image:alt" content="Icon of {result.data.snapByName.title || result.data.snapByName.package_name}" />
 
         <!-- Twitter -->
-        <meta name="twitter:card" content="app" />
+        <meta name="twitter:card" content="summary" />
         <meta name="twitter:site" content="@snapstats_org" />
         <meta name="twitter:title" content="{result.data.snapByName.title || result.data.snapByName.package_name}" />
         <meta name="twitter:description" content="{result.data.snapByName.summary}" />

@@ -119,6 +119,7 @@
     <meta name="twitter:creator" content="@diddledan" />
     <meta name="twitter:title" content="Search the Snap Store" />
     <meta name="twitter:description" content="Search the Snap Store listings on SnapStats.org" />
+    <meta name="twitter:image" content="https://snapstats.org/favicons/android-icon-512x512.png" />
 </svelte:head>
 
 <h1>Search the Snap Store</h1>

@@ -25,6 +25,7 @@
     <meta name="twitter:creator" content="@diddledan" />
     <meta name="twitter:title" content="About Snapstats.org" />
     <meta name="twitter:description" content="Find out about the Snapstats.org website" />
+    <meta name="twitter:image" content="https://snapstats.org/favicons/android-icon-512x512.png" />
 </svelte:head>
 
 <h1>About Snapstats.org</h1>

@@ -87,6 +87,7 @@
     <meta name="twitter:creator" content="@diddledan" />
 	<meta name="twitter:title" content="Snap Store confinements statistics | Snapstats.org" />
     <meta name="twitter:description" content="Statistics about Snap Package confinement mechanisms within the Snap Store for Linux" />
+    <meta name="twitter:image" content="https://snapstats.org/favicons/android-icon-512x512.png" />
 </svelte:head>
 
 <div>
