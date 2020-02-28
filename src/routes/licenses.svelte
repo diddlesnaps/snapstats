@@ -26,7 +26,7 @@
 	`;
 
 	export async function preload(page, session) {
-		return { cache: await client.query({ query: q }) };
+		return { cache: await (await client.query({ query: q })).data };
     }
 </script>
 
@@ -35,7 +35,7 @@
 
 	export let cache;
 
-	restore(client, q, cache.data);
+	restore(client, q, cache);
 	let data = query(client, { query: q });
 </script>
 

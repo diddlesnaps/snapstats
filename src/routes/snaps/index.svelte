@@ -50,9 +50,10 @@
 
         return {
             q,
+            qlQuery: q ? searchQuery : latestQuery,
             offset,
             limit,
-            cache: await data,
+            cache: (await data).data,
         };
     }
 </script>
@@ -61,21 +62,20 @@
 	import { setClient, restore, query } from 'svelte-apollo';
 
     export let q;
+    export let qlQuery;
     export let offset;
     export let limit;
-	export let cache;
+    export let cache;
 
-	restore(client, q ? searchQuery : latestQuery, cache.data);
+	restore(client, qlQuery, cache);
 	setClient(client);
 
     let data = query(client, {
-        query: q ? searchQuery : latestQuery,
+        query: qlQuery,
         variables: {q, offset, limit}
     });
 
     let getPageUrl = (page) => `snaps?q=${q}&offset=${limit*page}&limit=${limit}`;
-
-    $: data.refetch({q, offset, limit});
 
     function submit(e) {
         firebase.analytics().logEvent('search', {

@@ -31,7 +31,14 @@
     export async function preload(page, session) {
         const {slug} = page.params;
 
-        return { cache: await client.query({ query: q, variables: {slug} }) };
+        const result = await client.query({ query: q, variables: {slug} });
+        const data = await result.data;
+        
+        if (!data.snapByName) {
+            this.error(404, `The Snap package '${slug}' is not in the latest snapshot of data from the Snap Store. Perhaps it has been unpublished.. 😭`);
+        } else {
+            return { cache: data };
+        }
     }
 </script>
 
@@ -68,7 +75,7 @@
 
     export let cache;
 
-	restore(client, q, cache.data);
+	restore(client, q, cache);
 	setClient(client);
     let data = query(client, { query: q });
 </script>
