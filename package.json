@@ -43,7 +43,7 @@
     "graphql-tag-pluck": "^0.8.7",
     "graphql-tools": "^4.0.7",
     "ignore-styles": "^5.0.1",
-    "jsdom": "^15.2.1",
+    "jsdom": "^16.2.0",
     "lodash.escaperegexp": "^4.1.2",
     "marked": "^0.7.0",
     "merge-graphql-schemas": "^1.7.6",
