@@ -34,13 +34,17 @@ export const newSnapsSubscriber = async (message) => {
 
         if (twitter_consumer_key && twitter_consumer_secret
         && twitter_access_token && twitter_access_secret) {
-            body = `${message.json.name} has just been added to the #Linux #Snap Store. #Snapcraft #${message.json.slug}`
+            let slug = message.json.slug.replace(/-/g, '')
+            
+            body = `${message.json.name} has just been added to the #Linux #Snap Store. #Snapcraft #${slug}`
+            
             let twitter = new Twitter({
                 consumer_key: twitter_consumer_key,
                 consumer_secret: twitter_consumer_secret,
                 access_token_key: twitter_access_token,
                 access_token_secret: twitter_access_secret,
             })
+            
             promises.push(twitter.post('statuses/update', {
                 status: `${body}: ${url}`,
             }).catch(e => console.error(e)))
