@@ -75,6 +75,8 @@
         variables: {q, offset, limit}
     });
 
+    $: data.refetch({ q, offset, limit })
+
     let getPageUrl = (page) => `snaps?q=${q}&offset=${limit*page}&limit=${limit}`;
 
     function submit(e) {
