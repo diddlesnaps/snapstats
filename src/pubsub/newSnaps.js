@@ -46,7 +46,7 @@ export const newSnapsSubscriber = async (message) => {
             })
             
             promises.push(twitter.post('statuses/update', {
-                status: `${body}: ${url}`,
+                status: `${body} ${url}`,
             }).catch(e => console.error(e)))
         }
 
