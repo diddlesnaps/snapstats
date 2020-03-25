@@ -5,6 +5,12 @@ const SnapsSchema = new Schema({
         type: String,
         required: true,
     },
+    common_ids: {
+        type: String,
+    },
+    confinement: { // strict, classic, devmode
+        type: String,
+    },
     name: { // namespaced name
         type: String,
         required: true,
