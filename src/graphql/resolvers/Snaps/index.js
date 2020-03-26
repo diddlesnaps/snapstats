@@ -56,7 +56,7 @@ const searchSnapsFn = (args, snapshot_date) => {
 const findSnapsQueryFn = (searchHandlerFn) => async (_, args) => {
     const updated = await LastUpdatedModel.findOne({});
     if (!updated) {
-        return [];
+        return []
     }
     return await searchHandlerFn(args, updated.date)
     .skip(args.query.offset || 0)
@@ -66,11 +66,10 @@ const findSnapsQueryFn = (searchHandlerFn) => async (_, args) => {
 const findSnapsCountFn = (searchSnapsFn) => async (_, args) => {
     const updated = await LastUpdatedModel.findOne({});
     if (!updated) {
-        return [];
+        return []
     }
-    return {
-        count: (await searchSnapsFn(args, updated.date).countDocuments()) || 0,
-    }
+    const count = (await searchSnapsFn(args, updated.date).countDocuments()) || 0;
+    return { count }
 }
 
 export default {
@@ -84,7 +83,7 @@ export default {
         snapByName: async (_, args) => {
             const updated = await LastUpdatedModel.findOne({});
             if (!updated) {
-                return [];
+                return []
             }
             const snaps = await SnapsModel.find({
                 snapshot_date: updated.date,
@@ -97,7 +96,7 @@ export default {
         snapById: async (_, args) => {
             const updated = await LastUpdatedModel.findOne({});
             if (!updated) {
-                return [];
+                return []
             }
             const snaps = await SnapsModel.find({
                 snapshot_date: updated.date,
@@ -110,7 +109,7 @@ export default {
         snapsByDate: async (_, args) => {
             const updated = await LastUpdatedModel.findOne({});
             if (!updated) {
-                return [];
+                return []
             }
             return await snapsByDateFn(updated.date)
             .sort({'date_published': -1})
@@ -120,7 +119,7 @@ export default {
         snapsByDateCount: async () => {
             const updated = await LastUpdatedModel.findOne({});
             if (!updated) {
-                return [];
+                return []
             }
             return {
                 count: (await snapsByDateFn(updated.date).countDocuments()) || 0,

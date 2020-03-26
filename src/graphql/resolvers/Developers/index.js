@@ -72,7 +72,7 @@ export default {
                 return {count: 0};
             }
             const snapshot_date = updated.date;
-            const developerCounts = await promisify(SnapsModel.aggregate([
+            const developerCounts = await SnapsModel.aggregate([
                 { $match: {
                     snapshot_date,
                     developer_validation: 'verified',
@@ -82,8 +82,9 @@ export default {
                     uniqueDevelopers: { $addToSet: '$developer_name' }
                 } },
                 { $project: { count: { $size: '$uniqueDevelopers' } } }
-            ]))
-            const {count} = developerCounts.shift()
+            ])
+            console.dir(developerCounts)
+            const count = 0 //developerCounts.shift()
             return {count}
         },
     },

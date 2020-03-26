@@ -5,12 +5,6 @@ const SnapsSchema = new Schema({
         type: String,
         required: true,
     },
-    common_ids: {
-        type: String,
-    },
-    confinement: { // strict, classic, devmode
-        type: String,
-    },
     name: { // namespaced name
         type: String,
         required: true,
@@ -23,7 +17,7 @@ const SnapsSchema = new Schema({
         type: String,
     },
     title: { // human-readable
-        type: String
+        type: String,
     },
     summary: { // human-readable
         type: String,
@@ -94,6 +88,12 @@ const SnapsSchema = new Schema({
     isDaily: {
         type: Boolean,
         default: false,
+    },
+    common_ids: {
+        type: [String],
+    },
+    confinement: { // strict, classic, devmode
+        type: String,
     },
 });
 

@@ -5,6 +5,7 @@ export const schema = `
         name: String!
         package_name: String
         base_snap: String
+        common_ids: [String]
         title: String
         summary: String
         description: String
