@@ -1,7 +1,7 @@
 <script>
     export let snap;
 
-    let icon_url;
+    let icon_url, icon2x_url;
     
     $: icon_url = `https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,h_92/${snap.icon_url}`;
     $: icon2x_url = `https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,h_184/${snap.icon_url}`;
