@@ -11,6 +11,7 @@
         title
         summary
         icon_url
+        ratings_average
     `;
 
     const latestQuery = gql`

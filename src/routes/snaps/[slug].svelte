@@ -1,6 +1,7 @@
 <script context="module">
-	import client from '../../apollo';
-    import { gql } from 'apollo-boost';
+	import client from '../../apollo'
+    import { gql } from 'apollo-boost'
+    import StarRating from '../../components/StarRating.svelte'
 
     const q = gql`
         query($slug:String!) {
@@ -29,26 +30,26 @@
     `;
 
     export async function preload(page, session) {
-        const {slug} = page.params;
+        const {slug} = page.params
 
-        const result = await client.query({ query: q, variables: {slug} });
-        const data = await result.data;
+        const result = await client.query({ query: q, variables: {slug} })
+        const data = await result.data
         
         if (!data.snapByName) {
-            this.error(404, `The Snap package '${slug}' is not in the latest snapshot of data from the Snap Store. Perhaps it has been unpublished.. 😭`);
+            this.error(404, `The Snap package '${slug}' is not in the latest snapshot of data from the Snap Store. Perhaps it has been unpublished.. 😭`)
         } else {
-            return { cache: data };
+            return { cache: data }
         }
     }
 </script>
 
 <script>
     if (process.browser) {
-        import('fslightbox');
+        import('fslightbox')
     }
-    import marked from 'marked';
-    import createDOMPurify from 'dompurify';
-    const DOMPurify = createDOMPurify(window);
+    import marked from 'marked'
+    import createDOMPurify from 'dompurify'
+    const DOMPurify = createDOMPurify(window)
     const DOMPurifyOpts = {
         ALLOWED_TAGS: [
             'a',
@@ -63,21 +64,21 @@
 
     DOMPurify.addHook('afterSanitizeAttributes', function(node) {
         if (node.hasAttribute('href')) {
-            const href = node.getAttribute('href');
+            const href = node.getAttribute('href')
             if (href.startsWith('.') || href.startsWith('#')) {
-                node.removeAttribute('href');
+                node.removeAttribute('href')
             }
-            node.setAttribute('rel', 'nofollow ugc');
+            node.setAttribute('rel', 'nofollow ugc')
         }
-    });
+    })
 
-	import { setClient, restore, query } from 'svelte-apollo';
+	import { setClient, restore, query } from 'svelte-apollo'
 
-    export let cache;
+    export let cache
 
-	restore(client, q, cache);
-	setClient(client);
-    let data = query(client, { query: q });
+	restore(client, q, cache)
+	setClient(client)
+    let data = query(client, { query: q })
 </script>
 
 <style>
@@ -195,8 +196,8 @@
         <meta name="twitter:image:alt" content="Icon of {result.data.snapByName.title || result.data.snapByName.package_name}" />
 
         <!-- Schema.org -->
-        {@html '<script type="application/ld+json">' +
-            JSON.stringify({
+        {@html `<script type="application/ld+json">
+            ${JSON.stringify({
                 "@context" : "http://schema.org",
                 "@type" : "SoftwareApplication",
                 "datePublished": new Date(result.data.snapByName.date_published).toISOString(),
@@ -204,17 +205,26 @@
                 "name" : result.data.snapByName.title || result.data.snapByName.package_name,
                 "image" : result.data.snapByName.icon_url,
                 "publisher": result.data.snapByName.developer_name || result.data.snapByName.publisher,
-                "applicationCategory": result.data.snapByName.categories,
+                "applicationCategory": result.data.snapByName.categories.join(', '),
                 "softwareVersion": result.data.snapByName.version,
                 "description": result.data.snapByName.summary,
                 "operatingSystem": "Linux",
                 "softwareRequirements": "Snapd",
                 "processorRequirements": result.data.snapByName.architecture ? result.data.snapByName.architecture.join(', ') : '',
-                "screenshot" : result.data.snapByName.screenshot_urls.filter(
+                "screenshot": result.data.snapByName.screenshot_urls.filter(
                     url => !url.match(/\/banner(-icon)?_\w{7}.(png|jpg)$/)
                 ),
-                "downloadUrl" : `https://snapcraft.io/${result.data.snapByName.package_name}`,
-            }) + `</${'script'}>`}
+                "installUrl" : `https://snapcraft.io/${result.data.snapByName.package_name}`,
+                "aggregateRating": {
+                    "@type": "AggregateRating",
+                    "ratingValue": result.data.snapByName.ratings_average,
+                    "bestRating": 5,
+                    "worstRating": 0,
+                    "name": "User rating",
+                    "description": `Average uer-submitted rating for ${result.data.snapByName.title || result.data.snapByName.packageName}`,
+                },
+            })}
+        </${'script'}>`}
     {/await}
 </svelte:head>
 
@@ -239,6 +249,15 @@
             {/if}
             <div>
                 <h1 class='title'>{result.data.snapByName.title || result.data.snapByName.package_name}</h1>
+                <p class='rating'><StarRating
+                    style={{
+                        styleStarWidth: 25,
+                        styleFullStarColor: '#ffd219',
+                        styleEmptyStarColor: '#eeeeee',
+                    }}
+                    isIndicatorActive={false}
+                    rating={result.data.snapByName.ratings_average}
+                /></p>
                 <p class='version'>Version {result.data.snapByName.version}</p>
                 <p class='summary'>{result.data.snapByName.summary}</p>
             </div>

@@ -1,4 +1,6 @@
 <script>
+    import StarRating from './StarRating.svelte'
+
     export let snap;
 
     let icon_url, icon2x_url;
@@ -16,6 +18,7 @@
     grid-template-rows: auto auto;
     grid-template-areas:
         "icon title"
+        "icon rating"
         "icon summary";
 }
 
@@ -29,6 +32,11 @@
 
 .title {
     grid-area: title;
+    margin: 0;
+}
+
+.rating {
+    grid-area: rating;
     margin: 0;
 }
 
@@ -52,5 +60,14 @@
             {snap.title}
         </a>
     </p>
+    <p class='rating'><StarRating
+        style={{
+            styleStarWidth: 16,
+            styleFullStarColor: '#ffd219',
+            styleEmptyStarColor: '#eeeeee',
+        }}
+        isIndicatorActive={false}
+        rating={snap.ratings_average}
+    /></p>
     <p class='summary'>{snap.summary}</p>
 </div>

@@ -54,6 +54,7 @@
     "sirv": "^0.4.2",
     "sitemap": "^4.1.1",
     "subscriptions-transport-ws": "^0.9.16",
+    "svelte-stars-rating": "^1.0.3",
     "twitter-lite": "^0.9.4"
   },
   "devDependencies": {
