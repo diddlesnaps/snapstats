@@ -18,11 +18,11 @@ const graphql = functions.runWith({
 }).https.onRequest((...args) => entrypoint.getGraphQL(...args));
 
 const hourlyStats = functions.runWith({
-    timeoutSeconds: 540,
+    timeoutSeconds: 300,
     memory: '512MB'
 }).pubsub.schedule('every 30 minutes').onRun((...args) => entrypoint.getCollectStats(false)(...args));
 const dailyStats = functions.runWith({
-    timeoutSeconds: 540,
+    timeoutSeconds: 300,
     memory: '512MB'
 }).pubsub.schedule('38 23 * * *').onRun((...args) => entrypoint.getCollectStats(true)(...args));
 // export const dailyStats = functions.pubsub.schedule('every 24 hours').onRun(collectStats(true));
