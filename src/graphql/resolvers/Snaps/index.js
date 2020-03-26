@@ -1,5 +1,4 @@
 import { SnapsModel } from "../../../models/Snaps";
-import { RatingsModel } from "../../../models/Rating";
 import { LastUpdatedModel } from '../../../models/LastUpdated';
 import escapeRegExp from 'lodash.escaperegexp';
 
@@ -57,7 +56,7 @@ const searchSnapsFn = (args, snapshot_date) => {
 const findSnapsQueryFn = (searchHandlerFn) => async (_, args) => {
     const updated = await LastUpdatedModel.findOne({});
     if (!updated) {
-        return null
+        return [];
     }
     return await searchHandlerFn(args, updated.date)
     .skip(args.query.offset || 0)
@@ -67,7 +66,7 @@ const findSnapsQueryFn = (searchHandlerFn) => async (_, args) => {
 const findSnapsCountFn = (searchSnapsFn) => async (_, args) => {
     const updated = await LastUpdatedModel.findOne({});
     if (!updated) {
-        return null
+        return [];
     }
     return {
         count: (await searchSnapsFn(args, updated.date).countDocuments()) || 0,
@@ -85,22 +84,28 @@ export default {
         snapByName: async (_, args) => {
             const updated = await LastUpdatedModel.findOne({});
             if (!updated) {
-                return null
+                return [];
             }
-            return await SnapsModel.findOne({
+            const snaps = await SnapsModel.find({
                 snapshot_date: updated.date,
                 package_name: args.name
             })
+            .skip(0)
+            .limit(1);
+            return snaps.shift();
         },
         snapById: async (_, args) => {
             const updated = await LastUpdatedModel.findOne({});
             if (!updated) {
-                return null
+                return [];
             }
-            return await SnapsModel.findOne({
+            const snaps = await SnapsModel.find({
                 snapshot_date: updated.date,
                 snap_id: args.snap_id
             })
+            .skip(0)
+            .limit(1);
+            return snaps.shift();
         },
         snapsByDate: async (_, args) => {
             const updated = await LastUpdatedModel.findOne({});
