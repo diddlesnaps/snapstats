@@ -1,10 +1,25 @@
-import { SnapsModel } from "../../../models/Snaps";
-import { LastUpdatedModel } from '../../../models/LastUpdated';
-import escapeRegExp from 'lodash.escaperegexp';
+import { SnapsModel } from "../../../models/Snaps"
+import { RatingsModel } from "../../../models/Rating"
+import { LastUpdatedModel } from '../../../models/LastUpdated'
+import escapeRegExp from 'lodash.escaperegexp'
 
-const snapsByDateFn = (snapshot_date) => {
-    return SnapsModel.find({ snapshot_date });
-};
+const getRating = async (snap) => {
+    const rating = await RatingsModel.findOne({
+        app_id: `io.snapcraft.${snap.package_name}-${snap.snap_id}`,
+    })
+    if (!rating) {
+        return 0
+    }
+    return (
+          rating.star5 * 5
+        + rating.star4 * 4
+        + rating.star3 * 3
+        + rating.star2 * 2
+        + rating.star1
+    ) / rating.total
+}
+
+const snapsByDateFn = (snapshot_date) => SnapsModel.find({ snapshot_date })
 
 const searchSnapsFn = (args, snapshot_date) => {
     let query = { snapshot_date, $and: [] }
@@ -50,25 +65,30 @@ const searchSnapsFn = (args, snapshot_date) => {
         }
     }
 
-    return SnapsModel.find(query);
+    return SnapsModel.find(query)
 }
 
 const findSnapsQueryFn = (searchHandlerFn) => async (_, args) => {
-    const updated = await LastUpdatedModel.findOne({});
+    const updated = await LastUpdatedModel.findOne({})
     if (!updated) {
         return []
     }
-    return await searchHandlerFn(args, updated.date)
+    const snaps = await searchHandlerFn(args, updated.date)
     .skip(args.query.offset || 0)
     .limit(args.query.limit || 6)
+
+    return snaps.map(async snap => ({
+        ...snap._doc,
+        ratings_average: await getRating(snap)
+    }))
 }
 
 const findSnapsCountFn = (searchSnapsFn) => async (_, args) => {
-    const updated = await LastUpdatedModel.findOne({});
+    const updated = await LastUpdatedModel.findOne({})
     if (!updated) {
         return []
     }
-    const count = (await searchSnapsFn(args, updated.date).countDocuments()) || 0;
+    const count = (await searchSnapsFn(args, updated.date).countDocuments()) || 0
     return { count }
 }
 
@@ -81,49 +101,58 @@ export default {
         findSnapsByBase: findSnapsQueryFn(searchSnapsFn),
         findSnapsByBaseCount: findSnapsCountFn(searchSnapsFn),
         snapByName: async (_, args) => {
-            const updated = await LastUpdatedModel.findOne({});
+            const updated = await LastUpdatedModel.findOne({})
             if (!updated) {
                 return []
             }
-            const snaps = await SnapsModel.find({
+            const snap = await SnapsModel.findOne({
                 snapshot_date: updated.date,
                 package_name: args.name
             })
-            .skip(0)
-            .limit(1);
-            return snaps.shift();
+
+            return {
+                ...snap._doc,
+                ratings_average: await getRating(snap)
+            }
         },
         snapById: async (_, args) => {
-            const updated = await LastUpdatedModel.findOne({});
+            const updated = await LastUpdatedModel.findOne({})
             if (!updated) {
                 return []
             }
-            const snaps = await SnapsModel.find({
+            const snap = await SnapsModel.findOne({
                 snapshot_date: updated.date,
                 snap_id: args.snap_id
             })
-            .skip(0)
-            .limit(1);
-            return snaps.shift();
+
+            return {
+                ...snap._doc,
+                ratings_average: await getRating(snap)
+            }
         },
         snapsByDate: async (_, args) => {
-            const updated = await LastUpdatedModel.findOne({});
+            const updated = await LastUpdatedModel.findOne({})
             if (!updated) {
                 return []
             }
-            return await snapsByDateFn(updated.date)
+            const snaps = await snapsByDateFn(updated.date)
             .sort({'date_published': -1})
             .skip(args.query.offset || 0)
             .limit(args.query.limit || 6)
+
+            return snaps.map(async snap => ({
+                ...snap._doc,
+                ratings_average: await getRating(snap)
+            }))
         },
         snapsByDateCount: async () => {
-            const updated = await LastUpdatedModel.findOne({});
+            const updated = await LastUpdatedModel.findOne({})
             if (!updated) {
                 return []
             }
             return {
                 count: (await snapsByDateFn(updated.date).countDocuments()) || 0,
-            };
+            }
         },
     },
 };
