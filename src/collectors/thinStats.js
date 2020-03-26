@@ -1,5 +1,13 @@
 import {LastUpdatedModel} from '../models/LastUpdated';
 import {SnapsModel} from '../models/Snaps';
+import {ArchitecturesModel} from '../models/Architecture';
+import {BasesModel} from '../models/Base';
+import {ChannelsModel} from '../models/Channel';
+import {ConfinementsModel} from '../models/Confinement';
+import {DeveloperCountsModel} from '../models/DeveloperCount';
+import {LicensesModel} from '../models/License';
+import {SnapCountsModel} from '../models/SnapCount';
+
 import {promisify} from '../graphql/resolvers/promisify';
 import {updateLastUpdated} from './updateLastUpdated';
 
@@ -19,11 +27,11 @@ export const thinSnaps = async () => {
                 DeveloperCountsModel,
                 LicensesModel,
                 SnapCountsModel,
+                SnapsModel,
             ]) {
                 promises.push(promisify(model.deleteMany({ isDaily: { $ne: true } })));
             }
 
-            promises.push(promisify(SnapsModel.deleteMany({ isDaily: { $ne: true } })));
             promises.push(updateLastUpdated(lastUpdated.dailyDate));
             await Promise.all(promises);
         }
