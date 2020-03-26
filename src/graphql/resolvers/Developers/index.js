@@ -83,8 +83,7 @@ export default {
                 } },
                 { $project: { count: { $size: '$uniqueDevelopers' } } }
             ])
-            console.dir(developerCounts)
-            const count = 0 //developerCounts.shift()
+            const {count} = developerCounts.shift()
             return {count}
         },
     },
