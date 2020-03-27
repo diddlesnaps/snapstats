@@ -1,6 +1,6 @@
 {
   "name": "snapstats",
-  "description": "TODO",
+  "description": "snapstats",
   "version": "0.0.1",
   "engines": {
     "node": "10"
