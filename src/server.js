@@ -14,7 +14,8 @@ const connectDB = async () => {
         useCreateIndex: true,
         useNewUrlParser: true,
         useUnifiedTopology: true,
-        connectTimeoutMS: 10000,
+        connectTimeoutMS: 5000,
+        serverSelectionTimeoutMS: 5000,
       }
     )
     .catch((err) => console.log(`Mongo failed to connect: ${err.toString()}`));
