@@ -16,6 +16,7 @@ export const schema = `
         icon_url: String
         screenshot_urls: [String]
         ratings_average: Float
+        ratings_count: Int
         prices: [Price]
         license: String
         developer_id: String

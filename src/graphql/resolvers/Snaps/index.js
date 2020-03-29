@@ -10,13 +10,16 @@ const getRating = async (snap) => {
     if (!rating) {
         return 0
     }
-    return (
-          rating.star5 * 5
-        + rating.star4 * 4
-        + rating.star3 * 3
-        + rating.star2 * 2
-        + rating.star1
-    ) / rating.total
+    return {
+        ratings_average: (
+            rating.star5 * 5
+            + rating.star4 * 4
+            + rating.star3 * 3
+            + rating.star2 * 2
+            + rating.star1
+        ) / rating.total,
+        ratings_count: rating.total,
+    }
 }
 
 const snapsByDateFn = (snapshot_date) => SnapsModel.find({ snapshot_date })
@@ -79,7 +82,7 @@ const findSnapsQueryFn = (searchHandlerFn) => async (_, args) => {
 
     return snaps.map(async snap => ({
         ...snap._doc,
-        ratings_average: await getRating(snap)
+        ...await getRating(snap)
     }))
 }
 
@@ -112,7 +115,7 @@ export default {
 
             return {
                 ...snap._doc,
-                ratings_average: await getRating(snap)
+                ...await getRating(snap)
             }
         },
         snapById: async (_, args) => {
@@ -127,7 +130,7 @@ export default {
 
             return {
                 ...snap._doc,
-                ratings_average: await getRating(snap)
+                ...await getRating(snap)
             }
         },
         snapsByDate: async (_, args) => {
@@ -142,7 +145,7 @@ export default {
 
             return snaps.map(async snap => ({
                 ...snap._doc,
-                ratings_average: await getRating(snap)
+                ...await getRating(snap)
             }))
         },
         snapsByDateCount: async () => {

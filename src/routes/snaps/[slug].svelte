@@ -20,6 +20,7 @@
                 package_name
                 publisher
                 ratings_average
+                ratings_count
                 screenshot_urls
                 summary
                 title
@@ -218,6 +219,7 @@
                 "aggregateRating": {
                     "@type": "AggregateRating",
                     "ratingValue": result.data.snapByName.ratings_average,
+                    "ratingCount": result.data.snapByName.ratings_count,
                     "bestRating": 5,
                     "worstRating": 0,
                     "name": "User rating",
