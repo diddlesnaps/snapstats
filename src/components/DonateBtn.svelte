@@ -11,5 +11,5 @@
 </style>
 
 <p class='donate'>
-    Please <a href="https://liberapay.com/diddledan/donate" on:click={logConversion}><img alt="Donate using Liberapay" src="https://liberapay.com/assets/widgets/donate.svg"/></a> to help keep the lights on.
+    Enjoying this site? Please <a href="https://liberapay.com/diddledan/donate" on:click={logConversion}><img alt="Donate using Liberapay" src="https://liberapay.com/assets/widgets/donate.svg"/></a> to help keep the Snapstats.org lights on.
 </p>
