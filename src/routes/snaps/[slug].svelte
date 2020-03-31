@@ -2,6 +2,7 @@
 	import client from '../../apollo'
     import { gql } from 'apollo-boost'
     import StarRating from '../../components/StarRating.svelte'
+    import DonateBtn from '../../components/DonateBtn.svelte'
 
     const q = gql`
         query($slug:String!) {
@@ -92,35 +93,67 @@
         display: initial;
     }
 }
+
 .bannerImage {
     max-width: 100%;
 }
 .banner {
+    display: grid;
+    gap: 0.3rem 0.6rem;
+    grid-template-areas:
+        "title"
+        "icon"
+        "rating"
+        "version"
+        "summary";
+}
+.icon {
+    grid-area: icon;
+    display: grid;
     align-items: center;
-    display: flex;
-    flex-direction: row;
-    height: 240px;
     justify-content: center;
 }
-.banner > div {
-    display: flex;
-    flex-direction: column;
-}
-.banner > img {
-    margin-right: 1em;
-    max-width: 128px;
-}
 .title {
+    text-align: center;
+    grid-area: title;
     line-height: 1em;
-    margin: 0.4em 0;
+    margin: 0;
+}
+.rating {
+    display: flex;
+    justify-content: center;
+    grid-area: rating;
+    margin: 0;
 }
 .version {
+    text-align: center;
+    grid-area: version;
     font-size: 1.2rem;
-    margin: 0.4em 0;
+    margin: 0;
 }
 .summary {
-    margin: 0.4em 0;
+    grid-area: summary;
+    margin: 0;
 }
+@media screen and (min-width: 360px) {
+    .banner {
+        grid-template-areas:
+            "icon title"
+            "icon rating"
+            "icon version"
+            "icon summary";
+    }
+    .title {
+        text-align: initial;
+    }
+    .rating {
+        display: initial;
+    }
+    .version {
+        text-align: initial;
+    }
+}
+
 .screenshots {
     align-items: center;
     display: flex;
@@ -128,17 +161,14 @@
     flex-wrap: wrap;
     justify-content: center;
     order: 1;
-}
-@media screen and (min-width: 720px) {
-    .screenshots {
-        margin-top: 5em;
-    }
+    gap: 0.4rem;
 }
 .screenshots img {
-    margin: 2em 1em;
     max-height: 240px;
-    max-width: calc(100vw - 2em);
+    max-width: 100%;
+    height: auto;
 }
+
 .storeButton {
     text-align: center;
 }
@@ -147,10 +177,16 @@
         text-align: right;
     }
 }
-.meta ul {
-    background: #eeeeee;
-    border: 2px dashed #888888;
+.storeButton img {
+    border-radius: 1rem;
+}
+
+.meta dl {
+    color: #000000;
+    background: rgba(135, 190, 161, 0.4); /* #87bea1; */
+    border-radius: 0rem 2rem 2rem 0rem;
     font-size: 0.7rem;
+    line-height: 1.2rem;
     order: 1;
     padding: 0.4em 1rem;
     max-width: 50rem;
@@ -158,9 +194,15 @@
     margin-left: auto;
     margin-right: auto;
 }
-.meta li {
-    margin: 0 1rem;
-    padding: 0;
+@media screen and (min-width: 360px) {
+    .meta dl {
+        display: grid;
+        gap: 0 0.4rem;
+        grid-template-columns: minmax(min-content, max-content) auto;
+    }
+    .meta dd {
+        margin: 0;
+    }
 }
 
 .verified {
@@ -245,24 +287,24 @@
         {/if}
         <div class='banner'>
             {#if result.data.snapByName.icon_url}
-                <img height="128" loading="lazy"
-                    src={result.data.snapByName.icon_url}
-                    alt={`Icon for ${result.data.snapByName.title || result.data.snapByName.package_name}`} />
+                <p class='icon'>
+                    <img height="128" loading="lazy"
+                        src={result.data.snapByName.icon_url}
+                        alt={`Icon for ${result.data.snapByName.title || result.data.snapByName.package_name}`} />
+                </p>
             {/if}
-            <div>
-                <h1 class='title'>{result.data.snapByName.title || result.data.snapByName.package_name}</h1>
-                <p class='rating'><StarRating
-                    style={{
-                        styleStarWidth: 25,
-                        styleFullStarColor: '#ffd219',
-                        styleEmptyStarColor: '#eeeeee',
-                    }}
-                    isIndicatorActive={false}
-                    rating={result.data.snapByName.ratings_average}
-                /></p>
-                <p class='version'>Version {result.data.snapByName.version}</p>
-                <p class='summary'>{result.data.snapByName.summary}</p>
-            </div>
+            <h1 class='title'>{result.data.snapByName.title || result.data.snapByName.package_name}</h1>
+            <p class='rating'><StarRating
+                style={{
+                    styleStarWidth: 25,
+                    styleFullStarColor: '#ffd219',
+                    styleEmptyStarColor: '#eeeeee',
+                }}
+                isIndicatorActive={false}
+                rating={result.data.snapByName.ratings_average}
+            /></p>
+            <p class='version'>Version {result.data.snapByName.version}</p>
+            <p class='summary'>{result.data.snapByName.summary}</p>
         </div>
         {#if
             // if any of these are present then display the meta box.
@@ -278,70 +320,71 @@
             result.data.snapByName.last_updated
         }
             <aside class='meta'>
-                <ul>
+                <dl>
                     {#if result.data.snapByName.architecture}
-                        <li>
-                            Architectures supported:
-                            {#if result.data.snapByName.architecture}
-                                {result.data.snapByName.architecture.join(', ')}
-                            {:else}
-                                none
-                            {/if}
-                        </li>
+                        <dt>Architectures supported:</dt>
+                        <dd>
+                        {#if result.data.snapByName.architecture}
+                            {result.data.snapByName.architecture.join(', ')}
+                        {:else}
+                            none
+                        {/if}
+                        </dd>
                     {/if}
                     {#if result.data.snapByName.categories}
-                        <li>
-                            Category: {result.data.snapByName.categories.join(', ')}
-                        </li>
+                        <dt>Category:</dt>
+                        <dd>{result.data.snapByName.categories.join(', ')}</dd>
                     {/if}
                     {#if result.data.snapByName.license}
-                        <li>
-                            License: {result.data.snapByName.license}
-                        </li>
+                        <dt>License:</dt>
+                        <dd>{result.data.snapByName.license}</dd>
                     {/if}
                     {#if result.data.snapByName.website}
-                        <li>
-                            Application website: <a href={result.data.snapByName.website}>{result.data.snapByName.website}</a>
-                        </li>
+                        <dt>Application website:</dt>
+                        <dd><a href={result.data.snapByName.website}>{result.data.snapByName.website}</a></dd>
                     {/if}
                     {#if result.data.snapByName.contact}
-                        <li>
-                            Snap support contact: <a href={result.data.snapByName.contact}>{result.data.snapByName.contact}</a>
-                        </li>
+                        <dt>Snap support contact:</dt>
+                        <dd><a href={result.data.snapByName.contact}>{result.data.snapByName.contact}</a></dd>
                     {/if}
                     {#if result.data.snapByName.developer_name || result.data.snapByName.publisher}
-                        <li>
-                            Published to the Snap Store by {result.data.snapByName.developer_name || result.data.snapByName.publisher}
+                        <dt>Published to the Snap Store by</dt>
+                        <dd>
+                            {result.data.snapByName.developer_name || result.data.snapByName.publisher}
                             {#if result.data.snapByName.developer_validation === 'verified'}
                                 <span class="verified">✔️️ (Author is verified)</span>
                             {/if}
-                        </li>
+                        </dd>
                     {/if}
                     {#if result.data.snapByName.date_published}
-                        <li>
-                            Published on
+                        <dt>Published on</dt>
+                        <dd>
                             <time dateTime={new Date(result.data.snapByName.date_published).toISOString()}>
                                 {new Date(result.data.snapByName.date_published).toLocaleString()}
                             </time>
-                        </li>
+                        </dd>
                     {/if}
                     {#if result.data.snapByName.last_updated}
-                        <li>
-                            Last modified on
+                        <dt>Last modified on</dt>
+                        <dd>
                             <time dateTime={new Date(result.data.snapByName.last_updated).toISOString()}>
                                 {new Date(result.data.snapByName.last_updated).toLocaleString()}
                             </time>
-                        </li>
+                        </dd>
                     {/if}
-                </ul>
+                </dl>
             </aside>
         {/if}
 
+        <DonateBtn />
+
+        <h2>Description</h2>
         {@html DOMPurify.sanitize(marked(result.data.snapByName.description), DOMPurifyOpts)}
 
         {#if result.data.snapByName.screenshot_urls.filter(
             url => !url.match(/\/banner(-icon)?_\w{7}.(png|jpg)$/)
         ).length > 0}
+            <h2>Screenshots</h2>
             <div class='screenshots'>
                 {#each result.data.snapByName.screenshot_urls.filter(
                     url => !url.match(/\/banner(-icon)?_\w{7}.(png|jpg)$/)
