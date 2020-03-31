@@ -161,7 +161,7 @@
     flex-wrap: wrap;
     justify-content: center;
     order: 1;
-    gap: 0.4rem;
+    gap: 2rem;
 }
 .screenshots img {
     max-height: 240px;
