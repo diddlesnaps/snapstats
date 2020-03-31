@@ -64,6 +64,13 @@ export default {
                 { $group: {
                     _id: '$developer_name',
                 } },
+                { $project: {
+                    _id: 1,
+                    sort_field: { $toLower: '$_id' }
+                } },
+                { $sort: {
+                    sort_field: 1,
+                } },
             ]))
         },
         verifiedDeveloperCount: async (_, args) => {

@@ -141,8 +141,8 @@
 		<p>There are <strong>{result.data.developerCountsByDate[0].developerCounts[0].total || 0}</strong> developers who have published at least one snap.</p>
 	{:else}
 		<p>There are an unknown number of developers who have published at least one snap.</p>
-	{/if}	
-	
+	{/if}
+
 	<h3>Developer Averages</h3>
 	<p>
 		Developers with published Snaps have each published an average (<a href="https://en.wikipedia.org/wiki/Arithmetic_mean">mean</a>) of <strong>{result.data.developerCountsByDate[0].developerCounts[0].mean || 0}</strong> Snaps.
