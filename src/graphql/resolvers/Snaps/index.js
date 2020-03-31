@@ -8,8 +8,12 @@ const getRating = async (snap) => {
         app_id: `io.snapcraft.${snap.package_name}-${snap.snap_id}`,
     })
     if (!rating) {
-        return 0
+        return {
+            ratings_average: 0,
+            ratings_count: 0,
+        }
     }
+    const count = rating.total
     return {
         ratings_average: (
             rating.star5 * 5
@@ -17,8 +21,8 @@ const getRating = async (snap) => {
             + rating.star3 * 3
             + rating.star2 * 2
             + rating.star1
-        ) / rating.total,
-        ratings_count: rating.total,
+        ) / count,
+        ratings_count: count,
     }
 }
 
@@ -82,7 +86,7 @@ const findSnapsQueryFn = (searchHandlerFn) => async (_, args) => {
 
     return snaps.map(async snap => ({
         ...snap._doc,
-        ...await getRating(snap)
+        ...await getRating(snap),
     }))
 }
 
@@ -115,7 +119,7 @@ export default {
 
             return {
                 ...snap._doc,
-                ...await getRating(snap)
+                ...await getRating(snap),
             }
         },
         snapById: async (_, args) => {
@@ -130,7 +134,7 @@ export default {
 
             return {
                 ...snap._doc,
-                ...await getRating(snap)
+                ...await getRating(snap),
             }
         },
         snapsByDate: async (_, args) => {
@@ -145,7 +149,7 @@ export default {
 
             return snaps.map(async snap => ({
                 ...snap._doc,
-                ...await getRating(snap)
+                ...await getRating(snap),
             }))
         },
         snapsByDateCount: async () => {
