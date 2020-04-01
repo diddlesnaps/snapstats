@@ -15,6 +15,7 @@ export async function get(req, res, next) {
     const static_pages = [
         { url: '/', changefreq: EnumChangefreq.DAILY },
         { url: '/snaps', changefreq: EnumChangefreq.DAILY },
+        { url: '/developers', changefreq: EnumChangefreq.DAILY },
         { url: '/architectures', changefreq: EnumChangefreq.DAILY },
         { url: '/bases', changefreq: EnumChangefreq.DAILY },
         { url: '/channels', changefreq: EnumChangefreq.DAILY },
