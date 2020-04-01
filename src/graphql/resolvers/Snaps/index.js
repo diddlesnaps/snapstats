@@ -117,6 +117,10 @@ export default {
                 package_name: args.name
             })
 
+            if (!snap) {
+                return null
+            }
+
             return {
                 ...snap._doc,
                 ...await getRating(snap),
@@ -131,6 +135,10 @@ export default {
                 snapshot_date: updated.date,
                 snap_id: args.snap_id
             })
+
+            if (!snap) {
+                return null
+            }
 
             return {
                 ...snap._doc,
