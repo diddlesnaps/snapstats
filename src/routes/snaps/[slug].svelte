@@ -258,14 +258,16 @@
                     url => !url.match(/\/banner(-icon)?_\w{7}.(png|jpg)$/)
                 ),
                 "installUrl" : `https://snapcraft.io/${result.data.snapByName.package_name}`,
-                "aggregateRating": {
-                    "@type": "AggregateRating",
-                    "ratingValue": result.data.snapByName.ratings_average,
-                    "ratingCount": result.data.snapByName.ratings_count,
-                    "bestRating": 5,
-                    "worstRating": 0,
-                    "name": "User rating",
-                    "description": `Average uer-submitted rating for ${result.data.snapByName.title || result.data.snapByName.packageName}`,
+                ...(result.data.snapByName.ratings_count > 0) && {
+                    "aggregateRating": {
+                        "@type": "AggregateRating",
+                        "ratingValue": result.data.snapByName.ratings_average,
+                        "ratingCount": result.data.snapByName.ratings_count,
+                        "bestRating": 5,
+                        "worstRating": 0,
+                        "name": "User rating",
+                        "description": `Average uer-submitted rating for ${result.data.snapByName.title || result.data.snapByName.packageName}`,
+                    },
                 },
             })}
         </${'script'}>`}
