@@ -127,6 +127,14 @@ const SnapsSchema = new Schema({
     title: { // human-readable
         type: String,
     },
+    trending: {
+        type: Boolean,
+        default: false,
+    },
+    unlisted: {
+        type: Boolean,
+        default: false,
+    },
     version: {
         type: String,
     },

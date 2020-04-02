@@ -7,7 +7,7 @@ function sort(array) {
 
 export default () => {
     return Promise.all(spider.snaps.stores.map(async (store) => {
-        const api = new SnapApi(store.url, store.domain);
+        const api = new SnapApi(store);
         const snaps = await api.list();
 
         const non_hello_or_test_snaps = snaps.reduce((carry, snap) => {

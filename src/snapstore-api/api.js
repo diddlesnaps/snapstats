@@ -1,7 +1,7 @@
 import { spider } from './config';
 import { request } from 'gaxios';
 
-const fields = [
+const searchfields = [
     'aliases',
     'anon_download_url',
     'apps',
@@ -11,39 +11,47 @@ const fields = [
     'channel',
     'common_ids',
     'confinement',
-    'contact',
     'date_published',
-    'description',
     'developer_id',
     'developer_name',
     'developer_validation',
     'download_url',
     'icon_url',
     'last_updated',
-    'license',
-    'media',
-    'name',
     'origin',
     'package_name',
-    'prices',
-    'private',
-    'publisher',
     'ratings_average',
     'release',
     'revision',
     'screenshot_urls',
     'sections',
     'snap_id',
-    'summary',
     'support_url',
-    'title',
     'version',
+].join(',')
+
+const detailsfields = [
+    'contact',
+    'description',
+    'license',
+    'media',
+    'name',
+    'prices',
+    'private',
+    'publisher',
+    'snap_id',
+    'store_url',
+    'summary',
+    'title',
+    'trending',
+    'unlisted',
     'website',
 ].join(',')
 
 class SnapApi {
-    constructor(url, domain) {
+    constructor({url, details_url, domain}) {
         this.url = url;
+        this.details_url = details_url;
         this.domain = domain;
     }
 
@@ -84,7 +92,7 @@ class SnapApi {
     }
 
     async searchList() {
-        const url = `${this.url}/search?size=${spider.snaps.page_size}&confinement=strict,devmode,classic&scope=wide&fields=${fields}`;
+        const url = `${this.url}/search?size=${spider.snaps.page_size}&confinement=strict,devmode,classic&scope=wide&fields=${searchfields}`;
         const promises = spider.snaps.architectures.map((architecture) => {
             return this.listArch(url, architecture);
         });
@@ -94,14 +102,14 @@ class SnapApi {
         const snapMap = {};
         let arch = 'all';
         let index = 0;
-        results.forEach((list) => {
-            // logger.debug(`total packages (${arch}): ${list.length}`);
-            list.forEach((snap) => {
-                snap.architecture = (snap.architecture) ? snap.architecture : [arch];
+        for (const result of results) {
+            // logger.debug(`total packages (${arch}): ${snaps.length}`);
+            for (const snap of result) {
                 if (!snap.package_name) {
-                    return;
+                    continue;
                 }
 
+                snap.architecture = (snap.architecture) ? snap.architecture : [arch];
                 const name = snap.package_name;
 
                 if (!snapMap[name]) {
@@ -124,19 +132,26 @@ class SnapApi {
 
                     snapMap[name].architecture = arches;
                 }
-            });
-
+            }
             if (index < spider.snaps.architectures.length) {
                 arch = spider.snaps.architectures[index];
                 index++;
             }
-        });
-        const snaps = [];
-        for (const name in snapMap) {
-            snaps.push(snapMap[name]);
         }
-        // logger.debug(`total packages: ${snaps.length}`);
-        return snaps;
+
+        for (const snapName of Object.keys(snapMap)) {
+            try {
+                snapMap[snapName] = {
+                    ...snapMap[snapName],
+                    ...await this.details(snap.packageName),
+                }
+            } catch {
+                continue
+            }
+        }
+
+        // logger.debug(`total packages: ${Object.keys(snapMap).length}`);
+        return Object.values(snapMap);
     }
 
     async list() {
@@ -159,7 +174,7 @@ class SnapApi {
     async detailsArch(url, arch, series) {
         const headers = {
             'User-Agent': spider.snaps.user_agent,
-            'X-Ubuntu-Series': series,
+            'Snap-Device-Series': series,
         };
 
         if (arch && arch !== 'all') {
@@ -178,7 +193,7 @@ class SnapApi {
     async details(packageName, arches, section, series) {
         // logger.debug('getting details for ' + packageName);
 
-        const url = `${this.url}/details/${packageName}?fields=${fields}`;
+        const url = `${this.details_url}/details/${packageName}?fields=${fields}`;
         const promises = arches.map(async (arch) => {
             try {
                 return this.detailsArch(url, arch, series);
@@ -228,7 +243,7 @@ class SnapApi {
     async searchSectionList() {
         const sections = await this.sections();
         const sectionResults = await Promise.all(sections.map((section) => {
-            return this.listArch(`${this.url}/search?size=${spider.snaps.page_size}&confinement=strict,devmode,classic&section=${section.name}&scope=wide&fields=${fields}`, undefined, section.name, []);
+            return this.listArch(`${this.url}/search?size=${spider.snaps.page_size}&confinement=strict,devmode,classic&section=${section.name}&scope=wide&fields=${searchfields}`, undefined, section.name, []);
         }));
         let results = [];
         sectionResults.forEach((sectionResult) => {
