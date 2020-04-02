@@ -138,13 +138,14 @@ export const collectStats = (isDaily = false) => async () => {
             const pubsub = new PubSub()
             const snapsSnapshotPubsubTopic = pubsub.topic(functions.config().pubsub.snaps_snapshot_topic)
 
-            promises.concat(snaps
+            await Promise.all(promises);
+            promises = snaps
                 .map(addDate('snapshot_date'))
                 .map(addIsDaily)
                 .map(async snap => {
                     const data = {
                         prevDate: previousSnapshot.date,
-                        snap,
+                        ...snap,
                     }
                     const dataBuffer = Buffer.from(JSON.stringify(data), 'utf8')
                     try {
@@ -152,7 +153,7 @@ export const collectStats = (isDaily = false) => async () => {
                     } catch(e) {
                         return console.error(`collectors/collectStats.js: Snap snapshot PubSub publish error: ${e}`);
                     }
-                }))
+                })
             await Promise.all(promises);
             await updateLastUpdated(date, isDaily);
         }
