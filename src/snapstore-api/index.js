@@ -22,12 +22,13 @@ export default () => {
             base_snap: snap.base || 'core',
         }));
 
+        const license_counts      = extractCombinedLicenseCounts(getCounts('license', non_hello_or_test_snaps));
+        const section_counts      = getCounts('sections.name', non_hello_or_test_snaps)
         const architecture_counts = getCounts('architecture', non_hello_or_test_snaps);
-        const base_counts = getCounts('base_snap', non_hello_or_test_snaps);
-        const license_counts = extractCombinedLicenseCounts(getCounts('license', non_hello_or_test_snaps));
-        const confinement_counts = getCounts('confinement', non_hello_or_test_snaps);
-        const channel_counts = getCounts('channel', non_hello_or_test_snaps);
-        const developer_counts = getCounts('developer_id', non_hello_or_test_snaps);
+        const base_counts         = getCounts('base_snap', non_hello_or_test_snaps);
+        const confinement_counts  = getCounts('confinement', non_hello_or_test_snaps);
+        const channel_counts      = getCounts('channel', non_hello_or_test_snaps);
+        const developer_counts    = getCounts('developer_id', non_hello_or_test_snaps);
         const developer_averages = {
             mean: computeMean(developer_counts, non_hello_or_test_snaps.length),
             mode: computeMode(developer_counts),
@@ -39,13 +40,16 @@ export default () => {
 
         const mapCounts = (cnts) => (key) => ({name: key, count: cnts[key]});
 
-        const bases = sort(Object.keys(base_counts).map(mapCounts(base_counts)));
+        const licenses      = sort(Object.keys(license_counts)     .map(mapCounts(license_counts)));
+        const sections      = sort(Object.keys(section_counts)     .map(mapCounts(section_counts)))
+        const bases         = sort(Object.keys(base_counts)        .map(mapCounts(base_counts)));
         const architectures = sort(Object.keys(architecture_counts).map(mapCounts(architecture_counts)));
-        const licenses = sort(Object.keys(license_counts).map(mapCounts(license_counts)));
-        const confinements = sort(Object.keys(confinement_counts).map(mapCounts(confinement_counts)));
-        const channels = sort(Object.keys(channel_counts).map(mapCounts(channel_counts)));
+        const confinements  = sort(Object.keys(confinement_counts) .map(mapCounts(confinement_counts)));
+        const channels      = sort(Object.keys(channel_counts)     .map(mapCounts(channel_counts)));
 
         return {
+            licenses,
+            sections,
             architectures,
             bases,
             channels,
@@ -54,7 +58,6 @@ export default () => {
                 total: Object.keys(developer_counts).length,
                 ...developer_averages,
             },
-            licenses,
             snap_counts: {
                 total: snaps.length,
                 filtered: non_hello_or_test_snaps.length,
@@ -85,10 +88,11 @@ const extractCombinedLicenseCounts = (cnts) => {
 }
 
 const getCounts = (field, json) => {
+    const [parentField, childField] = field.split('.', 2)
     const items = json.reduce((carry, snap) => {
         let newCarry = carry || [];
-        if (field in snap) {
-            let item = snap[field];
+        if (parentField in snap) {
+            let item = snap[parentField];
             if (!Array.isArray(item)) {
                 item = [item];
             }
@@ -97,7 +101,7 @@ const getCounts = (field, json) => {
         return newCarry;
     }, []);
 
-    const item_names = [...new Set(items)];
+    const item_names = [...new Set(items.map(item => childField ? item[childField] : item))];
 
     const item_counts = {};
     for (const name of item_names) {

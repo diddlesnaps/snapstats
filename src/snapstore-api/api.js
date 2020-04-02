@@ -1,6 +1,46 @@
 import { spider } from './config';
 import { request } from 'gaxios';
 
+const fields = [
+    'aliases',
+    'anon_download_url',
+    'apps',
+    'architecture',
+    'base',
+    'binary_filesize',
+    'channel',
+    'common_ids',
+    'confinement',
+    'contact',
+    'date_published',
+    'description',
+    'developer_id',
+    'developer_name',
+    'developer_validation',
+    'download_url',
+    'icon_url',
+    'last_updated',
+    'license',
+    'media',
+    'name',
+    'origin',
+    'package_name',
+    'prices',
+    'private',
+    'publisher',
+    'ratings_average',
+    'release',
+    'revision',
+    'screenshot_urls',
+    'sections',
+    'snap_id',
+    'summary',
+    'support_url',
+    'title',
+    'version',
+    'website',
+].join(',')
+
 class SnapApi {
     constructor(url, domain) {
         this.url = url;
@@ -44,7 +84,7 @@ class SnapApi {
     }
 
     async searchList() {
-        const url = `${this.url}/search?size=${spider.snaps.page_size}&confinement=strict,devmode,classic&scope=wide`;
+        const url = `${this.url}/search?size=${spider.snaps.page_size}&confinement=strict,devmode,classic&scope=wide&fields=${fields}`;
         const promises = spider.snaps.architectures.map((architecture) => {
             return this.listArch(url, architecture);
         });
@@ -138,7 +178,7 @@ class SnapApi {
     async details(packageName, arches, section, series) {
         // logger.debug('getting details for ' + packageName);
 
-        const url = `${this.url}/details/${packageName}`;
+        const url = `${this.url}/details/${packageName}?fields=${fields}`;
         const promises = arches.map(async (arch) => {
             try {
                 return this.detailsArch(url, arch, series);
@@ -188,7 +228,7 @@ class SnapApi {
     async searchSectionList() {
         const sections = await this.sections();
         const sectionResults = await Promise.all(sections.map((section) => {
-            return this.listArch(`${this.url}/search?size=${spider.snaps.page_size}&confinement=strict,devmode,classic&section=${section.name}&scope=wide`, undefined, section.name, []);
+            return this.listArch(`${this.url}/search?size=${spider.snaps.page_size}&confinement=strict,devmode,classic&section=${section.name}&scope=wide&fields=${fields}`, undefined, section.name, []);
         }));
         let results = [];
         sectionResults.forEach((sectionResult) => {

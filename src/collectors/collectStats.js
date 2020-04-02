@@ -7,6 +7,7 @@ import {ChannelsModel} from '../models/Channel';
 import {ConfinementsModel} from '../models/Confinement';
 import {DeveloperCountsModel} from '../models/DeveloperCount';
 import {LicensesModel} from '../models/License';
+import {SectionsModel} from '../models/Section';
 import {SnapCountsModel} from '../models/SnapCount';
 import {SnapsModel} from '../models/Snaps';
 
@@ -32,6 +33,7 @@ export const collectStats = (isDaily = false) => async () => {
             confinements,
             developer_counts,
             licenses,
+            sections,
             snap_counts,
         } = stats;
         let { snaps } = stats;
@@ -60,6 +62,7 @@ export const collectStats = (isDaily = false) => async () => {
         snaps = Object.keys(snapsByName).map((key) => {
             const snap = snapsByName[key];
             snap.architecture = [...new Set(snap.architecture)];
+            snap.sections = [...new Set(snap.sections.map(section => section.name))]
             return snap;
         });
 
@@ -102,6 +105,12 @@ export const collectStats = (isDaily = false) => async () => {
                     .map(addDate())
                     .map(addIsDaily)
                 ).catch(err => console.error(`licenses: ${err.toString()}`)),
+
+                SectionsModel.insertMany(
+                    sections.map(section => (section.name) ? section: { ...section, name: 'unset' })
+                    .map(addDate())
+                    .map(addIsDaily())
+                ).catch(err => console.error(`sections: ${err.toString()}`)),
 
                 SnapsModel.insertMany(
                     snaps.map(snap => (snap.name) ? snap : { ...snap, name: 'unset' })
