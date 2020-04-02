@@ -5,6 +5,7 @@ process.env.NODE_ENV = process.env.NODE_ENV || 'production';
 const filename = process.env.NODE_ENV === 'production' ? './server/server' : './__sapper__/build/server/server';
 const entrypoint = require(filename);
 
+const snapsSnapshotPubsubTopic = functions.config().pubsub.snaps_snapshot_topic
 const newSnapsPubsubTopic = functions.config().pubsub.newsnaps_topic
 
 const server = functions.runWith({
@@ -35,6 +36,10 @@ const dailyThinStats = functions.runWith({
     memory: '128MB',
 }).pubsub.schedule('48 23 * * *').onRun((...args) => entrypoint.getThinStats(...args));
 
+const snapsSnapshotSubscriber = functions.runWith({
+    timeoutSeconds: 30,
+    memory: '128MB',
+}).pubsub.topic(snapsSnapshotPubsubTopic).onPublish((...args) => entrypoint.getSnapsSnapshotSubscriber(...args));
 const newSnapSubscriber = functions.runWith({
     timeoutSeconds: 30,
     memory: '128MB',
@@ -47,5 +52,6 @@ module.exports = {
     dailyStats,
     dailyRatings,
     dailyThinStats,
+    snapsSnapshotSubscriber,
     newSnapSubscriber,
 };

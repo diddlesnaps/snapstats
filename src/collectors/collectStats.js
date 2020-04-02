@@ -9,9 +9,9 @@ import {DeveloperCountsModel} from '../models/DeveloperCount';
 import {LicensesModel} from '../models/License';
 import {SectionsModel} from '../models/Section';
 import {SnapCountsModel} from '../models/SnapCount';
-import {SnapsModel} from '../models/Snaps';
+// import {SnapsModel} from '../models/Snaps';
 
-import getStats from '../snapstore-api';
+import {getStats} from '../snapstore-api';
 import {updateLastUpdated} from './updateLastUpdated';
 import { LastUpdatedModel } from '../models/LastUpdated';
 
@@ -39,31 +39,37 @@ export const collectStats = (isDaily = false) => async () => {
         let { snaps } = stats;
 
         const snapsByName = {};
-        snaps.forEach((snap) => {
+        snaps.forEach(({details_api_url, snap}) => {
             if (!snap.name) {
                 return;
             }
             const name = snap.name;
             if (snapsByName[name]) {
-                const metaSnap = snapsByName[name];
                 if (snap.architecture) {
-                    if (metaSnap.architecture) {
-                        metaSnap.architecture = [...metaSnap.architecture, ...snap.architecture];
+                    if (snapsByName[name].snap.architecture) {
+                        snapsByName[name].snap.architecture = [
+                            ...snapsByName[name].snap.architecture,
+                            ...snap.architecture
+                        ];
                     } else {
-                        metaSnap.architecture = snap.architecture;
+                        snapsByName[name].snap.architecture = snap.architecture;
                     }
-                    snapsByName[name] = metaSnap;
                 }
             } else {
-                snapsByName[name] = snap;
+                snapsByName[name] = {
+                    snap,
+                    details_api_url,
+                };
             }
         });
 
-        snaps = Object.keys(snapsByName).map((key) => {
-            const snap = snapsByName[key];
+        snaps = Object.values(snapsByName).map(({snap, details_api_url}) => {
             snap.architecture = [...new Set(snap.architecture)];
             snap.sections = [...new Set(snap.sections.map(section => section.name))]
-            return snap;
+            return {
+                snap,
+                details_api_url,
+            };
         });
 
         const addDate = (dateKey = null) => (data) => {
@@ -112,11 +118,11 @@ export const collectStats = (isDaily = false) => async () => {
                     .map(addIsDaily)
                 ).catch(err => console.error(`collectors/collectStats.js: sections: ${err.toString()}`)),
 
-                SnapsModel.insertMany(
-                    snaps.map(snap => (snap.name) ? snap : { ...snap, name: 'unset' })
-                    .map(addDate('snapshot_date'))
-                    .map(addIsDaily)
-                ).catch(err => console.error(`collectors/collectStats.js: snaps: ${err.toString()}`)),
+                // SnapsModel.insertMany(
+                //     snaps.map(snap => (snap.name) ? snap : { ...snap, name: 'unset' })
+                //     .map(addDate('snapshot_date'))
+                //     .map(addIsDaily)
+                // ).catch(err => console.error(`collectors/collectStats.js: snaps: ${err.toString()}`)),
 
                 DeveloperCountsModel.insertMany(
                     [addDate()(developer_counts)]
@@ -128,30 +134,30 @@ export const collectStats = (isDaily = false) => async () => {
                     .map(addIsDaily)
                 ).catch(err => console.error(`collectors/collectStats.js: snapCounts: ${err.toString()}`)),
             ];
-
-            await Promise.all(promises);
-            await updateLastUpdated(date, isDaily);
-
+            
             const pubsub = new PubSub()
-            const newSnapsPubsubTopic = pubsub.topic(functions.config().pubsub.newsnaps_topic)
+            const snapsSnapshotPubsubTopic = pubsub.topic(functions.config().pubsub.snaps_snapshot_topic)
 
-            await Promise.all(snaps
-                .filter(snap => new Date(snap.date_published) > previousSnapshot.date)
+            promises.concat(snaps
+                .map(addDate('snapshot_date'))
+                .map(addIsDaily)
                 .map(async snap => {
                     const data = {
-                        name: snap.title,
-                        slug: snap.package_name,
+                        prevDate: previousSnapshot.date,
+                        snap,
                     }
                     const dataBuffer = Buffer.from(JSON.stringify(data), 'utf8')
                     try {
-                        return newSnapsPubsubTopic.publish(dataBuffer);
-                    } catch (e) {
-                        return console.error(`collectors/collectStats.js: New Snap PubSub publish error: ${e}`);
+                        return snapsSnapshotPubsubTopic.publish(dataBuffer)
+                    } catch(e) {
+                        return console.error(`collectors/collectStats.js: Snap snapshot PubSub publish error: ${e}`);
                     }
                 }))
+            await Promise.all(promises);
+            await updateLastUpdated(date, isDaily);
         }
     } catch (err) {
-        console.error(err.toString());
+        console.error(`collectors/collectStats.js: collectStats() error: ${err}`);
     }
     console.log(`Stats update completed at ${new Date().toLocaleString()}`);
 };

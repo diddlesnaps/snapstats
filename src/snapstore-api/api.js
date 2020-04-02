@@ -39,8 +39,6 @@ const detailsfields = [
     'prices',
     'private',
     'publisher',
-    'snap_id',
-    'store_url',
     'summary',
     'title',
     'trending',
@@ -113,11 +111,11 @@ class SnapApi {
                 const name = snap.package_name;
 
                 if (!snapMap[name]) {
-                    snapMap[name] = snap;
+                    snapMap[name] = {snap};
                 } else {
-                    const oldSnap = snapMap[name];
+                    const oldSnap = snapMap[name].snap;
 
-                    let arches = snap.architecture.concat(snapMap[name].architecture || '');
+                    let arches = snap.architecture.concat(oldSnap.architecture || '');
                     arches = arches.filter((value, index_1, self) => {
                         return self.indexOf(value) === index_1;
                     });
@@ -127,10 +125,11 @@ class SnapApi {
                     }
 
                     if (!oldSnap.revision || !snap.revision || snap.revision > oldSnap.revision) {
-                        snapMap[name] = snap;
+                        snapMap[name].snap = snap;
                     }
 
-                    snapMap[name].architecture = arches;
+                    snapMap[name].snap.architecture = arches;
+                    snapMap[name].details_api_url = `${this.details_url}/${name}?fields=${detailsfields}`
                 }
             }
             if (index < spider.snaps.architectures.length) {
@@ -139,16 +138,16 @@ class SnapApi {
             }
         }
 
-        for (const snapName of Object.keys(snapMap)) {
-            try {
-                snapMap[snapName] = {
-                    ...snapMap[snapName],
-                    ...await this.details(snap.packageName),
-                }
-            } catch (e) {
-                console.error(`snapstore-api/api.js: Error fetching snap details for ${snapName}`, e)
-            }
-        }
+        // for (const snapName of Object.keys(snapMap)) {
+        //     try {
+        //         snapMap[snapName] = {
+        //             ...snapMap[snapName],
+        //             ...(await this.details(snapName)).snap,
+        //         }
+        //     } catch (e) {
+        //         console.error(`snapstore-api/api.js: Error fetching snap details for ${snapName}`, e)
+        //     }
+        // }
 
         console.debug(`total packages: ${Object.keys(snapMap).length}`);
         return Object.values(snapMap);
@@ -192,40 +191,11 @@ class SnapApi {
     }
 
     async details(packageName, arches, section, series) {
-        console.debug('snapstore-api/api.js: : getting details for ' + packageName);
+        // console.debug('snapstore-api/api.js: : getting details for ' + packageName);
 
-        const url = `${this.details_url}/details/${packageName}?fields=${fields}`;
-        // const promises = arches.map(async (arch) => {
-        //     try {
-        //         return this.detailsArch(url, arch, series);
-        //     } catch (e) {
-        //         // console.error(`Failed getting details of snap "${packageName}:${arch}"`);
-        //         return null;
-        //     }
-        // });
-        // const results = await Promise.all(promises);
+        const url = `${this.details_url}/${packageName}?fields=${detailsfields}`;
 
-        const results = await this.detailsArch(url, 'all', 16)
-
-        let snap = {};
-        const downloads = {};
-        results.forEach((result) => {
-            if (result) {
-                if (!snap || (result.revision && snap.revision && result.revision > snap.revision)) {
-                    snap = result;
-                }
-                if (result.anon_download_url && result.architecture) {
-                    downloads[result.architecture[0]] = result.anon_download_url;
-                }
-            }
-        });
-        if (snap !== {}) {
-            snap.downloads = downloads;
-            snap.architecture = arches;
-            snap.section = section;
-            return snap;
-        }
-        return null;
+        return await this.detailsArch(url, 'all', 16)
     }
 
     async sections() {

@@ -1,16 +1,31 @@
+import { request } from 'gaxios';
 import { spider } from './config';
 import SnapApi from './api';
-
 function sort(array) {
     return array.sort((a, b) => b.count - a.count);
 }
 
-export default () => {
+export const getDetails = async (url) => {
+    const headers = {
+        'User-Agent': spider.snaps.user_agent,
+        'Snap-Device-Series': '16',
+    };
+
+    const res = await request({
+        method: 'GET',
+        url,
+        headers,
+    });
+    
+    return res.data;
+}
+
+export const getStats = () => {
     return Promise.all(spider.snaps.stores.map(async (store) => {
         const api = new SnapApi(store);
         const snaps = await api.list();
 
-        const non_hello_or_test_snaps = snaps.reduce((carry, snap) => {
+        const non_hello_or_test_snaps = snaps.reduce((carry, {snap}) => {
             let newCarry = carry || [];
             const name = ('name' in snap) ? snap.name : '';
             if (name && !name.match(/^(hello|test)-/) && !name.match(/-test$/)) {
@@ -19,7 +34,7 @@ export default () => {
             return newCarry;
         }, []).map((snap) => ({
             ...snap,
-            base_snap: snap.base || 'core',
+            base_snap: obj.snap.base || 'core',
         }));
 
         console.debug('snapstore-api/index.js: Extracting counts')
@@ -51,6 +66,7 @@ export default () => {
 
         console.debug('snapstore-api/index.js: Returning complete results')
         return {
+            snaps,
             licenses,
             sections,
             architectures,
@@ -65,7 +81,6 @@ export default () => {
                 total: snaps.length,
                 filtered: non_hello_or_test_snaps.length,
             },
-            snaps: non_hello_or_test_snaps,
         };
     }));
 };
