@@ -24,7 +24,7 @@ export const getStats = () => {
     return Promise.all(spider.snaps.stores.map(async (store) => {
         const api = new SnapApi(store);
         const snaps = await api.list();
-
+console.dir(snaps)
         const non_hello_or_test_snaps = snaps.reduce((carry, {snap}) => {
             let newCarry = carry || [];
             const name = ('name' in snap) ? snap.name : '';

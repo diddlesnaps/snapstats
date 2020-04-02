@@ -76,21 +76,21 @@ class SnapApi {
             }));
         }
 
-        if (res.data._links && res.data._links.next && res.data._links.next.href) {
-            let nextUrl = res.data._links.next.href;
+        // if (res.data._links && res.data._links.next && res.data._links.next.href) {
+        //     let nextUrl = res.data._links.next.href;
 
-            // Not sure why these links are coming back so weird, but this fixes it
-            nextUrl = nextUrl.replace('http://snapdevicegw_cached', this.domain);
-            nextUrl = nextUrl.replace('https://snapdevicegw_cached', this.domain);
+        //     // Not sure why these links are coming back so weird, but this fixes it
+        //     nextUrl = nextUrl.replace('http://snapdevicegw_cached', this.domain);
+        //     nextUrl = nextUrl.replace('https://snapdevicegw_cached', this.domain);
 
-            return this.listArch(nextUrl, arch, section, results);
-        } else {
+        //     return this.listArch(nextUrl, arch, section, results);
+        // } else {
             return results;
-        }
+        // }
     }
 
     async searchList() {
-        const url = `${this.url}/search?size=${spider.snaps.page_size}&confinement=strict,devmode,classic&scope=wide&fields=${searchfields}`;
+        const url = `${this.url}/search?size=1&confinement=strict,devmode,classic&scope=wide&fields=${searchfields}`;
         const promises = spider.snaps.architectures.map((architecture) => {
             return this.listArch(url, architecture);
         });
@@ -138,6 +138,7 @@ class SnapApi {
             }
         }
 
+        console.dir(snapMap)
         // for (const snapName of Object.keys(snapMap)) {
         //     try {
         //         snapMap[snapName] = {
@@ -161,10 +162,10 @@ class SnapApi {
         const searchResults = results[0];
         const sectionResults = results[1];
         searchResults.forEach((searchResult) => {
-            searchResult.categories = sectionResults.filter((sectionResult) => {
-                return (sectionResult.package_name === searchResult.package_name);
+            searchResult.snap.categories = sectionResults.filter((sectionResult) => {
+                return (sectionResult.snap.package_name === searchResult.snap.package_name);
             }).map((sectionResult) => {
-                return sectionResult.section;
+                return sectionResult.snap.section;
             });
         });
         console.debug('snapstore-api/api.js: : Returning package results')
@@ -219,10 +220,7 @@ class SnapApi {
             return this.listArch(`${this.url}/search?size=${spider.snaps.page_size}&confinement=strict,devmode,classic&section=${section.name}&scope=wide&fields=${searchfields}`, undefined, section.name, []);
         }));
         let results = [];
-        sectionResults.forEach((sectionResult) => {
-            results = results.concat(sectionResult);
-        });
-        return results;
+        return results.concat(sectionResults.map((sectionResult) => ({snap: sectionResult})))
     }
 }
 

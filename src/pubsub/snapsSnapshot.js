@@ -18,10 +18,8 @@ export const snapsSnapshotSubscriber = async (message) => {
 
         const publisher = combined.publisher['display-name']
         const validation = combined.publisher.validation
-        const developer_id = combined.publisher.id
         const snap = {
             ...combined,
-            developer_id,
             publisher,
             validation,
             snapshot_date,
