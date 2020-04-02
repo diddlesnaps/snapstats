@@ -46,9 +46,7 @@
 </script>
 
 <script>
-    if (process.browser) {
-        import('fslightbox')
-    }
+    import { onMount } from 'svelte';
     import marked from 'marked'
     import createDOMPurify from 'dompurify'
     const DOMPurify = createDOMPurify(window)
@@ -81,6 +79,11 @@
 	restore(client, q, cache)
 	setClient(client)
     let data = query(client, { query: q })
+
+    onMount(async () => {
+        await import('fslightbox')
+        refreshFsLightbox()
+    })
 </script>
 
 <style>
@@ -247,9 +250,14 @@
                 "dateModified": new Date(result.data.snapByName.last_updated).toISOString(),
                 "name" : result.data.snapByName.title || result.data.snapByName.package_name,
                 "image" : result.data.snapByName.icon_url,
-                "publisher": result.data.snapByName.developer_name || result.data.snapByName.publisher,
+                "publisher": {
+                    "@type": "Person",
+                    "name": result.data.snapByName.developer_name || result.data.snapByName.publisher,
+                    "url": result.data.snapByName.website,
+                },
                 "applicationCategory": result.data.snapByName.categories.join(', '),
                 "softwareVersion": result.data.snapByName.version,
+                "license": result.data.snapByName.license,
                 "description": result.data.snapByName.summary,
                 "operatingSystem": "Linux",
                 "softwareRequirements": "Snapd",
