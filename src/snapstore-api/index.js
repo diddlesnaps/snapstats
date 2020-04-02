@@ -22,6 +22,7 @@ export default () => {
             base_snap: snap.base || 'core',
         }));
 
+        console.debug('snapstore-api/index.js: Extracting counts')
         const license_counts      = extractCombinedLicenseCounts(getCounts('license', non_hello_or_test_snaps));
         const section_counts      = getCounts('sections.name', non_hello_or_test_snaps)
         const architecture_counts = getCounts('architecture', non_hello_or_test_snaps);
@@ -40,6 +41,7 @@ export default () => {
 
         const mapCounts = (cnts) => (key) => ({name: key, count: cnts[key]});
 
+        console.debug('snapstore-api/index.js: Formatting count data')
         const licenses      = sort(Object.keys(license_counts)     .map(mapCounts(license_counts)));
         const sections      = sort(Object.keys(section_counts)     .map(mapCounts(section_counts)))
         const bases         = sort(Object.keys(base_counts)        .map(mapCounts(base_counts)));
@@ -47,6 +49,7 @@ export default () => {
         const confinements  = sort(Object.keys(confinement_counts) .map(mapCounts(confinement_counts)));
         const channels      = sort(Object.keys(channel_counts)     .map(mapCounts(channel_counts)));
 
+        console.debug('snapstore-api/index.js: Returning complete results')
         return {
             licenses,
             sections,

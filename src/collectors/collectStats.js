@@ -80,53 +80,53 @@ export const collectStats = (isDaily = false) => async () => {
                     architectures.map(architecture => (architecture.name) ? architecture : { ...architecture, name: 'unset' })
                     .map(addDate())
                     .map(addIsDaily)
-                ).catch(err => console.error(`architectures: ${err.toString()}`)),
+                ).catch(err => console.error(`collectors/collectStats.js: architectures: ${err.toString()}`)),
 
                 BasesModel.insertMany(
                     bases.map(base => (base.name) ? base : { ...base, name: 'core' })
                     .map(addDate())
                     .map(addIsDaily)
-                ).catch(err => console.error(`bases: ${err.toString()}`)),
+                ).catch(err => console.error(`collectors/collectStats.js: bases: ${err.toString()}`)),
 
                 ChannelsModel.insertMany(
                     channels.map(channel => (channel.name) ? channel : { ...channel, name: 'unset' })
                     .map(addDate())
                     .map(addIsDaily)
-                ).catch(err => console.error(`channels: ${err.toString()}`)),
+                ).catch(err => console.error(`collectors/collectStats.js: channels: ${err.toString()}`)),
 
                 ConfinementsModel.insertMany(
                     confinements.map(confinement => (confinement.name) ? confinement : { ...confinement, name: 'unset' })
                     .map(addDate())
                     .map(addIsDaily)
-                ).catch(err => console.error(`confinements: ${err.toString()}`)),
+                ).catch(err => console.error(`collectors/collectStats.js: confinements: ${err.toString()}`)),
 
                 LicensesModel.insertMany(
                     licenses.map(license => (license.name) ? license : { ...license, name: 'unset' })
                     .map(addDate())
                     .map(addIsDaily)
-                ).catch(err => console.error(`licenses: ${err.toString()}`)),
+                ).catch(err => console.error(`collectors/collectStats.js: licenses: ${err.toString()}`)),
 
                 SectionsModel.insertMany(
                     sections.map(section => (section.name) ? section: { ...section, name: 'unset' })
                     .map(addDate())
-                    .map(addIsDaily())
-                ).catch(err => console.error(`sections: ${err.toString()}`)),
+                    .map(addIsDaily)
+                ).catch(err => console.error(`collectors/collectStats.js: sections: ${err.toString()}`)),
 
                 SnapsModel.insertMany(
                     snaps.map(snap => (snap.name) ? snap : { ...snap, name: 'unset' })
                     .map(addDate('snapshot_date'))
                     .map(addIsDaily)
-                ).catch(err => console.error(`snaps: ${err.toString()}`)),
+                ).catch(err => console.error(`collectors/collectStats.js: snaps: ${err.toString()}`)),
 
                 DeveloperCountsModel.insertMany(
                     [addDate()(developer_counts)]
                     .map(addIsDaily)
-                ).catch(err => console.error(`developerCounts: ${err.toString()}`)),
+                ).catch(err => console.error(`collectors/collectStats.js: developerCounts: ${err.toString()}`)),
 
                 SnapCountsModel.insertMany(
                     [addDate()(snap_counts)]
                     .map(addIsDaily)
-                ).catch(err => console.error(`snapCounts: ${err.toString()}`)),
+                ).catch(err => console.error(`collectors/collectStats.js: snapCounts: ${err.toString()}`)),
             ];
 
             await Promise.all(promises);
@@ -146,7 +146,7 @@ export const collectStats = (isDaily = false) => async () => {
                     try {
                         return newSnapsPubsubTopic.publish(dataBuffer);
                     } catch (e) {
-                        return console.error(`New Snap PubSub publish error: ${e}`);
+                        return console.error(`collectors/collectStats.js: New Snap PubSub publish error: ${e}`);
                     }
                 }))
         }

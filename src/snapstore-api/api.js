@@ -69,7 +69,7 @@ class SnapApi {
             headers,
         })
 
-        // logger.debug(`got package list page: ${url} (${arch}, ${section})`);
+        // console.debug(`got package list page: ${url} (${arch}, ${section})`);
 
         if (res.data && res.data._embedded && res.data._embedded['clickindex:package']) {
             results = results.concat(res.data._embedded['clickindex:package'].map((snap) => {
@@ -103,7 +103,7 @@ class SnapApi {
         let arch = 'all';
         let index = 0;
         for (const result of results) {
-            // logger.debug(`total packages (${arch}): ${snaps.length}`);
+            // console.debug(`total packages (${arch}): ${snaps.length}`);
             for (const snap of result) {
                 if (!snap.package_name) {
                     continue;
@@ -145,12 +145,12 @@ class SnapApi {
                     ...snapMap[snapName],
                     ...await this.details(snap.packageName),
                 }
-            } catch {
-                continue
+            } catch (e) {
+                console.error(`snapstore-api/api.js: Error fetching snap details for ${snapName}`, e)
             }
         }
 
-        // logger.debug(`total packages: ${Object.keys(snapMap).length}`);
+        console.debug(`total packages: ${Object.keys(snapMap).length}`);
         return Object.values(snapMap);
     }
 
@@ -168,6 +168,7 @@ class SnapApi {
                 return sectionResult.section;
             });
         });
+        console.debug('snapstore-api/api.js: : Returning package results')
         return searchResults;
     }
 
@@ -191,19 +192,21 @@ class SnapApi {
     }
 
     async details(packageName, arches, section, series) {
-        // logger.debug('getting details for ' + packageName);
+        console.debug('snapstore-api/api.js: : getting details for ' + packageName);
 
         const url = `${this.details_url}/details/${packageName}?fields=${fields}`;
-        const promises = arches.map(async (arch) => {
-            try {
-                return this.detailsArch(url, arch, series);
-            } catch (e) {
-                // logger.error(`Failed getting details of snap "${packageName}:${arch}"`);
-                return null;
-            }
-        });
+        // const promises = arches.map(async (arch) => {
+        //     try {
+        //         return this.detailsArch(url, arch, series);
+        //     } catch (e) {
+        //         // console.error(`Failed getting details of snap "${packageName}:${arch}"`);
+        //         return null;
+        //     }
+        // });
+        // const results = await Promise.all(promises);
 
-        const results = await Promise.all(promises);
+        const results = await this.detailsArch(url, 'all', 16)
+
         let snap = {};
         const downloads = {};
         results.forEach((result) => {
