@@ -70,27 +70,24 @@ class SnapApi {
         // console.debug(`got package list page: ${url} (${arch}, ${section})`);
 
         if (res.data && res.data._embedded && res.data._embedded['clickindex:package']) {
-            results = results.concat(res.data._embedded['clickindex:package'].map((snap) => {
-                snap.section = section;
-                return snap;
-            }));
+            results = results.concat(res.data._embedded['clickindex:package']);
         }
 
-        // if (res.data._links && res.data._links.next && res.data._links.next.href) {
-        //     let nextUrl = res.data._links.next.href;
+        if (res.data._links && res.data._links.next && res.data._links.next.href) {
+            let nextUrl = res.data._links.next.href;
 
-        //     // Not sure why these links are coming back so weird, but this fixes it
-        //     nextUrl = nextUrl.replace('http://snapdevicegw_cached', this.domain);
-        //     nextUrl = nextUrl.replace('https://snapdevicegw_cached', this.domain);
+            // Not sure why these links are coming back so weird, but this fixes it
+            nextUrl = nextUrl.replace('http://snapdevicegw_cached', this.domain);
+            nextUrl = nextUrl.replace('https://snapdevicegw_cached', this.domain);
 
-        //     return this.listArch(nextUrl, arch, section, results);
-        // } else {
+            return this.listArch(nextUrl, arch, section, results);
+        } else {
             return results;
-        // }
+        }
     }
 
     async searchList() {
-        const url = `${this.url}/search?size=1&confinement=strict,devmode,classic&scope=wide&fields=${searchfields}`;
+        const url = `${this.url}/search?size=${spider.snaps.page_size}&confinement=strict,devmode,classic&scope=wide&fields=${searchfields}`;
         const promises = spider.snaps.architectures.map((architecture) => {
             return this.listArch(url, architecture);
         });
@@ -110,8 +107,12 @@ class SnapApi {
                 snap.architecture = (snap.architecture) ? snap.architecture : [arch];
                 const name = snap.package_name;
 
+                const details_api_url = `${this.details_url}/${name}?fields=${detailsfields}`
                 if (!snapMap[name]) {
-                    snapMap[name] = {snap};
+                    snapMap[name] = {
+                        snap,
+                        details_api_url
+                    };
                 } else {
                     const oldSnap = snapMap[name].snap;
 
@@ -138,38 +139,14 @@ class SnapApi {
             }
         }
 
-        console.dir(snapMap)
-        // for (const snapName of Object.keys(snapMap)) {
-        //     try {
-        //         snapMap[snapName] = {
-        //             ...snapMap[snapName],
-        //             ...(await this.details(snapName)).snap,
-        //         }
-        //     } catch (e) {
-        //         console.error(`snapstore-api/api.js: Error fetching snap details for ${snapName}`, e)
-        //     }
-        // }
-
         console.debug(`total packages: ${Object.keys(snapMap).length}`);
         return Object.values(snapMap);
     }
 
     async list() {
-        const results = await Promise.all([
-            this.searchList(),
-            this.searchSectionList(),
-        ]);
-        const searchResults = results[0];
-        const sectionResults = results[1];
-        searchResults.forEach((searchResult) => {
-            searchResult.snap.categories = sectionResults.filter((sectionResult) => {
-                return (sectionResult.snap.package_name === searchResult.snap.package_name);
-            }).map((sectionResult) => {
-                return sectionResult.snap.section;
-            });
-        });
+        const results = await this.searchList()
         console.debug('snapstore-api/api.js: : Returning package results')
-        return searchResults;
+        return results;
     }
 
     async detailsArch(url, arch, series) {

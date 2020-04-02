@@ -9,11 +9,10 @@ import {DeveloperCountsModel} from '../models/DeveloperCount';
 import {LicensesModel} from '../models/License';
 import {SectionsModel} from '../models/Section';
 import {SnapCountsModel} from '../models/SnapCount';
-// import {SnapsModel} from '../models/Snaps';
 
 import {getStats} from '../snapstore-api';
 import {updateLastUpdated} from './updateLastUpdated';
-import { LastUpdatedModel } from '../models/LastUpdated';
+import {LastUpdatedModel} from '../models/LastUpdated';
 
 const denysave = process.env.denysave === 'true' ? true : false;
 
@@ -21,11 +20,10 @@ export const collectStats = (isDaily = false) => async () => {
     const date = Date.now();
     console.log(`Updating stats at ${new Date(date).toLocaleString()}`);
     try {
-        const stats = (await getStats()).shift();
+        const stats = (await getStats()).shift()
         if (!stats) {
             throw new Error(`No data returned from getStats().`);
         }
-        const previousSnapshot = await LastUpdatedModel.findOne({})
         const {
             architectures,
             bases,
@@ -38,12 +36,13 @@ export const collectStats = (isDaily = false) => async () => {
         } = stats;
         let { snaps } = stats;
 
-        const snapsByName = {};
+        console.debug(`collectors/collectStats.js: Mapping Snaps by package_name`)
+        const snapsByName = {}
         snaps.forEach(({details_api_url, snap}) => {
-            if (!snap.name) {
+            if (!snap.package_name) {
                 return;
             }
-            const name = snap.name;
+            const name = snap.package_name;
             if (snapsByName[name]) {
                 if (snap.architecture) {
                     if (snapsByName[name].snap.architecture) {
@@ -81,6 +80,7 @@ export const collectStats = (isDaily = false) => async () => {
         }
 
         if (!denysave) {
+            console.debug(`collectors/collectStats.js: Saving stats`)
             let promises = [
                 ArchitecturesModel.insertMany(
                     architectures.map(architecture => (architecture.name) ? architecture : { ...architecture, name: 'unset' })
@@ -139,12 +139,14 @@ export const collectStats = (isDaily = false) => async () => {
             const snapsSnapshotPubsubTopic = pubsub.topic(functions.config().pubsub.snaps_snapshot_topic)
 
             await Promise.all(promises);
+
+            console.debug(`collectors/collectStats.js: Publishing Snaps to snapshot PubSub topic`)
             promises = snaps
                 .map(addDate('snapshot_date'))
                 .map(addIsDaily)
                 .map(async snap => {
                     const data = {
-                        prevDate: previousSnapshot.date,
+                        prevDate: (await LastUpdatedModel.findOne({})).date,
                         ...snap,
                     }
                     const dataBuffer = Buffer.from(JSON.stringify(data), 'utf8')

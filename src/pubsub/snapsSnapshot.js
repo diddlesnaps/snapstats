@@ -16,12 +16,8 @@ export const snapsSnapshotSubscriber = async (message) => {
             return console.error(`pubsub/snapsSnapshot.js: Unable to load Snap data from store API: ${e}`)
         }
 
-        const publisher = combined.publisher['display-name']
-        const validation = combined.publisher.validation
         const snap = {
             ...combined,
-            publisher,
-            validation,
             snapshot_date,
             isDaily,
         }

@@ -24,18 +24,14 @@ export const getStats = () => {
     return Promise.all(spider.snaps.stores.map(async (store) => {
         const api = new SnapApi(store);
         const snaps = await api.list();
-console.dir(snaps)
-        const non_hello_or_test_snaps = snaps.reduce((carry, {snap}) => {
-            let newCarry = carry || [];
-            const name = ('name' in snap) ? snap.name : '';
-            if (name && !name.match(/^(hello|test)-/) && !name.match(/-test$/)) {
-                newCarry = [...newCarry, snap];
-            }
-            return newCarry;
-        }, []).map((snap) => ({
-            ...snap,
-            base_snap: obj.snap.base || 'core',
-        }));
+
+        const non_hello_or_test_snaps = snaps
+            .filter(({snap}) =>
+                'package_name' in snap && !snap.package_name.match(/^(hello|test)-/) && !snap.package_name.match(/-test$/))
+            .map(({snap}) => ({
+                ...snap,
+                base_snap: snap.base || 'core',
+            }));
 
         console.debug('snapstore-api/index.js: Extracting counts')
         const license_counts      = extractCombinedLicenseCounts(getCounts('license', non_hello_or_test_snaps));
