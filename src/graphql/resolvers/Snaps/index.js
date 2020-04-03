@@ -26,7 +26,10 @@ const getRating = async (snap) => {
     }
 }
 
-const snapsByDateFn = (snapshot_date) => SnapsModel.find({ snapshot_date })
+const snapsByDateFn = (snapshot_date) => SnapsModel.find({$and: [
+    {snapshot_date},
+    {name: {$not: /(^(test|hello)-|-test$)/i}},
+]})
 
 const searchSnapsFn = (args, snapshot_date) => {
     let query = { snapshot_date, $and: [] }
@@ -34,10 +37,13 @@ const searchSnapsFn = (args, snapshot_date) => {
     if (args.name) {
         const name = escapeRegExp(args.name)
 
-        query.$and.push({$or: [
-            {name: {$regex: name, $options: 'i'}},
-            {title: {$regex: name, $options: 'i'}},
-            {package_name: {$regex: name, $options: 'i'}},
+        query.$and.push({$and: [
+            {$or: [
+                {name: {$regex: name, $options: 'i'}},
+                {title: {$regex: name, $options: 'i'}},
+                {package_name: {$regex: name, $options: 'i'}},
+            ]},
+            {name: {$not: /(^(test|hello)-|-test$)/i}},
         ]})
     }
 
