@@ -1,32 +1,41 @@
 export const schema = `
+    type SnapMedia {
+        type: String
+        width: Int
+        height: Int
+        url: String
+    }
+
     type Snap {
         _id: ID!
-        snap_id: String
-        name: String!
-        package_name: String
+        architecture: [String]
         base_snap: String
         common_ids: [String]
-        title: String
-        summary: String
-        description: String
-        architecture: [String]
-        website: String
         contact: String
-        version: String
+        date_published: Date
+        description: String
+        developer_id: String
+        developer_name: String
+        developer_username: String
+        developer_validation: String
         icon_url: String
-        screenshot_urls: [String]
+        last_updated: Date
+        license: String
+        media: [SnapMedia]
+        name: String!
+        package_name: String
+        prices: [Price]
+        publisher: String
         ratings_average: Float
         ratings_count: Int
-        prices: [Price]
-        license: String
-        developer_id: String
-        developer_validation: String
-        publisher: String
-        developer_name: String
-        date_published: Date
-        last_updated: Date
+        screenshot_urls: [String]
+        sections: [String]
+        snap_id: String
         snapshot_date: Date
-        categories: [String]
+        summary: String
+        title: String
+        version: String
+        website: String
     }
 
     type Query {

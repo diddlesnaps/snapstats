@@ -8,7 +8,7 @@
         query($slug:String!) {
             snapByName(name:$slug) {
                 architecture
-                categories
+                sections
                 contact
                 date_published
                 description
@@ -255,7 +255,7 @@
                     "name": result.data.snapByName.developer_name || result.data.snapByName.publisher,
                     "url": result.data.snapByName.website,
                 },
-                "applicationCategory": result.data.snapByName.categories.join(', '),
+                "applicationCategory": result.data.snapByName.sections ? result.data.snapByName.sections.join(', ') : [],
                 "softwareVersion": result.data.snapByName.version,
                 "license": result.data.snapByName.license,
                 "description": result.data.snapByName.summary,
@@ -341,9 +341,9 @@
                         {/if}
                         </dd>
                     {/if}
-                    {#if result.data.snapByName.categories}
+                    {#if result.data.snapByName.sections}
                         <dt>Category:</dt>
-                        <dd>{result.data.snapByName.categories.join(', ')}</dd>
+                        <dd>{result.data.snapByName.sections.join(', ')}</dd>
                     {/if}
                     {#if result.data.snapByName.license}
                         <dt>License:</dt>
