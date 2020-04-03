@@ -90,6 +90,10 @@ export default {
                 } },
                 { $project: { count: { $size: '$uniqueDevelopers' } } }
             ])
+            if (developerCounts.length === 0) {
+                return {count: 0}
+            }
+
             const {count} = developerCounts.shift()
             return {count}
         },
