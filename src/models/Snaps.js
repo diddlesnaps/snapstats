@@ -98,6 +98,9 @@ const SnapsSchema = new Schema({
         type: String,
         required: true,
     },
+    publisher_username: {
+        type: String,
+    },
     ratings_average: {
         type: Number,
     },

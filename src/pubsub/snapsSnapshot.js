@@ -9,7 +9,7 @@ export const snapsSnapshotSubscriber = async (message) => {
 
         let details = {}
         try {
-            details = (await getDetails(details_api_url)).snap,
+            details = (await getDetails(details_api_url)).snap
         } catch (e) {
             return console.error(`pubsub/snapsSnapshot.js: Unable to load Snap data from store API: ${e}`)
         }
@@ -17,9 +17,9 @@ export const snapsSnapshotSubscriber = async (message) => {
         const snap = {
             ...details,
             ...message.json.snap,
-            validation:         details.publisher.validation,
-            publisher_username: details.publisher.username,
-            publisher:          details.publisher['display-name'],
+            developer_validation: details.publisher.validation,
+            publisher_username:   details.publisher.username,
+            publisher:            details.publisher['display-name'],
             snapshot_date,
             isDaily,
         }
@@ -27,6 +27,7 @@ export const snapsSnapshotSubscriber = async (message) => {
         try {
             await new SnapsModel(snap).save()
         } catch (e) {
+            console.dir(snap)
             return console.error(`pubsub/snapsSnapshot.js: Save Snap data error: ${e}`);
         }
 
