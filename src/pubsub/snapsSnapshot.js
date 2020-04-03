@@ -9,8 +9,8 @@ export const snapsSnapshotSubscriber = async (message) => {
         let combined = {}
         try {
             combined = {
-                ...message.json.snap,
                 ...(await getDetails(details_api_url)).snap,
+                ...message.json.snap,
             }
         } catch (e) {
             return console.error(`pubsub/snapsSnapshot.js: Unable to load Snap data from store API: ${e}`)
