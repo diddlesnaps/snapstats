@@ -6,16 +6,22 @@ import {SnapsModel} from '../models/Snaps';
 export const snapsSnapshotSubscriber = async (message) => {
     if (message.json && message.json.snap) {
         const {snapshot_date, details_api_url, isDaily} = message.json
-        let snap = {}
+
+        let details = {}
         try {
-            snap = {
-                ...(await getDetails(details_api_url)).snap,
-                ...message.json.snap,
-                snapshot_date,
-                isDaily,
-            }
+            details = (await getDetails(details_api_url)).snap,
         } catch (e) {
             return console.error(`pubsub/snapsSnapshot.js: Unable to load Snap data from store API: ${e}`)
+        }
+        
+        const snap = {
+            ...details,
+            ...message.json.snap,
+            validation:         details.publisher.validation,
+            publisher_username: details.publisher.username,
+            publisher:          details.publisher['display-name'],
+            snapshot_date,
+            isDaily,
         }
 
         try {
