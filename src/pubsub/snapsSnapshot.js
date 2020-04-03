@@ -31,7 +31,7 @@ export const snapsSnapshotSubscriber = async (message) => {
             return console.error(`pubsub/snapsSnapshot.js: Save Snap data error: ${e}`);
         }
 
-        if (new Date(snap.date_published) > message.json.prevDate) {
+        if (!snap.package_name.match(/(^(test|hello)-|-test$)/i) && new Date(snap.date_published) > message.json.prevDate) {
             const pubsub = new PubSub()
             const newSnapsPubsubTopic = pubsub.topic(functions.config().pubsub.newsnaps_topic)
             const data = {
