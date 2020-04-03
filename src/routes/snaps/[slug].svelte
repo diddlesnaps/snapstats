@@ -13,10 +13,15 @@
                 date_published
                 description
                 developer_name
+                developer_username
                 developer_validation
                 icon_url
                 last_updated
                 license
+                media{
+                    url
+                    type
+                }
                 name
                 package_name
                 publisher
@@ -80,10 +85,42 @@
 	setClient(client)
     let data = query(client, { query: q })
 
+    let video
+
     onMount(async () => {
+        const result = await $data
+        if (result.data.snapByName.media) {
+            video = result.data.snapByName.media.filter(m => m.type === 'video').shift()
+            if ('url' in video) {
+                if (video.url.match(/youtube/)) {
+                    video.url = video.url.replace('watch?w=', 'embed/')
+                    video.type = 'youtube'
+                }
+                if (video.url.match(/youtu\.be/)) {
+                    video.url = video.url.replace('youtu.be', 'youtube.com/embed/')
+                    video.type = 'youtube'
+                }
+                if (video.url.match(/vimeo/)) {
+                    video.url = video.url.replace('vimeo.com/', 'player.vimeo.com/video/')
+                    video.type = 'vimeo'
+                }
+                if (video.url.match(/asciinema/)) {
+                    video.url = video.url = video.url + '.js'
+                    video.type = 'asciinema'
+                }
+                video.url = video.url.replace('http://', 'https://')
+            }
+        }
         await import('fslightbox')
         refreshFsLightbox()
     })
+
+    function vimeo() {
+        const vimeoPlayerScript = document.createElement("script");
+        vimeoPlayerScript.src = "";
+        const firstScript = document.getElementsByTagName("script")[0];
+        firstScript.parentNode.insertBefore(vimeoPlayerScript, firstScript);
+    }
 </script>
 
 <style>
@@ -358,7 +395,7 @@
                         <dd><a href={result.data.snapByName.contact}>{result.data.snapByName.contact}</a></dd>
                     {/if}
                     {#if result.data.snapByName.developer_name || result.data.snapByName.publisher}
-                        <dt>Published to the Snap Store by</dt>
+                        <dt>Published to the Snap Store by:</dt>
                         <dd>
                             {result.data.snapByName.developer_name || result.data.snapByName.publisher}
                             {#if result.data.snapByName.developer_validation === 'verified'}
@@ -367,7 +404,7 @@
                         </dd>
                     {/if}
                     {#if result.data.snapByName.date_published}
-                        <dt>Published on</dt>
+                        <dt>Published on:</dt>
                         <dd>
                             <time dateTime={new Date(result.data.snapByName.date_published).toISOString()}>
                                 {new Date(result.data.snapByName.date_published).toLocaleString()}
@@ -375,7 +412,7 @@
                         </dd>
                     {/if}
                     {#if result.data.snapByName.last_updated}
-                        <dt>Last modified on</dt>
+                        <dt>Last modified on:</dt>
                         <dd>
                             <time dateTime={new Date(result.data.snapByName.last_updated).toISOString()}>
                                 {new Date(result.data.snapByName.last_updated).toLocaleString()}
@@ -396,6 +433,20 @@
         ).length > 0}
             <h2>Screenshots</h2>
             <div class='screenshots'>
+                {#if video && 'url' in video && 'type' in video}
+                    {#if video.type === 'youtube'}
+                        <iframe id="ytplayer" type="text/html" width="818" height="460" title="Youtube player"
+                            src="{video.url}?autoplay=1&mute=1&modestbranding=1&rel=0" frameborder="0"></iframe>
+                    {/if}
+                    {#if video.type === 'vimeo'}
+                        <iframe id="vimeoplayer" width="818" height="460" frameborder="0" title="Vimeo player"
+                            webkitallowfullscreen mozallowfullscreen allowfullscreen
+                            src="{video.url}?title=0&byline=0&portrait=0&transparent=0"></iframe>
+                    {/if}
+                    {#if video.type === 'asciinema'}
+                        <script src="{video.url}" id="asciicast" async data-autoplay="1" data-preload="0"></script>
+                    {/if}
+                {/if}
                 {#each result.data.snapByName.screenshot_urls.filter(
                     url => !url.match(/\/banner(-icon)?_\w{7}.(png|jpg)$/)
                 ) as screenshot}
