@@ -1,10 +1,20 @@
 <script>
 	import { stores } from '@sapper/app';
+	import '@beyonk/gdpr-cookie-consent-banner/dist/style.css'
+	import GdprBanner from '@beyonk/gdpr-cookie-consent-banner/src/components/Banner.svelte'
 	import Nav from '../components/Nav.svelte';
 
 	export let segment;
 
 	const { page } = stores();
+	
+	function enableAnalytics() {
+		firebase.analytics();
+		firebase.performance();
+	}
+	let GDPRCategories = {
+		analytics: () => true
+	}
 </script>
 
 <style>
@@ -53,6 +63,7 @@
 
 <Nav {segment}/>
 
+
 <main>
 	<slot></slot>
 </main>
@@ -60,3 +71,5 @@
 <footer>
 	<a href='privacy'>Privacy policy</a>
 </footer>
+<GdprBanner cookieName="gdprOptIn" choices={{tracking: false, marketing: false}} on:analytics={enableAnalytics}
+	description="We use cookies to analyze site traffic. Please review our <a href='/privacy-policy'>privacy policy page</a>. By clicking accept, you consent to our privacy policy &amp; use of cookies" />
