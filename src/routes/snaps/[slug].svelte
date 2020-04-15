@@ -209,6 +209,13 @@
     height: auto;
 }
 
+@media screen and (min-width: 640px) {
+    .screenshots img {
+        max-width: 25rem;
+        width: calc(50vw - 3rem);
+    }
+}
+
 .storeButton {
     text-align: center;
 }
