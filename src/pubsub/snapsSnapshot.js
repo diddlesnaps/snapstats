@@ -27,7 +27,7 @@ export const snapsSnapshotSubscriber = async (message) => {
         }
 
         try {
-            await new SnapsModel.updateOne({package_name: snap.package_name}, snap)
+            await SnapsModel.updateOne({package_name: snap.package_name}, snap)
         } catch (e) {
             return console.error(`pubsub/snapsSnapshot.js: Save Snap data error: ${e}`);
         }
