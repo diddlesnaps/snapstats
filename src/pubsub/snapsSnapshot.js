@@ -6,6 +6,8 @@ import {SnapsModel} from '../models/Snaps';
 export const snapsSnapshotSubscriber = async (message) => {
     if (message.json && message.json.snap) {
         const {snapshot_date, details_api_url, isDaily} = message.json
+        
+        console.debug(`pubsub/snapsSnapshot.js: Running for Snap: ${snap.package_name}`)
 
         let details = {}
         try {
@@ -31,6 +33,7 @@ export const snapsSnapshotSubscriber = async (message) => {
         }
 
         if (!snap.package_name.match(/(^(test|hello)-|-test$)/i) && (new Date(snap.date_published).getTime() / 1000) > message.json.prevDate) {
+            console.debug(`pubsub/snapsSnapshot.js: New Snap, Publishing to pubsub: ${snap.package_name}`)
             const pubsub = new PubSub()
             const newSnapsPubsubTopic = pubsub.topic(functions.config().pubsub.newsnaps_topic)
             const data = {
@@ -44,5 +47,6 @@ export const snapsSnapshotSubscriber = async (message) => {
                 return console.error(`pubsub/snapsSnapshot.js: New Snap PubSub publish error: ${e}`);
             }
         }
+        console.debug(`pubsub/snapsSnapshot.js: Finished: ${snap.package_name}`)
     }
 }

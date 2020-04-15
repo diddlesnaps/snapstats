@@ -37,11 +37,11 @@ const dailyThinStats = functions.runWith({
 }).pubsub.schedule('48 23 * * *').onRun((...args) => entrypoint.getThinStats(...args));
 
 const snapsSnapshotSubscriber = functions.runWith({
-    timeoutSeconds: 60,
+    timeoutSeconds: 30,
     memory: '128MB',
 }).pubsub.topic(snapsSnapshotPubsubTopic).onPublish((...args) => entrypoint.getSnapsSnapshotSubscriber(...args));
 const newSnapSubscriber = functions.runWith({
-    timeoutSeconds: 60,
+    timeoutSeconds: 30,
     memory: '128MB',
 }).pubsub.topic(newSnapsPubsubTopic).onPublish((...args) => entrypoint.getNewSnapsSubscriber(...args));
 
