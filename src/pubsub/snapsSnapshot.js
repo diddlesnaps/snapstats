@@ -27,11 +27,10 @@ export const snapsSnapshotSubscriber = async (message) => {
         try {
             await new SnapsModel(snap).save()
         } catch (e) {
-            console.dir(snap)
             return console.error(`pubsub/snapsSnapshot.js: Save Snap data error: ${e}`);
         }
 
-        if (!snap.package_name.match(/(^(test|hello)-|-test$)/i) && new Date(snap.date_published) > message.json.prevDate) {
+        if (!snap.package_name.match(/(^(test|hello)-|-test$)/i) && (new Date(snap.date_published).getTime() / 1000) > message.json.prevDate) {
             const pubsub = new PubSub()
             const newSnapsPubsubTopic = pubsub.topic(functions.config().pubsub.newsnaps_topic)
             const data = {
@@ -40,7 +39,7 @@ export const snapsSnapshotSubscriber = async (message) => {
             }
             const dataBuffer = Buffer.from(JSON.stringify(data), 'utf8')
             try {
-                return newSnapsPubsubTopic.publish(dataBuffer);
+                await newSnapsPubsubTopic.publish(dataBuffer);
             } catch (e) {
                 return console.error(`pubsub/snapsSnapshot.js: New Snap PubSub publish error: ${e}`);
             }
