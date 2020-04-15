@@ -194,13 +194,15 @@
     }
 }
 
+.screenshots-wrapper {
+    order: 1;
+}
 .screenshots {
     align-items: center;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
-    order: 1;
     gap: 2rem;
 }
 .screenshots img {
@@ -438,31 +440,33 @@
         {#if result.data.snapByName.screenshot_urls.filter(
             url => !url.match(/\/banner(-icon)?_\w{7}.(png|jpg)$/)
         ).length > 0}
-            <h2>Screenshots</h2>
-            <div class='screenshots'>
-                {#if video && 'url' in video && 'type' in video}
-                    {#if video.type === 'youtube'}
-                        <iframe id="ytplayer" type="text/html" width="818" height="460" title="Youtube player"
-                            src="{video.url}?autoplay=1&mute=1&modestbranding=1&rel=0" frameborder="0"></iframe>
+            <div class='screenshots-wrapper'>
+                <h2>Screenshots</h2>
+                <div class='screenshots'>
+                    {#if video && 'url' in video && 'type' in video}
+                        {#if video.type === 'youtube'}
+                            <iframe id="ytplayer" type="text/html" width="818" height="460" title="Youtube player"
+                                src="{video.url}?autoplay=1&mute=1&modestbranding=1&rel=0" frameborder="0"></iframe>
+                        {/if}
+                        {#if video.type === 'vimeo'}
+                            <iframe id="vimeoplayer" width="818" height="460" frameborder="0" title="Vimeo player"
+                                webkitallowfullscreen mozallowfullscreen allowfullscreen
+                                src="{video.url}?title=0&byline=0&portrait=0&transparent=0"></iframe>
+                        {/if}
+                        {#if video.type === 'asciinema'}
+                            <script src="{video.url}" id="asciicast" async data-autoplay="1" data-preload="0"></script>
+                        {/if}
                     {/if}
-                    {#if video.type === 'vimeo'}
-                        <iframe id="vimeoplayer" width="818" height="460" frameborder="0" title="Vimeo player"
-                            webkitallowfullscreen mozallowfullscreen allowfullscreen
-                            src="{video.url}?title=0&byline=0&portrait=0&transparent=0"></iframe>
-                    {/if}
-                    {#if video.type === 'asciinema'}
-                        <script src="{video.url}" id="asciicast" async data-autoplay="1" data-preload="0"></script>
-                    {/if}
-                {/if}
-                {#each result.data.snapByName.screenshot_urls.filter(
-                    url => !url.match(/\/banner(-icon)?_\w{7}.(png|jpg)$/)
-                ) as screenshot}
-                    <a data-fslightbox="screenshots" href={`https://res.cloudinary.com/canonical/image/fetch/${screenshot}`}>
-                        <img loading="lazy" height="240"
-                            src={`https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,h_240/${screenshot}`}
-                            alt={`${result.data.snapByName.title || result.data.snapByName.package_name} screenshot`} />
-                    </a>
-                {/each}
+                    {#each result.data.snapByName.screenshot_urls.filter(
+                        url => !url.match(/\/banner(-icon)?_\w{7}.(png|jpg)$/)
+                    ) as screenshot}
+                        <a data-fslightbox="screenshots" href={`https://res.cloudinary.com/canonical/image/fetch/${screenshot}`}>
+                            <img loading="lazy" height="240"
+                                src={`https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,h_240/${screenshot}`}
+                                alt={`${result.data.snapByName.title || result.data.snapByName.package_name} screenshot`} />
+                        </a>
+                    {/each}
+                </div>
             </div>
         {/if}
 
