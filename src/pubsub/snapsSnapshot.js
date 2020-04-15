@@ -7,7 +7,7 @@ export const snapsSnapshotSubscriber = async (message) => {
     if (message.json && message.json.snap) {
         const {snapshot_date, details_api_url, isDaily} = message.json
         
-        console.debug(`pubsub/snapsSnapshot.js: Running for Snap: ${snap.package_name}`)
+        console.debug(`pubsub/snapsSnapshot.js: Running for Snap: ${message.json.snap.package_name}`)
 
         let details = {}
         try {
