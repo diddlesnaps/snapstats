@@ -2,7 +2,10 @@ import { Schema, model} from "mongoose";
 
 const SnapsSchema = new Schema({
     aliases: {
-        type: [String],
+        type: [{
+            name: String,
+            target: String,
+        }],
         default: [],
     },
     anon_download_url: {
