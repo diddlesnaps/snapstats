@@ -146,10 +146,6 @@ export const collectStats = (isDaily = false) => async () => {
                 .map(addDate('snapshot_date'))
                 .map(addIsDaily)
                 .map(async snap => {
-                    const data = {
-                        prevDate: (await LastUpdatedModel.findOne({})).date,
-                        ...snap,
-                    }
                     try {
                         const s = await SnapsModel.findOne({package_name: snap.package_name})
                         if (!snap.isDaily && s && s.package_name === snap.package_name) {
@@ -157,6 +153,10 @@ export const collectStats = (isDaily = false) => async () => {
                         }
                     } catch(e) {
                         return console.error(`collectors/collectStats.js: Could not search for snap '${snap.package_name}': ${e}`)
+                    }
+                    const data = {
+                        prevDate: (await LastUpdatedModel.findOne({})).date,
+                        ...snap,
                     }
                     const dataBuffer = Buffer.from(JSON.stringify(data), 'utf8')
                     try {
