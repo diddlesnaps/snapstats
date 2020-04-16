@@ -9,6 +9,7 @@ import {DeveloperCountsModel} from '../models/DeveloperCount';
 import {LicensesModel} from '../models/License';
 import {SectionsModel} from '../models/Section';
 import {SnapCountsModel} from '../models/SnapCount';
+import {SnapsModel} from '../models/Snaps';
 
 import {getStats} from '../snapstore-api';
 import {updateLastUpdated} from './updateLastUpdated';
@@ -149,11 +150,19 @@ export const collectStats = (isDaily = false) => async () => {
                         prevDate: (await LastUpdatedModel.findOne({})).date,
                         ...snap,
                     }
+                    try {
+                        const s = await SnapsModel.findOne({package_name: snap.package_name})
+                        if (!snap.isDaily && s && s.package_name === snap.package_name) {
+                            return
+                        }
+                    } catch(e) {
+                        return console.error(`collectors/collectStats.js: Could not search for snap '${snap.package_name}': ${e}`)
+                    }
                     const dataBuffer = Buffer.from(JSON.stringify(data), 'utf8')
                     try {
                         return snapsSnapshotPubsubTopic.publish(dataBuffer)
                     } catch(e) {
-                        return console.error(`collectors/collectStats.js: Snap snapshot PubSub publish error: ${e}`);
+                        return console.error(`collectors/collectStats.js: Snap snapshot PubSub publish error for '${snap.package_name}': ${e}`);
                     }
                 })
             await Promise.all(promises);
