@@ -87,37 +87,37 @@ export const collectStats = (isDaily = false) => async () => {
                     architectures.map(architecture => (architecture.name) ? architecture : { ...architecture, name: 'unset' })
                     .map(addDate())
                     .map(addIsDaily)
-                ).catch(err => console.error(`collectors/collectStats.js: architectures: ${err.toString()}`)),
+                ).catch(err => console.error(`collectors/collectStats.js: Error: architectures: ${err.toString()}`)),
 
                 BasesModel.insertMany(
                     bases.map(base => (base.name) ? base : { ...base, name: 'core' })
                     .map(addDate())
                     .map(addIsDaily)
-                ).catch(err => console.error(`collectors/collectStats.js: bases: ${err.toString()}`)),
+                ).catch(err => console.error(`collectors/collectStats.js: Error: bases: ${err.toString()}`)),
 
                 ChannelsModel.insertMany(
                     channels.map(channel => (channel.name) ? channel : { ...channel, name: 'unset' })
                     .map(addDate())
                     .map(addIsDaily)
-                ).catch(err => console.error(`collectors/collectStats.js: channels: ${err.toString()}`)),
+                ).catch(err => console.error(`collectors/collectStats.js: Error: channels: ${err.toString()}`)),
 
                 ConfinementsModel.insertMany(
                     confinements.map(confinement => (confinement.name) ? confinement : { ...confinement, name: 'unset' })
                     .map(addDate())
                     .map(addIsDaily)
-                ).catch(err => console.error(`collectors/collectStats.js: confinements: ${err.toString()}`)),
+                ).catch(err => console.error(`collectors/collectStats.js: Error: confinements: ${err.toString()}`)),
 
                 LicensesModel.insertMany(
                     licenses.map(license => (license.name) ? license : { ...license, name: 'unset' })
                     .map(addDate())
                     .map(addIsDaily)
-                ).catch(err => console.error(`collectors/collectStats.js: licenses: ${err.toString()}`)),
+                ).catch(err => console.error(`collectors/collectStats.js: Error: licenses: ${err.toString()}`)),
 
                 SectionsModel.insertMany(
                     sections.map(section => (section.name) ? section: { ...section, name: 'unset' })
                     .map(addDate())
                     .map(addIsDaily)
-                ).catch(err => console.error(`collectors/collectStats.js: sections: ${err.toString()}`)),
+                ).catch(err => console.error(`collectors/collectStats.js: Error: sections: ${err.toString()}`)),
 
                 // SnapsModel.insertMany(
                 //     snaps.map(snap => (snap.name) ? snap : { ...snap, name: 'unset' })
@@ -128,12 +128,12 @@ export const collectStats = (isDaily = false) => async () => {
                 DeveloperCountsModel.insertMany(
                     [addDate()(developer_counts)]
                     .map(addIsDaily)
-                ).catch(err => console.error(`collectors/collectStats.js: developerCounts: ${err.toString()}`)),
+                ).catch(err => console.error(`collectors/collectStats.js: Error: developerCounts: ${err.toString()}`)),
 
                 SnapCountsModel.insertMany(
                     [addDate()(snap_counts)]
                     .map(addIsDaily)
-                ).catch(err => console.error(`collectors/collectStats.js: snapCounts: ${err.toString()}`)),
+                ).catch(err => console.error(`collectors/collectStats.js: Error: snapCounts: ${err.toString()}`)),
             ];
             
             const pubsub = new PubSub()
@@ -152,7 +152,7 @@ export const collectStats = (isDaily = false) => async () => {
                             return
                         }
                     } catch(e) {
-                        return console.error(`collectors/collectStats.js: Could not search for snap '${snap.package_name}': ${e}`)
+                        return console.error(`collectors/collectStats.js: Error: Could not search for snap '${snap.package_name}': ${e}`)
                     }
                     const data = {
                         prevDate: (await LastUpdatedModel.findOne({})).date,
@@ -162,14 +162,14 @@ export const collectStats = (isDaily = false) => async () => {
                     try {
                         return snapsSnapshotPubsubTopic.publish(dataBuffer)
                     } catch(e) {
-                        return console.error(`collectors/collectStats.js: Snap snapshot PubSub publish error for '${snap.package_name}': ${e}`);
+                        return console.error(`collectors/collectStats.js: Error: Snap snapshot PubSub publish error for '${snap.package_name}': ${e}`);
                     }
                 })
             await Promise.all(promises);
             await updateLastUpdated(date, isDaily);
         }
     } catch (err) {
-        console.error(`collectors/collectStats.js: collectStats() error: ${err}`);
+        console.error(`collectors/collectStats.js: Error: collectStats(): ${err}`);
     }
     console.log(`Stats update completed at ${new Date().toLocaleString()}`);
 };
