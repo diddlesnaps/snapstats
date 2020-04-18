@@ -39,7 +39,7 @@ export const snapsSnapshotSubscriber = async (message) => {
             return console.error(`collectors/collectStats.js: Error: Save Snap data: ${e}`, snap);
         }
 
-        if (!snap.package_name.match(/(^(test|hello)-|-test$)/i) && (new Date(snap.date_published).getTime() / 1000) > snapshot_date) {
+        if (!snap.package_name.match(/(^(test|hello)-|-test$)/i) && (new Date(snap.date_published).getTime() / 1000) > prevSnapshotDate) {
             console.debug(`collectors/collectStats.js: New Snap, Publishing to pubsub: ${snap.package_name}`)
 
             const pubsub = new PubSub()

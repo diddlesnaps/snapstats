@@ -91,8 +91,9 @@ const findSnapsQueryFn = (searchHandlerFn) => async (_, args) => {
 }
 
 const findSnapsCountFn = (searchSnapsFn) => async (_, args) => {
-    const count = (await searchSnapsFn(args).countDocuments()) || 0
-    return { count }
+    console.log(await searchSnapsFn(args));
+    // const count = (await searchSnapsFn(args).countDocuments()) || 0
+    return 0 //{ count }
 }
 
 export default {

@@ -148,7 +148,7 @@ export const collectStats = (isDaily = false) => async () => {
             let newNames  = []
 
             if (!isDaily) {
-                newNames  = await SnapsModel.find({package_name: {$nin: names}})
+                newNames  = await SnapsModel.find({package_name: {$nin: snapNames}})
                 snapNames = new Set([...snapNames, ...newNames])
                 snaps     = snaps.filter(snap => !newNames.includes(snap.package_name))
             }
