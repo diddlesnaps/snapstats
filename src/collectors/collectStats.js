@@ -11,11 +11,11 @@ import {SectionsModel} from '../models/Section';
 import {SnapCountsModel} from '../models/SnapCount';
 import {SnapsModel} from '../models/Snaps';
 
-import {getStats, getDetails} from '../snapstore-api';
+import {getStats} from '../snapstore-api';
 import {updateLastUpdated} from './updateLastUpdated';
 import {LastUpdatedModel} from '../models/LastUpdated';
 
-const snapshotVersion = 2
+import snapshotVersion from '../snapshotVersion';
 
 const denysave = process.env.denysave === 'true' ? true : false;
 

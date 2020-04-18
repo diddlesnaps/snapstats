@@ -3,6 +3,8 @@ import {PubSub} from '@google-cloud/pubsub';
 import {getDetails} from '../snapstore-api';
 import {SnapsModel} from '../models/Snaps';
 
+import snapshotVersion from '../snapshotVersion';
+
 export const snapsSnapshotSubscriber = async (message) => {
     if (message.json && message.json.snap) {
         const {prevSnapshotDate, details_api_url} = message.json
