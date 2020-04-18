@@ -51,14 +51,8 @@ export default {
         ])),
 
         verifiedDevelopers: async () => {
-            const updated = await LastUpdatedModel.findOne({});
-            if (!updated) {
-                return {count: 0};
-            }
-            const snapshot_date = updated.date;
             return promisify(SnapsModel.aggregate([
                 { $match: {
-                    snapshot_date,
                     developer_validation: 'verified',
                 } },
                 { $group: {
@@ -74,14 +68,8 @@ export default {
             ]))
         },
         verifiedDeveloperCount: async (_, args) => {
-            const updated = await LastUpdatedModel.findOne({});
-            if (!updated) {
-                return {count: 0};
-            }
-            const snapshot_date = updated.date;
             const developerCounts = await SnapsModel.aggregate([
                 { $match: {
-                    snapshot_date,
                     developer_validation: 'verified',
                 } },
                 { $group: {
