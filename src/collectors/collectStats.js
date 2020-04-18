@@ -172,9 +172,13 @@ export const collectStats = (isDaily = false) => async () => {
                 })
 
             await Promise.all(promises);
+            await SnapsModel.deleteMany({
+                $or: [
+                    {snapshotVersion: {$lt: snapshotVersion}},
+                    {package_name: {$nin: snapNames}},
+                ]
+            })
             await updateLastUpdated(date);
-            await SnapsModel.deleteMany({snapshotVersion: {$lt: snapshotVersion}})
-            await SnapsModel.deleteMany({package_name: {$nin: snapNames}})
         }
     } catch (err) {
         console.error(`collectors/collectStats.js: Error: collectStats(): ${err}`);
