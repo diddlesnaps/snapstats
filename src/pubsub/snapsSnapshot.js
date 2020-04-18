@@ -41,6 +41,10 @@ export const snapsSnapshotSubscriber = async (message) => {
 
         if (!snap.package_name.match(/(^(test|hello)-|-test$)/i) && (new Date(snap.date_published).getTime() / 1000) > snapshot_date) {
             console.debug(`collectors/collectStats.js: New Snap, Publishing to pubsub: ${snap.package_name}`)
+
+            const pubsub = new PubSub()
+            const newSnapsPubsubTopic = pubsub.topic(functions.config().pubsub.newsnaps_topic)
+
             const data = {
                 name: snap.title,
                 slug: snap.package_name,
