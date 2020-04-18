@@ -13,7 +13,7 @@ export const snapsSnapshotSubscriber = async (message) => {
         try {
             details = (await getDetails(details_api_url)).snap
         } catch (e) {
-            return console.error(`pubsub/snapsSnapshot.js: Unable to load Snap data from store API: ${e}`)
+            return console.error(`pubsub/snapsSnapshot.js: Error: Unable to load Snap data from store API: ${e}`)
         }
         
         const snap = {
@@ -29,7 +29,7 @@ export const snapsSnapshotSubscriber = async (message) => {
         try {
             await (new SnapsModel(snap)).save()
         } catch (e) {
-            return console.error(`pubsub/snapsSnapshot.js: Save Snap data error: ${e}`);
+            return console.error(`pubsub/snapsSnapshot.js: Error: Save Snap data: ${e}`);
         }
 
         if (!snap.package_name.match(/(^(test|hello)-|-test$)/i) && (new Date(snap.date_published).getTime() / 1000) > message.json.prevDate) {
@@ -44,7 +44,7 @@ export const snapsSnapshotSubscriber = async (message) => {
             try {
                 await newSnapsPubsubTopic.publish(dataBuffer);
             } catch (e) {
-                return console.error(`pubsub/snapsSnapshot.js: New Snap PubSub publish error: ${e}`);
+                return console.error(`pubsub/snapsSnapshot.js: Error: New Snap PubSub publish: ${e}`);
             }
         }
         console.debug(`pubsub/snapsSnapshot.js: Finished: ${snap.package_name}`)

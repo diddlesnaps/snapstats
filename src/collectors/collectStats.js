@@ -148,7 +148,7 @@ export const collectStats = (isDaily = false) => async () => {
                 .map(async snap => {
                     try {
                         const s = await SnapsModel.findOne({package_name: snap.package_name})
-                        if (!snap.isDaily && s && s.package_name === snap.package_name) {
+                        if (s && s.package_name === snap.package_name && !isDaily) {
                             return
                         }
                     } catch(e) {
