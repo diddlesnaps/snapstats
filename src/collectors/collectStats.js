@@ -150,7 +150,7 @@ export const collectStats = (isDaily = false) => async () => {
             if (!isDaily) {
                 newNames = new Set(
                     await SnapsModel
-                    .find({package_name: {$nin: snapNames.values()}})
+                    .find({package_name: {$nin: [...snapNames]}})
                     .map(snap => snap.package_name)
                 )
                 snaps    = snaps.filter(snap => !newNames.has(snap.package_name))
@@ -183,7 +183,7 @@ export const collectStats = (isDaily = false) => async () => {
             await SnapsModel.deleteMany({
                 $or: [
                     {snapshotVersion: {$lt: snapshotVersion}},
-                    {package_name: {$nin: snapNames.values()}},
+                    {package_name: {$nin: [...snapNames]}},
                 ]
             })
             await updateLastUpdated(date);
