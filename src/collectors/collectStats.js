@@ -11,9 +11,11 @@ import {SectionsModel} from '../models/Section';
 import {SnapCountsModel} from '../models/SnapCount';
 import {SnapsModel} from '../models/Snaps';
 
-import {getStats} from '../snapstore-api';
+import {getStats, getDetails} from '../snapstore-api';
 import {updateLastUpdated} from './updateLastUpdated';
 import {LastUpdatedModel} from '../models/LastUpdated';
+
+const snapshotVersion = 2
 
 const denysave = process.env.denysave === 'true' ? true : false;
 
@@ -80,7 +82,9 @@ export const collectStats = (isDaily = false) => async () => {
             return { ...data, isDaily };
         }
 
-        if (!denysave) {
+        if (denysave) {
+            console.debug(`collectors/collectStats.js: NOT saving stats`)
+        } else {
             console.debug(`collectors/collectStats.js: Saving stats`)
             let promises = [
                 ArchitecturesModel.insertMany(
@@ -136,37 +140,41 @@ export const collectStats = (isDaily = false) => async () => {
                 ).catch(err => console.error(`collectors/collectStats.js: Error: snapCounts: ${err.toString()}`)),
             ];
             
-            const pubsub = new PubSub()
-            const snapsSnapshotPubsubTopic = pubsub.topic(functions.config().pubsub.snaps_snapshot_topic)
-
             await Promise.all(promises);
 
             console.debug(`collectors/collectStats.js: Publishing Snaps to snapshot PubSub topic`)
+
+            let snapNames = snaps.map(snap => snap.package_name)
+            let newNames  = []
+
+            if (!isDaily) {
+                newNames  = await SnapsModel.find({package_name: {$nin: names}})
+                snapNames = new Set([...snapNames, ...newNames])
+                snaps     = snaps.filter(snap => !newNames.includes(snap.package_name))
+            }
+
+            const pubsub = new PubSub()
+            const snapsSnapshotPubsubTopic = pubsub.topic(functions.config().pubsub.snaps_snapshot_topic)
+            const {date: prevSnapshotDate} = await LastUpdatedModel.findOne() || {date: Date.now()}
+
             promises = snaps
                 .map(addDate('snapshot_date'))
                 .map(addIsDaily)
-                .map(async snap => {
-                    try {
-                        const s = await SnapsModel.findOne({package_name: snap.package_name})
-                        if (s && s.package_name === snap.package_name && !isDaily) {
-                            return
-                        }
-                    } catch(e) {
-                        return console.error(`collectors/collectStats.js: Error: Could not search for snap '${snap.package_name}': ${e}`)
-                    }
-                    const data = {
-                        prevDate: (await LastUpdatedModel.findOne({})).date,
-                        ...snap,
-                    }
+                .map(async ({snap, details_api_url}) => {
+                    console.debug(`collectors/collectStats.js: New Snap, Publishing to pubsub: ${snap.package_name}`)
+                    const data = { snap, details_api_url, prevSnapshotDate }
                     const dataBuffer = Buffer.from(JSON.stringify(data), 'utf8')
                     try {
-                        return snapsSnapshotPubsubTopic.publish(dataBuffer)
-                    } catch(e) {
-                        return console.error(`collectors/collectStats.js: Error: Snap snapshot PubSub publish error for '${snap.package_name}': ${e}`);
+                        await snapsSnapshotPubsubTopic.publish(dataBuffer);
+                    } catch (e) {
+                        return console.error(`pubsub/snapsSnapshot.js: Error: New Snap PubSub publish: ${e}`);
                     }
                 })
+
             await Promise.all(promises);
-            await updateLastUpdated(date, isDaily);
+            await updateLastUpdated(date);
+            await SnapsModel.deleteMany({snapshotVersion: {$lt: snapshotVersion}})
+            await SnapsModel.deleteMany({package_name: {$nin: snapNames}})
         }
     } catch (err) {
         console.error(`collectors/collectStats.js: Error: collectStats(): ${err}`);

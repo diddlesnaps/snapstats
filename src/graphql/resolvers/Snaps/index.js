@@ -26,25 +26,23 @@ const getRating = async (snap) => {
     }
 }
 
-const snapsByDateFn = (snapshot_date) => SnapsModel.find({$and: [
-    {snapshot_date},
-    {name: {$not: /(^(test|hello)-|-test$)/i}},
-]})
+const snapsByDateFn = () => SnapsModel.find({name: {$not: /(^(test|hello)-|-test$)/i}})
 
-const searchSnapsFn = (args, snapshot_date) => {
-    let query = { snapshot_date, $and: [] }
+const searchSnapsFn = (args) => {
+    let query = {}
 
     if (args.name) {
         const name = escapeRegExp(args.name)
 
-        query.$and.push({$and: [
-            {$or: [
-                {name: {$regex: name, $options: 'i'}},
-                {title: {$regex: name, $options: 'i'}},
-                {package_name: {$regex: name, $options: 'i'}},
-            ]},
-            {name: {$not: /(^(test|hello)-|-test$)/i}},
-        ]})
+        query = {
+            ...query,
+            name: { $not: /(^(test|hello)-|-test$)/i },
+            $or: [
+                { name: { $regex: name, $options: 'i' } },
+                { title: { $regex: name, $options: 'i' } },
+                { package_name: { $regex: name, $options: 'i' } },
+            ],
+        }
     }
 
     if (args.publisherOrDeveloper) {
@@ -54,27 +52,27 @@ const searchSnapsFn = (args, snapshot_date) => {
         publisherOrDeveloperQuery.push({publisher: {$regex: publisherOrDeveloper, $options: 'i'}})
         publisherOrDeveloperQuery.push({developer_name: {$regex: publisherOrDeveloper, $options: 'i'}})
 
-        query.$and.push({$or: [publisherOrDeveloperQuery]})
+        query = { ...query, $or: [publisherOrDeveloperQuery] }
     }
 
     if (args.base) {
-        query.$and.push({base_snap: args.base})
+        query = { ...query, base_snap: args.base }
     }
     if (args.architecture) {
-        query.$and.push({architecture: args.architecture})
+        query = { ...query, architecture: args.architecture }
     }
     if (args.categories) {
-        query.$and.push({categories: {$in: args.categories}})
+        query = { ...query, categories: { $in: args.categories } }
     }
     if (args.license) {
-        query.$and.push({license: args.license})
+        query = { ...query, license: args.license }
     }
 
     if (typeof args.developerValidated !== 'undefined') {
         if (args.developerValidated === true) {
-            query.$and.push({developer_validation: 'verified'})
+            query = { ...query, developer_validation: 'verified' }
         } else {
-            query.$and.push({developer_validation: 'unproven'})
+            query = { ...query, developer_validation: 'unproven' }
         }
     }
 
@@ -82,11 +80,7 @@ const searchSnapsFn = (args, snapshot_date) => {
 }
 
 const findSnapsQueryFn = (searchHandlerFn) => async (_, args) => {
-    const updated = await LastUpdatedModel.findOne({})
-    if (!updated) {
-        return []
-    }
-    const snaps = await searchHandlerFn(args, updated.date)
+    const snaps = await searchHandlerFn(args)
     .skip(args.query.offset || 0)
     .limit(args.query.limit || 6)
 
@@ -97,11 +91,7 @@ const findSnapsQueryFn = (searchHandlerFn) => async (_, args) => {
 }
 
 const findSnapsCountFn = (searchSnapsFn) => async (_, args) => {
-    const updated = await LastUpdatedModel.findOne({})
-    if (!updated) {
-        return []
-    }
-    const count = (await searchSnapsFn(args, updated.date).countDocuments()) || 0
+    const count = (await searchSnapsFn(args).countDocuments()) || 0
     return { count }
 }
 
@@ -114,12 +104,7 @@ export default {
         findSnapsByBase: findSnapsQueryFn(searchSnapsFn),
         findSnapsByBaseCount: findSnapsCountFn(searchSnapsFn),
         snapByName: async (_, args) => {
-            const updated = await LastUpdatedModel.findOne({})
-            if (!updated) {
-                return []
-            }
             const snap = await SnapsModel.findOne({
-                snapshot_date: updated.date,
                 package_name: args.name
             })
 
@@ -133,12 +118,7 @@ export default {
             }
         },
         snapById: async (_, args) => {
-            const updated = await LastUpdatedModel.findOne({})
-            if (!updated) {
-                return []
-            }
             const snap = await SnapsModel.findOne({
-                snapshot_date: updated.date,
                 snap_id: args.snap_id
             })
 
@@ -152,11 +132,7 @@ export default {
             }
         },
         snapsByDate: async (_, args) => {
-            const updated = await LastUpdatedModel.findOne({})
-            if (!updated) {
-                return []
-            }
-            const snaps = await snapsByDateFn(updated.date)
+            const snaps = await snapsByDateFn()
             .sort({'date_published': -1})
             .skip(args.query.offset || 0)
             .limit(args.query.limit || 6)
@@ -167,12 +143,8 @@ export default {
             }))
         },
         snapsByDateCount: async () => {
-            const updated = await LastUpdatedModel.findOne({})
-            if (!updated) {
-                return []
-            }
             return {
-                count: (await snapsByDateFn(updated.date).countDocuments()) || 0,
+                count: (await snapsByDateFn().countDocuments()) || 0,
             }
         },
     },

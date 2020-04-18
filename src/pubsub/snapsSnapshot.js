@@ -5,37 +5,42 @@ import {SnapsModel} from '../models/Snaps';
 
 export const snapsSnapshotSubscriber = async (message) => {
     if (message.json && message.json.snap) {
-        const {snapshot_date, details_api_url, isDaily} = message.json
-        
-        console.debug(`pubsub/snapsSnapshot.js: Running for Snap: ${message.json.snap.package_name}`)
+        const {prevSnapshotDate, details_api_url} = message.json
+        let {snap} = message.json
+
+        console.debug(`pubsub/snapsSnapshot.js: Running for Snap: ${snap.package_name}`)
 
         let details = {}
         try {
-            details = (await getDetails(details_api_url)).snap
+            details = (await getDetails(details_api_url))
         } catch (e) {
-            return console.error(`pubsub/snapsSnapshot.js: Error: Unable to load Snap data from store API: ${e}`)
+            return console.error(`collectors/collectStats.js: Error: Unable to load Snap data from store API: ${e}`)
         }
-        
-        const snap = {
-            ...details,
-            ...message.json.snap,
-            developer_validation: details.publisher.validation,
-            publisher_username:   details.publisher.username,
-            publisher:            details.publisher['display-name'],
-            snapshot_date,
-            isDaily,
+
+        const {snap: snapDetails, snap: {publisher}} = details
+
+        snap = {
+            ...snap,
+            ...snapDetails,
+            snapshotVersion,
+            publisher:            publisher['display-name'],
+            publisher_username:   publisher.username,
+            developer_validation: publisher.validation,
         }
 
         try {
-            await (new SnapsModel(snap)).save()
+            const s = await SnapsModel.findOne({package_name: snap.package_name})
+            if (s) {
+                await s.update(snap)
+            } else {
+                await new SnapsModel(snap).save()
+            }
         } catch (e) {
-            return console.error(`pubsub/snapsSnapshot.js: Error: Save Snap data: ${e}`);
+            return console.error(`collectors/collectStats.js: Error: Save Snap data: ${e}`, snap);
         }
 
-        if (!snap.package_name.match(/(^(test|hello)-|-test$)/i) && (new Date(snap.date_published).getTime() / 1000) > message.json.prevDate) {
-            console.debug(`pubsub/snapsSnapshot.js: New Snap, Publishing to pubsub: ${snap.package_name}`)
-            const pubsub = new PubSub()
-            const newSnapsPubsubTopic = pubsub.topic(functions.config().pubsub.newsnaps_topic)
+        if (!snap.package_name.match(/(^(test|hello)-|-test$)/i) && (new Date(snap.date_published).getTime() / 1000) > snapshot_date) {
+            console.debug(`collectors/collectStats.js: New Snap, Publishing to pubsub: ${snap.package_name}`)
             const data = {
                 name: snap.title,
                 slug: snap.package_name,
@@ -47,6 +52,7 @@ export const snapsSnapshotSubscriber = async (message) => {
                 return console.error(`pubsub/snapsSnapshot.js: Error: New Snap PubSub publish: ${e}`);
             }
         }
+
         console.debug(`pubsub/snapsSnapshot.js: Finished: ${snap.package_name}`)
     }
 }

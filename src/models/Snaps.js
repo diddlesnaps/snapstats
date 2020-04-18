@@ -155,10 +155,11 @@ const SnapsSchema = new Schema({
         required: true,
         default: Date.now,
     },
-    isDaily: {
-        type: Boolean,
-        default: false,
-    },
+    snapshotVersion: {
+        type: Number,
+        required: true,
+        default: 1,
+    }
 });
 
 export const SnapsModel = model("Snaps", SnapsSchema);

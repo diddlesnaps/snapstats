@@ -1,5 +1,4 @@
 import {LastUpdatedModel} from '../models/LastUpdated';
-import {SnapsModel} from '../models/Snaps';
 import {ArchitecturesModel} from '../models/Architecture';
 import {BasesModel} from '../models/Base';
 import {ChannelsModel} from '../models/Channel';
@@ -27,7 +26,6 @@ export const thinSnaps = async () => {
                 DeveloperCountsModel,
                 LicensesModel,
                 SnapCountsModel,
-                SnapsModel,
             ]) {
                 promises.push(promisify(model.deleteMany({ isDaily: { $ne: true } })));
             }
