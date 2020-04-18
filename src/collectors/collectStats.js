@@ -144,14 +144,18 @@ export const collectStats = (isDaily = false) => async () => {
 
             console.debug(`collectors/collectStats.js: Publishing Snaps to snapshot PubSub topic`)
 
-            let snapNames = snaps.map(snap => snap.package_name)
-            let newNames  = []
+            let snapNames = new Set(snaps.map(snap => snap.package_name))
+            let newNames  = new Set()
 
             if (!isDaily) {
-                newNames  = await SnapsModel.find({package_name: {$nin: snapNames}})
-                snapNames = new Set([...snapNames, ...newNames])
-                snaps     = snaps.filter(snap => !newNames.includes(snap.package_name))
+                newNames = new Set(await SnapsModel.find({package_name: {$nin: snapNames}}).map(snap => snap.package_name))
+                snaps    = snaps.filter(snap => !newNames.has(snap.package_name))
             }
+
+            snapNames = new Set([
+                ...snapNames,
+                ...newNames,
+            ])
 
             const pubsub = new PubSub()
             const snapsSnapshotPubsubTopic = pubsub.topic(functions.config().pubsub.snaps_snapshot_topic)
@@ -175,7 +179,7 @@ export const collectStats = (isDaily = false) => async () => {
             await SnapsModel.deleteMany({
                 $or: [
                     {snapshotVersion: {$lt: snapshotVersion}},
-                    {package_name: {$nin: snapNames}},
+                    {package_name: {$nin: snapNames.values()}},
                 ]
             })
             await updateLastUpdated(date);
