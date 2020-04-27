@@ -1,6 +1,5 @@
 import { SnapsModel } from "../../../models/Snaps"
 import { RatingsModel } from "../../../models/Rating"
-import { LastUpdatedModel } from '../../../models/LastUpdated'
 import escapeRegExp from 'lodash.escaperegexp'
 
 const getRating = async (snap) => {
@@ -91,7 +90,6 @@ const findSnapsQueryFn = (searchHandlerFn) => async (_, args) => {
 }
 
 const findSnapsCountFn = (searchSnapsFn) => async (_, args) => {
-    // console.log(await searchSnapsFn(args));
     const count = (await searchSnapsFn(args).countDocuments()) || 0
     return { count }
 }
