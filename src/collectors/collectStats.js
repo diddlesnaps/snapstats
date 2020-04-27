@@ -163,14 +163,14 @@ export const collectStats = (isDaily = false) => async () => {
 
             const pubsub = new PubSub()
             const snapsSnapshotPubsubTopic = pubsub.topic(functions.config().pubsub.snaps_snapshot_topic)
-            const {date: prevSnapshotDate} = await LastUpdatedModel.findOne() || {date: Date.now()}
+            const {date: prevSnapshotDate} = await LastUpdatedModel.findOne() || {date: new Date()}
 
             promises = snaps
                 .map(addDate('snapshot_date'))
                 .map(addIsDaily)
                 .map(async ({snap, details_api_url}) => {
                     console.debug(`collectors/collectStats.js: New Snap, Publishing to pubsub: ${snap.package_name}`)
-                    const data = { snap, details_api_url, prevSnapshotDate }
+                    const data = { snap, details_api_url, prevSnapshotDate: prevSnapshotDate.getTime() }
                     const dataBuffer = Buffer.from(JSON.stringify(data), 'utf8')
                     try {
                         await snapsSnapshotPubsubTopic.publish(dataBuffer);
