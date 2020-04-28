@@ -91,7 +91,7 @@
         const result = await $data
         if (result.data.snapByName.media) {
             video = result.data.snapByName.media.filter(m => m.type === 'video').shift()
-            if ('url' in video) {
+            if (typeof video === 'object' && 'url' in video) {
                 if (video.url.match(/youtube/)) {
                     video.url = video.url.replace('watch?w=', 'embed/')
                     video.type = 'youtube'

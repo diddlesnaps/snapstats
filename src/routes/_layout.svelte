@@ -9,8 +9,10 @@
 	const { page } = stores();
 	
 	function enableAnalytics() {
-		firebase.analytics();
-		firebase.performance();
+		if (process.env.NODE_ENV === 'production') {
+			firebase.analytics();
+			firebase.performance();
+		}
 	}
 	let GDPRCategories = {
 		analytics: () => true
