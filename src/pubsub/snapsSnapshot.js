@@ -21,6 +21,10 @@ export const snapsSnapshotSubscriber = async (message) => {
 
         const {snap: snapDetails, snap: {publisher}} = details
 
+        if (typeof snap.base === 'undefined' || snap.base === null || snap.base === '') {
+            snap.base = 'core';
+        }
+
         snap = {
             ...snap,
             ...snapDetails,
