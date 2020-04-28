@@ -37,7 +37,9 @@ export const getStats = () => {
         const architecture_counts = getCounts('architecture', non_hello_or_test_snaps);
         const base_counts         = getCounts('base_snap', non_hello_or_test_snaps);
         const confinement_counts  = getCounts('confinement', non_hello_or_test_snaps);
-        const channel_counts      = getCounts('channel', non_hello_or_test_snaps);
+        const channel_counts      = getCounts('channel', non_hello_or_test_snaps.map(snap => ({
+            ...snap, channel: snap.channel.replace(/^.*\//, '')
+        })));
         const developer_counts    = getCounts('developer_id', non_hello_or_test_snaps);
         const developer_averages = {
             mean: computeMean(developer_counts, non_hello_or_test_snaps.length),
