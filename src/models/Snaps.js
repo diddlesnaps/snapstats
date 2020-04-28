@@ -20,7 +20,6 @@ const SnapsSchema = new Schema({
     },
     base_snap: { // base snap name
         type: String,
-        alias: 'base',
     },
     binary_filesize: {
         type: Number,
