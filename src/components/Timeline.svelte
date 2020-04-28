@@ -4,6 +4,7 @@
     import Chart from 'chart.js';
     import Rainbow from 'color-rainbow';
 
+    export let getLegendItem = (title) => title
     export let data;
     export let title;
     let chart;
@@ -73,7 +74,7 @@
                     for (let i = 0; i < chart.data.datasets.length; i++) {
                         text.push(`<li class="legend-item">
                             <span class="line" style="background-color: ${colors[i]}"></span>
-                            ${chart.data.datasets[i].label}
+                            ${getLegendItem(chart.data.datasets[i].label)}
                         </li>`);
                     }
                     text.push('</ul>');

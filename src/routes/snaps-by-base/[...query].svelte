@@ -103,4 +103,5 @@
     <Pagination count={result.data.findSnapsByBaseCount.count} {limit} {offset} {getPageUrl} />
 {/await}
 
-<a href="/">Go back to the homepage</a>
+<a href="/bases">Go back to the bases list</a>, or {' '}
+<a href="/">go back to the homepage</a>.

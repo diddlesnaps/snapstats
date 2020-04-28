@@ -38,6 +38,8 @@
 	restore(client, q, cache);
 	setClient(client);
 	let data = query(client, { query: q });
+
+	const getLegendItem = (title) => `<a href="/snaps-by-base/${title}">${title}</a>`
 </script>
 
 <style>
@@ -96,7 +98,7 @@
 {:then result}
 	<h1>Bases</h1>
 	<DonateBtn/>
-	<Timeline title="Bases timeline" data={result.data.baseTimeline} />
+	<Timeline title="Bases timeline" data={result.data.baseTimeline} {getLegendItem} />
 	<a href="/">Go back to the homepage...</a>
 {/await}
 </div>

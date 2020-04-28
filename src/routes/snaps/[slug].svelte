@@ -480,4 +480,4 @@
 {/await}
 
 <a href="snaps">Search for another snap</a>, or{' '}
-<a href="/">go back to the homepage</a>
+<a href="/">go back to the homepage</a>.
