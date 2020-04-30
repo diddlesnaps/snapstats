@@ -26,7 +26,7 @@ export const getStats = () => {
         const snaps = (await api.list()).map(({snap}) => ({
             ...snap,
             base_snap: snap.base || 'core',
-        }));;
+        }));
 
         const non_hello_or_test_snaps = snaps.filter((snap) =>
             'package_name' in snap && !snap.package_name.match(/^(hello|test)-/) && !snap.package_name.match(/-test$/))
