@@ -28,7 +28,7 @@ export const getStats = () => {
             base_snap: snap.base || 'core',
         }));;
 
-        const non_hello_or_test_snaps = snaps.filter(({snap}) =>
+        const non_hello_or_test_snaps = snaps.filter((snap) =>
             'package_name' in snap && !snap.package_name.match(/^(hello|test)-/) && !snap.package_name.match(/-test$/))
 
         console.debug('snapstore-api/index.js: Extracting counts')
