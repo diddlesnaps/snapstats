@@ -20,7 +20,8 @@
   "dependencies": {
     "@beyonk/gdpr-cookie-consent-banner": "^6.4.1",
     "@firebase/app": "^0.4.26",
-    "@google-cloud/pubsub": "^1.7.2",
+    "@google-cloud/pubsub": "1.5.0",
+    "@grpc/grpc-js": "0.6.18",
     "apollo-boost": "^0.4.7",
     "apollo-cache-inmemory": "^1.6.5",
     "apollo-cache-persist": "^0.1.1",
