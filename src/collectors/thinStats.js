@@ -18,6 +18,7 @@ export const thinSnaps = async () => {
 
         const lastUpdated = await LastUpdatedModel.findOne({});
         if (!denysave) {
+            let promises = [];
             for (const model of [
                 ArchitecturesModel,
                 BasesModel,
