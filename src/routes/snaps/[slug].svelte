@@ -353,6 +353,8 @@
                     srcset="{`https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,w_480/${result.data.snapByName.media.find(item => item.type === 'banner').url}`},
                         {`https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,w_960/${result.data.snapByName.media.find(item => item.type === 'banner').url}`} 2x" />
                 <img class='bannerImage' loading="lazy"
+                    width={result.data.snapByName.media.find(item => item.type === 'banner').width || 1920}
+                    height={result.data.snapByName.media.find(item => item.type === 'banner').height || 640}
                     src={`https://res.cloudinary.com/canonical/image/fetch/${result.data.snapByName.media.find(item => item.type === 'banner').url}`}
                     alt={`${result.data.snapByName.title || result.data.snapByName.package_name} banner`} />
             </picture>
