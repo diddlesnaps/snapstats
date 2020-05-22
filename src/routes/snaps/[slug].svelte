@@ -138,6 +138,7 @@
 
 .bannerImage {
     max-width: 100%;
+    height: auto;
 }
 .banner {
     display: grid;
