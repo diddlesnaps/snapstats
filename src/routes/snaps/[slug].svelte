@@ -206,11 +206,11 @@
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 2rem;
 }
 .screenshots img {
     max-height: 240px;
     max-width: 100%;
+    margin: 0 0.6rem;
 }
 
 @media screen and (min-width: 640px) {
