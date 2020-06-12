@@ -484,13 +484,13 @@
                     {#each result.data.snapByName.media.filter(
                         item => item.type === 'screenshot'
                     ) as screenshot}
-                        <a data-fslightbox="screenshots" href={`https://res.cloudinary.com/canonical/image/fetch/${screenshot.url}`}>
+                        <a data-fslightbox="screenshots" href="https://res.cloudinary.com/canonical/image/fetch/{screenshot.url}">
                             <picture>
-                                <source srcset="{`https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,h_240/${screenshot.url}`},
-                                    {`https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,h_480/${screenshot.url}`} 2x" />
+                                <source srcset="https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,h_240/{screenshot.url},
+                                    https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,h_480/{screenshot.url} 2x" />
                                 <img loading="lazy" width={Math.ceil(screenshot.width * (240 / screenshot.height)) || 'auto'} height={240}
-                                    src={`https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,h_240/${screenshot.url}`}
-                                    alt={`${result.data.snapByName.title || result.data.snapByName.package_name} screenshot`} />
+                                    src="https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,h_240/{screenshot.url}"
+                                    alt="{result.data.snapByName.title || result.data.snapByName.package_name} screenshot" />
                             </picture>
                         </a>
                     {/each}
@@ -499,7 +499,7 @@
         {/if}
 
         <p class='storeButton'>
-            <a href={`https://snapcraft.io/${result.data.snapByName.package_name}`}>
+            <a href="https://snapcraft.io/{result.data.snapByName.package_name}">
                 <img alt="Get it from the Snap Store"
                     src="https://snapcraft.io/static/images/badges/en/snap-store-black.svg" />
             </a>
