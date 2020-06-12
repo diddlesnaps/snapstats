@@ -29,20 +29,20 @@ const dailyStats = functions.runWith({
 // export const dailyStats = functions.pubsub.schedule('every 24 hours').onRun(collectStats(true));
 const dailyRatings = functions.runWith({
     timeoutSeconds: 30,
-    memory: '128MB',
+    memory: '256MB',
 }).pubsub.schedule('every 24 hours').onRun((...args) => entrypoint.getCollectRatings(...args));
 const dailyThinStats = functions.runWith({
     timeoutSeconds: 300,
-    memory: '128MB',
+    memory: '256MB',
 }).pubsub.schedule('48 23 * * *').onRun((...args) => entrypoint.getThinStats(...args));
 
 const snapsSnapshotSubscriber = functions.runWith({
     timeoutSeconds: 30,
-    memory: '128MB',
+    memory: '256MB',
 }).pubsub.topic(snapsSnapshotPubsubTopic).onPublish((...args) => entrypoint.getSnapsSnapshotSubscriber(...args));
 const newSnapSubscriber = functions.runWith({
     timeoutSeconds: 30,
-    memory: '128MB',
+    memory: '256MB',
 }).pubsub.topic(newSnapsPubsubTopic).onPublish((...args) => entrypoint.getNewSnapsSubscriber(...args));
 
 module.exports = {
