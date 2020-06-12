@@ -97,6 +97,10 @@
     padding: 1rem 2rem;
     width: 100%;
 }
+.rssicon {
+    background-color: orange;
+    border-radius: 0.4rem;
+}
 </style>
 
 <svelte:head>
@@ -143,11 +147,12 @@
 {#await $data}
     <p>Loading...</p>
 {:then result}
-    <h2>Search results:</h2>
     {#if q}
+        <h2>Search results:</h2>
         <SnapList snaps={result.data.findSnapsByName} />
         <Pagination count={result.data.findSnapsByNameCount.count} {limit} {offset} {getPageUrl} />
     {:else}
+        <h2>Newest Snaps: <a href="/snaps/feed.rss"><img class="rssicon" src="/rssfeed.svg" title="Newest Snaps RSS feed" alt="RSS feed"></a></h2>
         <SnapList snaps={result.data.snapsByDate} />
         <Pagination count={result.data.snapsByDateCount.count} {limit} {offset} {getPageUrl} />
     {/if}
