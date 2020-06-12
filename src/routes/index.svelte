@@ -100,25 +100,29 @@
 	<meta name="description" content="Statistics about Snap Packages within the Snap Store for Linux" />
 
 	<!-- Facebook -->
-	<meta property="og:site_name" content="Snapstats.org" />
-	<meta property="fb:app_id" content="2603641926537298" />
 	<meta property="og:type" content="website" />
-    <meta property="og:url" content="https://snapstats.org/snaps" />
     <meta property="og:title" content="Snapstats.org Snap Store statistics" />
     <meta property="og:description" content="Statistics about Snap Packages within the Snap Store for Linux" />
-    <meta property="og:image" content="https://snapstats.org/favicons/android-icon-512x512.png" />
-    <meta property="og:image:secure_url" content="https://snapstats.org/favicons/android-icon-512x512.png" />
+    <meta property="og:image" content="/favicons/android-icon-512x512.png" />
+    <meta property="og:image:secure_url" content="/favicons/android-icon-512x512.png" />
     <meta property="og:image:width" content="512" />
     <meta property="og:image:height" content="512" />
     <meta property="og:image:alt" content="Icon of Snapstats.org" />
 
 	<!-- Twitter -->
     <meta name="twitter:card" content="summary" />
-    <meta name="twitter:site" content="@snapstats_org" />
     <meta name="twitter:creator" content="@diddledan" />
     <meta name="twitter:title" content="Snapstats.org Snap Store statistics" />
     <meta name="twitter:description" content="Statistics about Snap Packages within the Snap Store for Linux" />
-    <meta name="twitter:image" content="https://snapstats.org/favicons/android-icon-512x512.png" />
+    <meta name="twitter:image" content="/favicons/android-icon-512x512.png" />
+
+	<!-- Feed -->
+    <link rel="alternate home" type="application/rss+xml" href="/snaps/feed.rss"
+      title="RSS feed of new Snaps"/>
+    <link rel="alternate home" type="application/atom+xml" href="/snaps/feed.atom"
+      title="Atom feed of new Snaps"/>
+    <link rel="alternate home" type="application/activitystream+json" href="/snaps/feed.json"
+      title="Activity Streams JSON feed of new Snaps"/>
 </svelte:head>
 
 <div>

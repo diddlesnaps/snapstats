@@ -49,5 +49,7 @@ export const schema = `
         snapById(snap_id: String!, query: Pagination): Snap
         snapsByDate(query: Pagination!): [Snap]
         snapsByDateCount: PaginationCount
+        snapsByUpdatedDate(query: Pagination!): [Snap]
+        snapsByUpdatedDateCount(query: Pagination!): [Snap]
     }
 `;

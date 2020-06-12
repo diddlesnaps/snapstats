@@ -77,11 +77,10 @@
     <meta property="og:site_name" content="Snapstats.org" />
 	<meta property="fb:app_id" content="2603641926537298" />
 	<meta property="og:type" content="website" />
-    <meta property="og:url" content="https://snapstats.org/snaps" />
     <meta property="og:title" content="Snaps using base snap '{base}'" />
     <meta property="og:description" content="Snaps in the Snap Store using base snap '{base}' found by SnapStats.org" />
-    <meta property="og:image" content="https://snapstats.org/favicons/android-icon-512x512.png" />
-    <meta property="og:image:secure_url" content="https://snapstats.org/favicons/android-icon-512x512.png" />
+    <meta property="og:image" content="/favicons/android-icon-512x512.png" />
+    <meta property="og:image:secure_url" content="/favicons/android-icon-512x512.png" />
     <meta property="og:image:width" content="512" />
     <meta property="og:image:height" content="512" />
     <meta property="og:image:alt" content="Icon of Snapstats.org" />
@@ -92,7 +91,7 @@
     <meta name="twitter:creator" content="@diddledan" />
     <meta name="twitter:title" content="Snaps using base snap '{base}'" />
     <meta name="twitter:description" content="Snaps in the Snap Store using base snap '{base}' found by SnapStats.org" />
-    <meta name="twitter:image" content="https://snapstats.org/favicons/android-icon-512x512.png" />
+    <meta name="twitter:image" content="/favicons/android-icon-512x512.png" />
 </svelte:head>
 
 {#await $data}

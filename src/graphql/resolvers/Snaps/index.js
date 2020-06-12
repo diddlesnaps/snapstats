@@ -146,5 +146,17 @@ export default {
                 count: (await snapsByDateFn().countDocuments()) || 0,
             }
         },
+        snapsByUpdatedDate: async (_, args) => {
+            const snaps = await snapsByDateFn()
+            .sort({'last_updated': -1})
+            .skip(args.query.offset || 0)
+            .limit(args.query.limit || 6)
+
+            return snaps.map(async snap => ({
+                ...snap._doc,
+                ...await getRating(snap),
+            }))
+        },
+        snapsByUpdatedDateCount: async () => snapsByDateCount(),
     },
 };

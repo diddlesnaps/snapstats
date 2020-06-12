@@ -104,25 +104,29 @@
     <meta name="description" content="Search the Snap Store listings on SnapStats.org" />
 
     <!-- Facebook -->
-    <meta property="og:site_name" content="Snapstats.org" />
-	<meta property="fb:app_id" content="2603641926537298" />
 	<meta property="og:type" content="website" />
-    <meta property="og:url" content="https://snapstats.org/snaps" />
     <meta property="og:title" content="Search the Snap Store" />
     <meta property="og:description" content="Search the Snap Store listings on SnapStats.org" />
-    <meta property="og:image" content="https://snapstats.org/favicons/android-icon-512x512.png" />
-    <meta property="og:image:secure_url" content="https://snapstats.org/favicons/android-icon-512x512.png" />
+    <meta property="og:image" content="/favicons/android-icon-512x512.png" />
+    <meta property="og:image:secure_url" content="/favicons/android-icon-512x512.png" />
     <meta property="og:image:width" content="512" />
     <meta property="og:image:height" content="512" />
     <meta property="og:image:alt" content="Icon of Snapstats.org" />
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary" />
-    <meta name="twitter:site" content="@snapstats_org" />
     <meta name="twitter:creator" content="@diddledan" />
     <meta name="twitter:title" content="Search the Snap Store" />
     <meta name="twitter:description" content="Search the Snap Store listings on SnapStats.org" />
-    <meta name="twitter:image" content="https://snapstats.org/favicons/android-icon-512x512.png" />
+    <meta name="twitter:image" content="/favicons/android-icon-512x512.png" />
+
+    <!-- Feed -->
+    <link rel="alternate home" type="application/rss+xml" href="/snaps/feed.rss"
+      title="RSS feed of new Snaps"/>
+    <link rel="alternate home" type="application/atom+xml" href="/snaps/feed.atom"
+      title="Atom feed of new Snaps"/>
+    <link rel="alternate home" type="application/activitystream+json" href="/snaps/feed.json"
+      title="Activity Streams JSON feed of new Snaps"/>
 </svelte:head>
 
 <h1>Search the Snap Store</h1>

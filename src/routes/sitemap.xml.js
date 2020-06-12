@@ -1,15 +1,5 @@
 import { createSitemap, EnumChangefreq } from 'sitemap';
-import client from '../apollo';
-
-import { gql } from 'apollo-boost'; 
-const q = gql`
-    query {
-        snapsByDate(query:{limit:10000}){
-            last_updated
-            package_name
-        }
-    }
-`;
+import Snaps from '../graphql/resolvers/Snaps';
 
 export async function get(req, res, next) {
     const static_pages = [
@@ -23,23 +13,12 @@ export async function get(req, res, next) {
         { url: '/licenses', changefreq: EnumChangefreq.DAILY },
     ];
     try {
-        let {data} = await client.query({ query: q });
-        if (!data) {
-            return res.status(500).end();
-        }
-
-        let urls = static_pages.concat(
-            data.snapsByDate.sort((a, b) => {
-                if (a && a.last_updated && b && b.last_updated) {
-                    return b.last_updated - a.last_updated
-                } else {
-                    return 0;
-                }
-            }).map(snap => ({
+        const snaps = await Promise.all(await Snaps.Query.snapsByUpdatedDate(null, {query:{limit:10000}}));
+        const urls = static_pages.concat(
+            snaps.map(snap => ({
                 url: `/snaps/${snap.package_name}`,
                 lastmodISO: (snap.last_updated ? new Date(snap.last_updated) : new Date(0)).toISOString(),
-            }))
-        );
+            })));
         res.setHeader('Content-Type', 'application/xml');
         return res.end(createSitemap({
             hostname: 'https://snapstats.org',

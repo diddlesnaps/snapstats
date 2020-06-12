@@ -268,10 +268,7 @@
         <meta name="description" content="{result.data.snapByName.summary}" />
 
         <!-- Facebook -->
-        <meta property="og:site_name" content="Snapstats.org" />
-	    <meta property="fb:app_id" content="2603641926537298" />
 	    <meta property="og:type" content="product" />
-        <meta property="og:url" content="https://snapstats.org/snaps/{result.data.snapByName.package_name}" />
         <meta property="og:title" content="{result.data.snapByName.title || result.data.snapByName.package_name}" />
         <meta property="og:description" content="{result.data.snapByName.summary}" />
         <meta property="og:image" content="{result.data.snapByName.icon_url}" />
@@ -282,7 +279,6 @@
 
         <!-- Twitter -->
         <meta name="twitter:card" content="summary" />
-        <meta name="twitter:site" content="@snapstats_org" />
         <meta name="twitter:title" content="{result.data.snapByName.title || result.data.snapByName.package_name}" />
         <meta name="twitter:description" content="{result.data.snapByName.summary}" />
         <meta name="twitter:image" content="{result.data.snapByName.icon_url}" />

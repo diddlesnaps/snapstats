@@ -61,6 +61,10 @@
 			"url": `https://snapstats.org${$page.path}`
 		})}
 	</${'script'}>`}
+
+	<meta property="og:site_name" content="Snapstats.org" />
+	<meta property="fb:app_id" content="2603641926537298" />
+	<meta name="twitter:site" content="@snapstats_org" />
 </svelte:head>
 
 <Nav {segment}/>

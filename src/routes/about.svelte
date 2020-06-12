@@ -7,25 +7,21 @@
 	<meta name="description" content="Find out about the Snapstats.org website" />
 
 	<!-- Facebook -->
-	<meta property="og:site_name" content="Snapstats.org" />
-	<meta property="fb:app_id" content="2603641926537298" />
 	<meta property="og:type" content="website" />
-    <meta property="og:url" content="https://snapstats.org/snaps" />
     <meta property="og:title" content="About Snapstats.org" />
     <meta property="og:description" content="Find out about the Snapstats.org website" />
-    <meta property="og:image" content="https://snapstats.org/favicons/android-icon-512x512.png" />
-    <meta property="og:image:secure_url" content="https://snapstats.org/favicons/android-icon-512x512.png" />
+    <meta property="og:image" content="/favicons/android-icon-512x512.png" />
+    <meta property="og:image:secure_url" content="/favicons/android-icon-512x512.png" />
     <meta property="og:image:width" content="512" />
     <meta property="og:image:height" content="512" />
     <meta property="og:image:alt" content="Icon of Snapstats.org" />
 
 	<!-- Twitter -->
     <meta name="twitter:card" content="summary" />
-    <meta name="twitter:site" content="@snapstats_org" />
     <meta name="twitter:creator" content="@diddledan" />
     <meta name="twitter:title" content="About Snapstats.org" />
     <meta name="twitter:description" content="Find out about the Snapstats.org website" />
-    <meta name="twitter:image" content="https://snapstats.org/favicons/android-icon-512x512.png" />
+    <meta name="twitter:image" content="/favicons/android-icon-512x512.png" />
 </svelte:head>
 
 <h1>About Snapstats.org</h1>
