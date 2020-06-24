@@ -28,7 +28,6 @@
     "apollo-client": "^2.6.10",
     "apollo-link-http": "^1.5.17",
     "apollo-link-ws": "^1.0.20",
-    "canvas": "^2.6.1",
     "chart.js": "^2.9.3",
     "color-rainbow": "0.0.0",
     "compression": "^1.7.4",
