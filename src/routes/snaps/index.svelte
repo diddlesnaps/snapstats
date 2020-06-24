@@ -153,9 +153,9 @@ label {
         <input name="offset" type="hidden" value='0' />
         <input name="limit" type="hidden" value={limit} />
         <label>Sort by <select name="field" on:blur={submit}>
-            <option value="date_published">Date</option>
-            <option value="package_name">Name</option>
-            <option value="title">Title</option>
+            <option value="date_published" selected={!field || field === 'date_published'}>Date</option>
+            <option value="package_name" selected={field === 'package_name'}>Name</option>
+            <option value="title" selected={field === 'title'}>Title</option>
         </select></label>
         <label>Order <select name="order" on:blur={submit}>
             <option value="1" selected={order === 1}>Ascending</option>
