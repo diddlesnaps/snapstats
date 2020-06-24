@@ -37,7 +37,8 @@ a {
 	color: inherit;
 }
 a:focus {
-	animation: 2s outline-blink infinite;
+	/* animation: 2s outline-blink infinite; */
+	outline: 2px solid #8fc19f;
 	outline-offset: 2px;
 	position: relative;
 }
@@ -70,7 +71,8 @@ input {
 	border: 2px solid #000;
 }
 input:focus {
-	animation: 1.2s pseudo-outline-blink infinite;
+	/* animation: 1.2s pseudo-outline-blink infinite; */
+	box-shadow: 0 0 0 2px #fff, 0 0 0 4px #8fc19f;
 	outline: 0;
 }
 

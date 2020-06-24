@@ -60,7 +60,7 @@
             {snap.title}
         </a>
     </p>
-    <p class='rating'><StarRating
+    <div class='rating'><StarRating
         style={{
             styleStarWidth: 16,
             styleFullStarColor: '#ffd219',
@@ -68,6 +68,6 @@
         }}
         isIndicatorActive={false}
         rating={snap.ratings_average}
-    /></p>
+    /></div>
     <p class='summary'>{snap.summary}</p>
 </div>

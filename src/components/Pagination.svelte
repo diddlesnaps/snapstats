@@ -4,7 +4,7 @@
     export let getPageUrl = () => '#';
 
     export let limit;
-    export let offset
+    export let offset;
     export let count;
     let currentPage;
     let pages = [];

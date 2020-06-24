@@ -1,5 +1,5 @@
 <script>
-  import { onMount } from "svelte";
+  // import { onMount } from "svelte";
 
   export let rating = 0;
   export let isIndicatorActive = true;
@@ -88,10 +88,10 @@
       : style.styleEmptyStarColor;
   }
 
-  onMount(() => {
+  // onMount(() => {
     initStars();
     setStars();
-  });
+  // });
 </script>
 
 <style>

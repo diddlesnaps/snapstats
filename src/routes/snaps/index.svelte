@@ -84,17 +84,33 @@
         variables: {q, field, order, offset, limit}
     });
 
-    let getPageUrl = (page) => `snaps?q=${q}&offset=${limit*page}&limit=${limit}&field=${field}&order=${order}`;
+    const initialsearch = `q=${q}&offset=${offset}&limit=${limit}&field=${field}&order=${order}`
 
-    function submit(e) {
-        const field = document.querySelector('select[name="field"]').value || 'date_published'
-        const order = parseInt(document.querySelector('select[name="order"]').value) || -1
+    $: {
         if (typeof firebase !== 'undefined' && firebase) {
             firebase.analytics().logEvent('search', {
                 search_term: q,
+                page: offset / limit,
             });
         }
-        window.location = `/snaps?q=${q}&offset=${offset}&limit=${limit}&field=${field}&order=${order}`
+        
+        const search = `q=${q}&offset=${offset}&limit=${limit}&field=${field}&order=${order}`
+        if (initialsearch !== search) {
+            window.location.search = search
+        }
+    }
+
+    let getPageUrl = (page) => `snaps?q=${q}&offset=${limit*page}&limit=${limit}&field=${field}&order=${order}`;
+
+    function submit(e) {
+        // field = document.querySelector('select[name="field"]').value || 'date_published'
+        // order = parseInt(document.querySelector('select[name="order"]').value) || -1
+        // q = document.querySelector('input[name="q"]').value || ''
+        // if (typeof firebase !== 'undefined' && firebase) {
+        //     firebase.analytics().logEvent('search', {
+        //         search_term: q,
+        //     });
+        // }
     }
 </script>
 
@@ -107,7 +123,7 @@ label {
     box-sizing: border-box;
     display: block;
     font-size: 1.5rem;
-    margin: 4rem 0;
+    margin: 0.4rem 0 2rem;
     padding: 1rem 2rem;
     width: 100%;
 }
@@ -149,21 +165,21 @@ label {
 
 <h1>Search the Snap Store</h1>
 <div class='search'>
-    <form method="get" on:submit={submit}>
+    <form method="get">
         <input name="offset" type="hidden" value='0' />
         <input name="limit" type="hidden" value={limit} />
-        <label>Sort by <select name="field" on:blur={submit}>
-            <option value="date_published" selected={!field || field === 'date_published'}>Date</option>
-            <option value="package_name" selected={field === 'package_name'}>Name</option>
-            <option value="title" selected={field === 'title'}>Title</option>
+        <label>Sort by <select name="field" bind:value={field}>
+            <option value="date_published">Date</option>
+            <option value="package_name">Name</option>
+            <option value="title">Title</option>
         </select></label>
-        <label>Order <select name="order" on:blur={submit}>
-            <option value="1" selected={order === 1}>Ascending</option>
-            <option value="-1" selected={!order || order === -1}>Descending</option>
+        <label>Order <select name="order" bind:value={order}>
+            <option value={1}>Ascending</option>
+            <option value={-1}>Descending</option>
         </select></label>
         <label>Enter a term to search
-            <input name="q" id="search" type="text" value={q}
-                placeholder="spotify" />
+            <input name="q" type="text" value={q} placeholder="spotify"
+                on:blur={(e) => q = e.target.value} />
         </label>
     </form>
 </div>
