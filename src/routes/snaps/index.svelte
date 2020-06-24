@@ -95,7 +95,6 @@
             });
         }
         window.location = `/snaps?q=${q}&offset=${offset}&limit=${limit}&field=${field}&order=${order}`
-        data.refetch({q, field, order, offset, limit})
     }
 </script>
 
