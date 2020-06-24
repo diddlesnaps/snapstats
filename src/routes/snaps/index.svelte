@@ -100,6 +100,9 @@
 </script>
 
 <style>
+label {
+    display: block;
+}
 .search input {
     border-radius: 2rem;
     box-sizing: border-box;
