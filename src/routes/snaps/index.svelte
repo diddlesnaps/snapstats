@@ -87,13 +87,13 @@
     let getPageUrl = (page) => `snaps?q=${q}&offset=${limit*page}&limit=${limit}&field=${field}&order=${order}`;
 
     function submit(e) {
-        if (typeof firebase !== 'undefined' && firebase) {
-            firebase.analytics().logEvent('search', {
-                search_term: this.querySelector('input[name=q]').value,
-            });
-        }
         const field = document.querySelector('select[name="field"]').value || 'date_published'
         const order = parseInt(document.querySelector('select[name="order"]').value) || -1
+        if (typeof firebase !== 'undefined' && firebase) {
+            firebase.analytics().logEvent('search', {
+                search_term: q,
+            });
+        }
         window.location = `/snaps?q=${q}&offset=${offset}&limit=${limit}&field=${field}&order=${order}`
         data.refetch({q, field, order, offset, limit})
     }
