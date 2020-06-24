@@ -75,6 +75,11 @@ const searchSnapsFn = (args) => {
         }
     }
 
+    if (args.query && args.query.sort) {
+        let sort = { [args.query.sort.field]: args.query.sort.order }
+        return SnapsModel.find(query).sort(sort)
+    }
+    
     return SnapsModel.find(query)
 }
 

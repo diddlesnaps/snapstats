@@ -14,20 +14,20 @@
         ratings_average
     `;
 
-    const latestQuery = gql`
-        query($offset: Int!, $limit: Int!){
-            snapsByDate(query:{limit:$limit, offset:$offset}){
-                ${queryFields}
-            }
-            snapsByDateCount{
-                count
-            }
-        }
-    `;
+    // const latestQuery = gql`
+    //     query($offset: Int!, $limit: Int!){
+    //         snapsByDate(query:{limit:$limit, offset:$offset}){
+    //             ${queryFields}
+    //         }
+    //         snapsByDateCount{
+    //             count
+    //         }
+    //     }
+    // `;
 
     const searchQuery = gql`
-        query($q: String!, $offset: Int!, $limit: Int!){
-            findSnapsByName(name:$q, query:{offset:$offset, limit:$limit}){
+        query($q: String!, $offset: Int!, $limit: Int!, $field: String!, $order: Int!){
+            findSnapsByName(name:$q, query:{offset:$offset, limit:$limit, sort:{field:$field,order:$order}}){
                 ${queryFields}
             }
             findSnapsByNameCount(name:$q){
@@ -38,20 +38,26 @@
 
     export async function preload(page, session) {
         let {query} = page;
-        let {q, offset, limit} = query;
+        let {q, field, order, offset, limit} = query;
 
         q = q || '';
+        field = field || 'date_published';
+        order = order ? parseInt(order) || -1 : -1;
         offset = offset ? parseInt(offset) || 0 : 0;
         limit = limit ? parseInt(limit) || 20 : 20;
 
         let data = client.query({
-            query: q ? searchQuery : latestQuery,
-            variables: {q, offset, limit},
+            // query: q ? searchQuery : latestQuery,
+            query: searchQuery,
+            variables: {q, field, order, offset, limit},
         });
 
         return {
             q,
-            qlQuery: q ? searchQuery : latestQuery,
+            field,
+            order,
+            // qlQuery: q ? searchQuery : latestQuery,
+            qlQuery: searchQuery,
             offset,
             limit,
             cache: (await data).data,
@@ -63,6 +69,8 @@
 	import { setClient, restore, query } from 'svelte-apollo';
 
     export let q;
+    export let field;
+    export let order;
     export let qlQuery;
     export let offset;
     export let limit;
@@ -73,17 +81,21 @@
 
     let data = query(client, {
         query: qlQuery,
-        variables: {q, offset, limit}
+        variables: {q, field, order, offset, limit}
     });
 
-    $: data.refetch({ q, offset, limit })
-
-    let getPageUrl = (page) => `snaps?q=${q}&offset=${limit*page}&limit=${limit}`;
+    let getPageUrl = (page) => `snaps?q=${q}&offset=${limit*page}&limit=${limit}&field=${field}&order=${order}`;
 
     function submit(e) {
-        firebase.analytics().logEvent('search', {
-            search_term: this.querySelector('input[name=q]').value,
-        });
+        if (typeof firebase !== 'undefined' && firebase) {
+            firebase.analytics().logEvent('search', {
+                search_term: this.querySelector('input[name=q]').value,
+            });
+        }
+        const field = document.querySelector('select[name="field"]').value || 'date_published'
+        const order = parseInt(document.querySelector('select[name="order"]').value) || -1
+        window.location = `/snaps?q=${q}&offset=${offset}&limit=${limit}&field=${field}&order=${order}`
+        data.refetch({q, field, order, offset, limit})
     }
 </script>
 
@@ -97,10 +109,10 @@
     padding: 1rem 2rem;
     width: 100%;
 }
-.rssicon {
+/* .rssicon {
     background-color: orange;
     border-radius: 0.4rem;
-}
+} */
 </style>
 
 <svelte:head>
@@ -138,24 +150,34 @@
     <form method="get" on:submit={submit}>
         <input name="offset" type="hidden" value='0' />
         <input name="limit" type="hidden" value={limit} />
-        <label for="search">Enter a term to search</label>
-        <input name="q" id="search" type="text" value={q}
-            placeholder="spotify" />
+        <label>Sort by <select name="field" on:blur={submit}>
+            <option value="date_published">Date</option>
+            <option value="package_name">Name</option>
+            <option value="title">Title</option>
+        </select></label>
+        <label>Order <select name="order" on:blur={submit}>
+            <option value="1" selected={order === 1}>Ascending</option>
+            <option value="-1" selected={!order || order === -1}>Descending</option>
+        </select></label>
+        <label>Enter a term to search
+            <input name="q" id="search" type="text" value={q}
+                placeholder="spotify" />
+        </label>
     </form>
 </div>
 
 {#await $data}
     <p>Loading...</p>
 {:then result}
-    {#if q}
+    <!-- {#if 'findSnapsByNameCount' in result.data } -->
         <h2>Search results:</h2>
         <SnapList snaps={result.data.findSnapsByName} />
         <Pagination count={result.data.findSnapsByNameCount.count} {limit} {offset} {getPageUrl} />
-    {:else}
+    <!-- {:else}
         <h2>Newest Snaps: <a href="/snaps/feed.rss"><img class="rssicon" src="/rssfeed.svg" title="Newest Snaps RSS feed" alt="RSS feed"></a></h2>
         <SnapList snaps={result.data.snapsByDate} />
         <Pagination count={result.data.snapsByDateCount.count} {limit} {offset} {getPageUrl} />
-    {/if}
+    {/if} -->
 {/await}
 
 <a href="/">Go back to the homepage</a>
