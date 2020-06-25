@@ -1,4 +1,5 @@
 <script context="module">
+    import { goto } from '@sapper/app';
     import SnapList from '../../components/SnapList.svelte';
     import Pagination from '../../components/Pagination.svelte';
 
@@ -66,7 +67,8 @@
 </script>
 
 <script>
-	import { setClient, restore, query } from 'svelte-apollo';
+    import { onMount } from 'svelte';
+    import { setClient, restore, query } from 'svelte-apollo';
 
     export let q;
     export let field;
@@ -84,7 +86,8 @@
         variables: {q, field, order, offset, limit}
     });
 
-    const initialsearch = `q=${q}&offset=${offset}&limit=${limit}&field=${field}&order=${order}`
+    let mounted = false;
+    // const initialsearch = `q=${q}&offset=${offset}&limit=${limit}&field=${field}&order=${order}`
 
     $: {
         if (typeof firebase !== 'undefined' && firebase) {
@@ -95,23 +98,18 @@
         }
         
         const search = `q=${q}&offset=${offset}&limit=${limit}&field=${field}&order=${order}`
-        if (initialsearch !== search) {
-            window.location.search = search
+        if (mounted) {
+            goto(`snaps?${search}`)
+            data.refetch({q, offset, limit, field, order})
+            // window.location.search = search
         }
     }
 
     let getPageUrl = (page) => `snaps?q=${q}&offset=${limit*page}&limit=${limit}&field=${field}&order=${order}`;
 
-    function submit(e) {
-        // field = document.querySelector('select[name="field"]').value || 'date_published'
-        // order = parseInt(document.querySelector('select[name="order"]').value) || -1
-        // q = document.querySelector('input[name="q"]').value || ''
-        // if (typeof firebase !== 'undefined' && firebase) {
-        //     firebase.analytics().logEvent('search', {
-        //         search_term: q,
-        //     });
-        // }
-    }
+    onMount(() => {
+        mounted = true;
+    })
 </script>
 
 <style>
