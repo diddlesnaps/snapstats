@@ -167,7 +167,7 @@ label {
         <input name="offset" type="hidden" value='0' />
         <input name="limit" type="hidden" value={limit} />
         <label>Sort by <select name="field" bind:value={field}>
-            <option value="date_published">Date</option>
+            <option value="date_published">First publish date</option>
             <option value="package_name">Name</option>
             <option value="title">Title</option>
         </select></label>
