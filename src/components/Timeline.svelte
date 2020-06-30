@@ -51,6 +51,9 @@
                 }),
             },
             options: {
+                animation: { duration: 0 },
+                hover: { animationDuration: 0 },
+                responsiveAnimationDuration: 0,
                 scales: {
                     xAxes: [{
                         type: 'time',
@@ -85,6 +88,25 @@
         legend = timelineChart.generateLegend();
     });
 </script>
+
+<style>
+    :global(.legend ul) {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-around;
+    }
+    :global(.legend-item) {
+        list-style: none;
+        width: 10rem;
+        padding-left: 0;
+    }
+    :global(.legend-item .line) {
+        display: inline-block;
+        width: 2rem;
+        height: 2px;
+        vertical-align: middle;
+    }
+</style>
 
 <h3>{title}</h3>
 <canvas bind:this={chart} width="1000" height="500" class="chart"></canvas>
