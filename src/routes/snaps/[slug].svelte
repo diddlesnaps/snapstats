@@ -289,7 +289,6 @@
             ${JSON.stringify({
                 "@context" : "http://schema.org",
                 "@type" : "SoftwareApplication",
-                "datePublished": new Date(result.data.snapByName.date_published).toISOString(),
                 "dateModified": new Date(result.data.snapByName.last_updated).toISOString(),
                 "name" : result.data.snapByName.title || result.data.snapByName.package_name,
                 "image" : result.data.snapByName.icon_url,
