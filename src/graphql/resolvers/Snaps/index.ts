@@ -1,7 +1,27 @@
 import { SnapsModel } from "../../../models/Snaps"
 import { RatingsModel } from "../../../models/Rating"
 import escapeRegExp from 'lodash.escaperegexp'
+import {Document} from 'mongoose';
 import {MongooseDataloaderFactory} from 'graphql-dataloader-mongoose';
+
+type args = {
+    query: {
+        limit?: number
+        offset?: number
+        sort?: {
+            field?: string
+            order?: number
+        }
+    }
+    name?: string
+    package_name?: string
+    publisherOrDeveloper?: string
+    base?: string
+    architecture?: string
+    categories?: string[]
+    license?: string
+    developerValidated?: boolean
+}
 
 const getRatingAverage = async (snap) => {
     const rating = await RatingsModel.findOne({
@@ -32,7 +52,7 @@ const getRatingCount = async (snap) => {
 
 const snapsByDateFn = () => SnapsModel.find({name: {$not: /(^(test|hello)-|-test$)/i}})
 
-const searchSnapsFn = (args) => {
+const searchSnapsFn = (args: args): Promise<Document[]> => {
     let query = {}
 
     if (args.name) {
@@ -80,7 +100,7 @@ const searchSnapsFn = (args) => {
         }
     }
 
-    if (args.query && args.query.sort) {
+    if (args.query?.sort?.field && args.query?.sort?.order) {
         let sort = { [args.query.sort.field]: args.query.sort.order }
         return SnapsModel.find(query).sort(sort)
     }
@@ -88,13 +108,13 @@ const searchSnapsFn = (args) => {
     return SnapsModel.find(query)
 }
 
-const findSnapsQueryFn = (searchHandlerFn) => async (_, args) => {
+const findSnapsQueryFn = (searchHandlerFn) => async (_, args: args): Promise<Document[]> => {
     return await searchHandlerFn(args)
     .skip(args.query.offset || 0)
     .limit(args.query.limit || 6)
 }
 
-const findSnapsCountFn = (searchSnapsFn) => async (_, args) => {
+const findSnapsCountFn = (searchSnapsFn) => async (_, args: args) => {
     const count = (await searchSnapsFn(args).countDocuments()) || 0
     return { count }
 }
@@ -105,6 +125,11 @@ const snapsByDateCount = async () => {
     }
 };
 
+const loadSnap = (key: string, argKey: string) => async (parent, args: args, context): Promise<Document> => {
+    const dataloaderFactory: MongooseDataloaderFactory = context.dataloaderFactory;
+    const snapLoader = dataloaderFactory.mongooseLoader(SnapsModel).dataloader(key);
+    return snapLoader.load(args[argKey]);
+};
 export default {
     Query: {
         findSnaps: findSnapsQueryFn(searchSnapsFn),
@@ -113,16 +138,8 @@ export default {
         findSnapsByNameCount: findSnapsCountFn(searchSnapsFn),
         findSnapsByBase: findSnapsQueryFn(searchSnapsFn),
         findSnapsByBaseCount: findSnapsCountFn(searchSnapsFn),
-        snapByName: async (parent, args, context) => {
-            const dataloaderFactory: MongooseDataloaderFactory = context.dataloaderFactory;
-            const snapNameLoader = dataloaderFactory.mongooseLoader(SnapsModel).dataloader('package_name');
-            return snapNameLoader.load(args.name);
-        },
-        snapById: async (parent, args, context) => {
-            const dataloaderFactory: MongooseDataloaderFactory = context.dataloaderFactory;
-            const snapNameLoader = dataloaderFactory.mongooseLoader(SnapsModel).dataloader('snap_id');
-            return snapNameLoader.load(args.snap_id);
-        },
+        snapByName: loadSnap('package_name', 'name'),
+        snapById: loadSnap('snap_id', 'snap_id'),
         snapsByDate: async (_, args) => {
             return await snapsByDateFn()
             .sort({'date_published': -1})

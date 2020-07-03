@@ -11,44 +11,44 @@ const newSnapsPubsubTopic = functions.config().pubsub.newsnaps_topic;
 const server = functions.runWith({
     timeoutSeconds: 10,
     memory: '256MB',
-}).https.onRequest((...args) => entrypoint.getApp(...args));
+}).https.onRequest(entrypoint.getApp);
 
 const sitemap = functions.runWith({
     timeoutSeconds: 10,
     memory: '256MB',
-}).https.onRequest((...args) => entrypoint.getSitemap(...args));
+}).https.onRequest(entrypoint.sitemap);
 
 const graphql = functions.runWith({
     timeoutSeconds: 10,
     memory: '256MB',
-}).https.onRequest((...args) => entrypoint.getGraphQL(...args));
+}).https.onRequest(entrypoint.graphQL);
 
 const hourlyStats = functions.runWith({
     timeoutSeconds: 300,
     memory: '512MB'
-}).pubsub.schedule('every 1 hours').onRun((...args) => entrypoint.getCollectStats(false)(...args));
+}).pubsub.schedule('every 1 hours').onRun(entrypoint.collectStats(false));
 const dailyStats = functions.runWith({
     timeoutSeconds: 300,
     memory: '512MB'
-}).pubsub.schedule('38 23 * * *').onRun((...args) => entrypoint.getCollectStats(true)(...args));
+}).pubsub.schedule('38 23 * * *').onRun(entrypoint.collectStats(true));
 // export const dailyStats = functions.pubsub.schedule('every 24 hours').onRun(collectStats(true));
 const dailyRatings = functions.runWith({
     timeoutSeconds: 30,
     memory: '256MB',
-}).pubsub.schedule('every 24 hours').onRun((...args) => entrypoint.getCollectRatings(...args));
+}).pubsub.schedule('every 24 hours').onRun(entrypoint.collectRatings);
 const dailyThinStats = functions.runWith({
     timeoutSeconds: 300,
     memory: '256MB',
-}).pubsub.schedule('48 23 * * *').onRun((...args) => entrypoint.getThinStats(...args));
+}).pubsub.schedule('48 23 * * *').onRun(entrypoint.thinSnaps);
 
 const snapsSnapshotSubscriber = functions.runWith({
     timeoutSeconds: 30,
     memory: '256MB',
-}).pubsub.topic(snapsSnapshotPubsubTopic).onPublish((...args) => entrypoint.getSnapsSnapshotSubscriber(...args));
+}).pubsub.topic(snapsSnapshotPubsubTopic).onPublish(entrypoint.snapsSnapshotSubscriber);
 const newSnapSubscriber = functions.runWith({
     timeoutSeconds: 30,
     memory: '256MB',
-}).pubsub.topic(newSnapsPubsubTopic).onPublish((...args) => entrypoint.getNewSnapsSubscriber(...args));
+}).pubsub.topic(newSnapsPubsubTopic).onPublish(entrypoint.newSnapsSubscriber);
 
 module.exports = {
     server,

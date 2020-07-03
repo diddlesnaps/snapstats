@@ -16,7 +16,7 @@ import {collectRatings} from './collectors/collectRatings';
 import {thinSnaps} from './collectors/thinStats';
 import {snapsSnapshotSubscriber} from './pubsub/snapsSnapshot';
 import {newSnapsSubscriber} from './pubsub/newSnaps';
-import {get as sitemap} from './routes/sitemap.xml';
+import {sitemap} from './sitemap';
 
 const { PORT, NODE_ENV } = process.env;
 const dev = NODE_ENV === 'development';
@@ -46,7 +46,7 @@ const graphQLConfig = {
   },
 };
 
-const getGraphQL = new prodGraphQL(graphQLConfig).createHandler();
+const graphQL = new prodGraphQL(graphQLConfig).createHandler();
 
 const getApp = (...args) => {
   // try {
@@ -54,7 +54,7 @@ const getApp = (...args) => {
 
   const app = express(); // You can also use Express
 
-  app.use((_, res, next) => {
+  app.use((req, res, next) => {
     res.set('Cache-Control', 'public, max-age=600, s-maxage=900');
     return next();
   });
@@ -79,24 +79,17 @@ const getApp = (...args) => {
   }
 };
 
-const getSitemap = (req, res) => sitemap(req, res);
-const getCollectStats = (isDaily) => (...args) => collectStats(isDaily)(...args);
-const getCollectRatings = (...args) => collectRatings(...args);
-const getThinStats = (...args) => thinSnaps(...args);
-const getSnapsSnapshotSubscriber = (...args) => snapsSnapshotSubscriber(...args);
-const getNewSnapsSubscriber = (...args) => newSnapsSubscriber(...args);
-
 if (dev) {
   getApp();
 }
 
 export {
   getApp,
-  getSitemap,
-  getGraphQL,
-  getCollectStats,
-  getCollectRatings,
-  getThinStats,
-  getSnapsSnapshotSubscriber,
-  getNewSnapsSubscriber,
+  sitemap,
+  graphQL,
+  collectStats,
+  collectRatings,
+  thinSnaps,
+  snapsSnapshotSubscriber,
+  newSnapsSubscriber,
 };
