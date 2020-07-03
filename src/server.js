@@ -13,6 +13,7 @@ import {collectRatings} from './collectors/collectRatings';
 import {thinSnaps} from './collectors/thinStats';
 import {snapsSnapshotSubscriber} from './pubsub/snapsSnapshot';
 import {newSnapsSubscriber} from './pubsub/newSnaps';
+import {get as sitemap} from './routes/sitemap.xml';
 
 const { PORT, NODE_ENV } = process.env;
 const dev = NODE_ENV === 'development';
@@ -32,18 +33,18 @@ mongoose
   )
   .catch((err) => console.log(`Mongo failed to connect: ${err.toString()}`));
 
-const getGraphQL = async (...args) => expressGraphQL({
+const getGraphQL = (...args) => expressGraphQL({
     schema,
     graphiql: true,
   })(...args);
 
-const getApp = async (...args) => {
+const getApp = (...args) => {
   // try {
   global.window = (new JSDOM('')).window;
 
   const app = express(); // You can also use Express
 
-  app.use((req, res, next) => {
+  app.use((_, res, next) => {
     res.set('Cache-Control', 'public, max-age=600, s-maxage=900');
     return next();
   });
@@ -66,11 +67,12 @@ const getApp = async (...args) => {
   }
 };
 
-const getCollectStats = (isDaily) => async (...args) => collectStats(isDaily)(...args);
-const getCollectRatings = async (...args) => collectRatings(...args);
-const getThinStats = async (...args) => thinSnaps(...args);
-const getSnapsSnapshotSubscriber = async (...args) => snapsSnapshotSubscriber(...args);
-const getNewSnapsSubscriber = async (...args) => newSnapsSubscriber(...args);
+const getSitemap = (req, res) => sitemap(req, res);
+const getCollectStats = (isDaily) => (...args) => collectStats(isDaily)(...args);
+const getCollectRatings = (...args) => collectRatings(...args);
+const getThinStats = (...args) => thinSnaps(...args);
+const getSnapsSnapshotSubscriber = (...args) => snapsSnapshotSubscriber(...args);
+const getNewSnapsSubscriber = (...args) => newSnapsSubscriber(...args);
 
 if (dev) {
   getApp();
@@ -78,6 +80,7 @@ if (dev) {
 
 export {
   getApp,
+  getSitemap,
   getGraphQL,
   getCollectStats,
   getCollectRatings,

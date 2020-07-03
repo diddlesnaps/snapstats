@@ -5,13 +5,18 @@ process.env.NODE_ENV = process.env.NODE_ENV || 'production';
 const filename = process.env.NODE_ENV === 'production' ? './server/server' : './__sapper__/build/server/server';
 const entrypoint = require(filename);
 
-const snapsSnapshotPubsubTopic = functions.config().pubsub.snaps_snapshot_topic
-const newSnapsPubsubTopic = functions.config().pubsub.newsnaps_topic
+const snapsSnapshotPubsubTopic = functions.config().pubsub.snaps_snapshot_topic;
+const newSnapsPubsubTopic = functions.config().pubsub.newsnaps_topic;
 
 const server = functions.runWith({
     timeoutSeconds: 45,
     memory: '256MB',
 }).https.onRequest((...args) => entrypoint.getApp(...args));
+
+const sitemap = functions.runWith({
+    timeoutSeconds: 45,
+    memory: '512MB',
+}).https.onRequest((...args) => entrypoint.getSitemap(...args));
 
 const graphql = functions.runWith({
     timeoutSeconds: 30,
@@ -47,6 +52,7 @@ const newSnapSubscriber = functions.runWith({
 
 module.exports = {
     server,
+    sitemap,
     graphql,
     hourlyStats,
     dailyStats,
