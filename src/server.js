@@ -46,7 +46,7 @@ const graphQLConfig = {
   },
 };
 
-const getGraphQL = (...args) => new prodGraphQL(graphQLConfig)(...args);
+const getGraphQL = new prodGraphQL(graphQLConfig).createHandler();
 
 const getApp = (...args) => {
   // try {
