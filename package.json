@@ -3,7 +3,7 @@
   "description": "snapstats",
   "version": "0.0.1",
   "engines": {
-    "node": "10"
+    "node": "12"
   },
   "scripts": {
     "dev": "sapper dev",
