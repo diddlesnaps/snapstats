@@ -9,17 +9,17 @@ const snapsSnapshotPubsubTopic = functions.config().pubsub.snaps_snapshot_topic;
 const newSnapsPubsubTopic = functions.config().pubsub.newsnaps_topic;
 
 const server = functions.runWith({
-    timeoutSeconds: 10,
+    timeoutSeconds: 30,
     memory: '256MB',
 }).https.onRequest(entrypoint.getApp);
 
 const sitemap = functions.runWith({
-    timeoutSeconds: 10,
+    timeoutSeconds: 30,
     memory: '256MB',
 }).https.onRequest(entrypoint.sitemap);
 
 const graphql = functions.runWith({
-    timeoutSeconds: 10,
+    timeoutSeconds: 30,
     memory: '256MB',
 }).https.onRequest(entrypoint.graphQL);
 
