@@ -7,7 +7,8 @@
   },
   "scripts": {
     "dev": "sapper dev",
-    "build": "sapper build --legacy && cp package*.json __sapper__/build/ && npm install --production --prefix __sapper__/build && cp index.js __sapper__/build/",
+    "tsc:watch": "tsc --watch",
+    "build": "tsc && sapper build --legacy && cp package*.json __sapper__/build/ && npm install --production --prefix __sapper__/build && cp index.js __sapper__/build/",
     "export": "sapper export --legacy",
     "start": "node __sapper__/build",
     "firebase:start": "cp .runtimeconfig.json __sapper__/build/ && firebase serve",
@@ -28,6 +29,8 @@
     "apollo-client": "^2.6.10",
     "apollo-link-http": "^1.5.17",
     "apollo-link-ws": "^1.0.20",
+    "apollo-server-cloud-functions": "^2.15.1",
+    "apollo-server-express": "^2.15.1",
     "chart.js": "^2.9.3",
     "color-rainbow": "0.0.0",
     "compression": "^1.7.4",
@@ -41,6 +44,7 @@
     "firebase-functions": "^3.7.0",
     "fslightbox": "^3.1.0",
     "graphql": "^14.6.0",
+    "graphql-dataloader-mongoose": "^1.0.1",
     "graphql-tag": "^2.10.3",
     "graphql-tag-pluck": "^0.8.7",
     "graphql-tools": "^4.0.8",
@@ -84,6 +88,7 @@
     "rollup-plugin-terser": "^5.3.0",
     "sapper": "^0.27.15",
     "svelte": "^3.23.2",
-    "svelte-apollo": "^0.3.0"
+    "svelte-apollo": "^0.3.0",
+    "typescript": "^3.9.6"
   }
 }

@@ -1,28 +1,33 @@
 import { SnapsModel } from "../../../models/Snaps"
 import { RatingsModel } from "../../../models/Rating"
 import escapeRegExp from 'lodash.escaperegexp'
+import {MongooseDataloaderFactory} from 'graphql-dataloader-mongoose';
 
-const getRating = async (snap) => {
+const getRatingAverage = async (snap) => {
     const rating = await RatingsModel.findOne({
-        app_id: `io.snapcraft.${snap.package_name}-${snap.snap_id}`,
+        app_id: `io.snapcraft.${snap._doc.package_name}-${snap._doc.snap_id}`,
     })
     if (!rating) {
-        return {
-            ratings_average: 0,
-            ratings_count: 0,
-        }
+        return 0;
     }
     const count = rating.total
-    return {
-        ratings_average: (
+    return (
             rating.star5 * 5
             + rating.star4 * 4
             + rating.star3 * 3
             + rating.star2 * 2
             + rating.star1
-        ) / count,
-        ratings_count: count,
+        ) / count;
+}
+
+const getRatingCount = async (snap) => {
+    const rating = await RatingsModel.findOne({
+        app_id: `io.snapcraft.${snap._doc.package_name}-${snap._doc.snap_id}`,
+    })
+    if (!rating) {
+        return 0;
     }
+    return rating.total;
 }
 
 const snapsByDateFn = () => SnapsModel.find({name: {$not: /(^(test|hello)-|-test$)/i}})
@@ -47,7 +52,7 @@ const searchSnapsFn = (args) => {
     if (args.publisherOrDeveloper) {
         const publisherOrDeveloper = escapeRegExp(args.publisherOrDeveloper)
 
-        let publisherOrDeveloperQuery = []
+        let publisherOrDeveloperQuery: any[] = []
         publisherOrDeveloperQuery.push({publisher: {$regex: publisherOrDeveloper, $options: 'i'}})
         publisherOrDeveloperQuery.push({developer_name: {$regex: publisherOrDeveloper, $options: 'i'}})
 
@@ -84,14 +89,9 @@ const searchSnapsFn = (args) => {
 }
 
 const findSnapsQueryFn = (searchHandlerFn) => async (_, args) => {
-    const snaps = await searchHandlerFn(args)
+    return await searchHandlerFn(args)
     .skip(args.query.offset || 0)
     .limit(args.query.limit || 6)
-
-    return snaps.map(async snap => ({
-        ...snap._doc,
-        ...await getRating(snap),
-    }))
 }
 
 const findSnapsCountFn = (searchSnapsFn) => async (_, args) => {
@@ -99,69 +99,55 @@ const findSnapsCountFn = (searchSnapsFn) => async (_, args) => {
     return { count }
 }
 
+const snapsByDateCount = async () => {
+    return {
+        count: (await snapsByDateFn().countDocuments()) || 0,
+    }
+};
+
 export default {
     Query: {
         findSnaps: findSnapsQueryFn(searchSnapsFn),
         findSnapsCount: findSnapsCountFn(searchSnapsFn),
-        findSnapsByName: findSnapsQueryFn(searchSnapsFn),
-        findSnapsByNameCount: findSnapsCountFn(searchSnapsFn),
-        findSnapsByBase: findSnapsQueryFn(searchSnapsFn),
-        findSnapsByBaseCount: findSnapsCountFn(searchSnapsFn),
-        snapByName: async (_, args) => {
-            const snap = await SnapsModel.findOne({
-                package_name: args.name
-            })
-
-            if (!snap) {
-                return null
-            }
-
-            return {
-                ...snap._doc,
-                ...await getRating(snap),
-            }
+        findSnapsByName: async (parent, args, context) => {
+            const dataloaderFactory: MongooseDataloaderFactory = context.dataloaderFactory;
+            const snapNameLoader = dataloaderFactory.mongooseLoader(SnapsModel).dataloader('package_name');
+            return snapNameLoader.loadMany(args.name);
         },
-        snapById: async (_, args) => {
-            const snap = await SnapsModel.findOne({
-                snap_id: args.snap_id
-            })
-
-            if (!snap) {
-                return null
-            }
-
-            return {
-                ...snap._doc,
-                ...await getRating(snap),
-            }
+        findSnapsByNameCount: findSnapsCountFn(searchSnapsFn),
+        findSnapsByBase: async (parent, args, context) => {
+            const dataloaderFactory: MongooseDataloaderFactory = context.dataloaderFactory;
+            const snapNameLoader = dataloaderFactory.mongooseLoader(SnapsModel).dataloader('base');
+            return snapNameLoader.loadMany(args.base);
+        },
+        findSnapsByBaseCount: findSnapsCountFn(searchSnapsFn),
+        snapByName: async (parent, args, context) => {
+            const dataloaderFactory: MongooseDataloaderFactory = context.dataloaderFactory;
+            const snapNameLoader = dataloaderFactory.mongooseLoader(SnapsModel).dataloader('package_name');
+            return snapNameLoader.load(args.name);
+        },
+        snapById: async (parent, args, context) => {
+            const dataloaderFactory: MongooseDataloaderFactory = context.dataloaderFactory;
+            const snapNameLoader = dataloaderFactory.mongooseLoader(SnapsModel).dataloader('snap_id');
+            return snapNameLoader.loadMany(args.snap_id);
         },
         snapsByDate: async (_, args) => {
-            const snaps = await snapsByDateFn()
+            return await snapsByDateFn()
             .sort({'date_published': -1})
             .skip(args.query.offset || 0)
             .limit(args.query.limit || 6)
-
-            return snaps.map(async snap => ({
-                ...snap._doc,
-                ...await getRating(snap),
-            }))
         },
-        snapsByDateCount: async () => {
-            return {
-                count: (await snapsByDateFn().countDocuments()) || 0,
-            }
-        },
+        snapsByDateCount: snapsByDateCount,
         snapsByUpdatedDate: async (_, args) => {
-            const snaps = await snapsByDateFn()
+            return await snapsByDateFn()
             .sort({'last_updated': -1})
             .skip(args.query.offset || 0)
             .limit(args.query.limit || 6)
-
-            return snaps.map(async snap => ({
-                ...snap._doc,
-                ...await getRating(snap),
-            }))
         },
-        snapsByUpdatedDateCount: async () => snapsByDateCount(),
+        snapsByUpdatedDateCount: snapsByDateCount,
     },
+    Snap: {
+        ratings_average: getRatingAverage,
+        ratings_count: getRatingCount,
+    }
 };

@@ -1,9 +1,12 @@
 import * as functions from 'firebase-functions';
 import mongoose from 'mongoose';
 import express from 'express';
-import expressGraphQL from 'express-graphql';
+// import expressGraphQL from 'express-graphql';
+import {ApolloServer as devGraphQL} from 'apollo-server-express';
+import {ApolloServer as prodGraphQL} from 'apollo-server-cloud-functions';
+import {MongooseDataloaderFactory} from 'graphql-dataloader-mongoose';
 import compression from 'compression';
-import { JSDOM } from 'jsdom';
+import {JSDOM} from 'jsdom';
 import * as sapper from '@sapper/server';
 import sirv from 'sirv';
 
@@ -33,10 +36,17 @@ mongoose
   )
   .catch((err) => console.log(`Mongo failed to connect: ${err.toString()}`));
 
-const getGraphQL = (...args) => expressGraphQL({
-    schema,
-    graphiql: true,
-  })(...args);
+const graphQLConfig = {
+  schema,
+  playground: true,
+  introspection: true,
+  context: async ctx => {
+    let dataloaderFactory = new MongooseDataloaderFactory();
+    return { ...ctx, dataloaderFactory };
+  },
+};
+
+const getGraphQL = (...args) => new prodGraphQL(graphQLConfig)(...args);
 
 const getApp = (...args) => {
   // try {
@@ -50,9 +60,11 @@ const getApp = (...args) => {
   });
   app.use(compression({ threshold: 0 }));
 
+  let graphql;
   if (dev) {
     app.use(sirv('static', { dev }));
-    app.use('/graphql', getGraphQL);
+    graphql = new devGraphQL(graphQLConfig);
+    graphql.applyMiddleware({app});
   }
 
   app.use(sapper.middleware());
@@ -61,7 +73,7 @@ const getApp = (...args) => {
     app.listen(3000, err => {
       if (err) console.log('error', err);
     });
-    return app;
+    return graphql;
   } else {
     return app(...args);
   }
