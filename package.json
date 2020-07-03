@@ -6,9 +6,15 @@
     "node": "10"
   },
   "scripts": {
-    "dev": "sapper dev",
+    "dev": "run-p sapper:dev tsc:watch",
+    "sapper:dev": "sapper dev",
     "tsc:watch": "tsc --watch",
-    "build": "tsc && sapper build --legacy && cp package*.json __sapper__/build/ && npm install --production --prefix __sapper__/build && cp index.js __sapper__/build/",
+    "build": "run-s build:typescript build:sapper build:packagejson build:npminstall build:firebase:index",
+    "build:sapper": "sapper build --legacy",
+    "build:packagejson": "cp package*.json __sapper__/build/",
+    "build:npminstall": "npm install --production --prefix __sapper__/build",
+    "build:firebase:index": "cp index.js __sapper__/build/",
+    "build:typescript": "tsc",
     "export": "sapper export --legacy",
     "start": "node __sapper__/build",
     "firebase:start": "cp .runtimeconfig.json __sapper__/build/ && firebase serve",

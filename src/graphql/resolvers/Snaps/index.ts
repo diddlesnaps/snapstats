@@ -109,17 +109,9 @@ export default {
     Query: {
         findSnaps: findSnapsQueryFn(searchSnapsFn),
         findSnapsCount: findSnapsCountFn(searchSnapsFn),
-        findSnapsByName: async (parent, args, context) => {
-            const dataloaderFactory: MongooseDataloaderFactory = context.dataloaderFactory;
-            const snapNameLoader = dataloaderFactory.mongooseLoader(SnapsModel).dataloader('package_name');
-            return snapNameLoader.loadMany(args.name);
-        },
+        findSnapsByName: findSnapsQueryFn(searchSnapsFn),
         findSnapsByNameCount: findSnapsCountFn(searchSnapsFn),
-        findSnapsByBase: async (parent, args, context) => {
-            const dataloaderFactory: MongooseDataloaderFactory = context.dataloaderFactory;
-            const snapNameLoader = dataloaderFactory.mongooseLoader(SnapsModel).dataloader('base');
-            return snapNameLoader.loadMany(args.base);
-        },
+        findSnapsByBase: findSnapsQueryFn(searchSnapsFn),
         findSnapsByBaseCount: findSnapsCountFn(searchSnapsFn),
         snapByName: async (parent, args, context) => {
             const dataloaderFactory: MongooseDataloaderFactory = context.dataloaderFactory;
@@ -129,7 +121,7 @@ export default {
         snapById: async (parent, args, context) => {
             const dataloaderFactory: MongooseDataloaderFactory = context.dataloaderFactory;
             const snapNameLoader = dataloaderFactory.mongooseLoader(SnapsModel).dataloader('snap_id');
-            return snapNameLoader.loadMany(args.snap_id);
+            return snapNameLoader.load(args.snap_id);
         },
         snapsByDate: async (_, args) => {
             return await snapsByDateFn()
