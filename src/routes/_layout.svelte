@@ -1,5 +1,6 @@
 <script>
 	import { stores } from '@sapper/app';
+	import { derived } from 'svelte/store';
 	import '@beyonk/gdpr-cookie-consent-banner/dist/style.css'
 	import GdprBanner from '@beyonk/gdpr-cookie-consent-banner/src/components/Banner.svelte'
 	import Nav from '../components/Nav.svelte';
