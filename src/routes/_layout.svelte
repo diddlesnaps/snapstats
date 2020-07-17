@@ -77,9 +77,8 @@
 <main>
 {#if $preloading && $delayedPreloading}
 	Loading...
-{:else}
-	<slot></slot>
 {/if}
+	<slot></slot>
 </main>
 
 <footer>
