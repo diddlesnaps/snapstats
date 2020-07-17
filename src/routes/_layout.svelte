@@ -3,11 +3,14 @@
 	import '@beyonk/gdpr-cookie-consent-banner/dist/style.css'
 	import GdprBanner from '@beyonk/gdpr-cookie-consent-banner/src/components/Banner.svelte'
 	import Nav from '../components/Nav.svelte';
-
+	
 	export let segment;
 
-	const { page } = stores();
-	
+	const { preloading, page } = stores();
+	const delayedPreloading = derived(preloading, (currentPreloading, set) => {
+		setTimeout(() => set(currentPreloading), 250);
+	});
+
 	function enableAnalytics() {
 		if (process.env.NODE_ENV === 'production') {
 			firebase.analytics();
@@ -71,7 +74,11 @@
 
 
 <main>
+{#if $preloading && $delayedPreloading}
+	Loading...
+{:else}
 	<slot></slot>
+{/if}
 </main>
 
 <footer>
