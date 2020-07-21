@@ -1,25 +1,12 @@
 import * as functions from 'firebase-functions';
 import mongoose from 'mongoose';
-import express from 'express';
 // import expressGraphQL from 'express-graphql';
-import {ApolloServer as devGraphQL} from 'apollo-server-express';
 import {ApolloServer as prodGraphQL} from 'apollo-server-cloud-functions';
 import {MongooseDataloaderFactory} from 'graphql-dataloader-mongoose';
-import compression from 'compression';
-import {JSDOM} from 'jsdom';
-import * as sapper from '@sapper/server';
-import sirv from 'sirv';
 
 import {schema} from "./graphql";
-import {collectStats} from './collectors/collectStats';
-import {collectRatings} from './collectors/collectRatings';
-import {thinSnaps} from './collectors/thinStats';
-import {snapsSnapshotSubscriber} from './pubsub/snapsSnapshot';
-import {newSnapsSubscriber} from './pubsub/newSnaps';
-import {sitemap} from './sitemap';
 
 const { PORT, NODE_ENV } = process.env;
-const dev = NODE_ENV === 'development';
 
 // Connect to MongoDB with Mongoose.
 const mongoUrl = process.env.MONGO_URL || functions.config().mongo.url || 'mongodb://localhost/snapstats';
@@ -46,50 +33,49 @@ const graphQLConfig = {
   },
 };
 
-const graphQL = new prodGraphQL(graphQLConfig).createHandler();
+let server, graphql;
+export * from './functions';
 
-const getApp = (...args) => {
-  // try {
-  global.window = (new JSDOM('')).window;
+const dev = process.env.SNAPSTATS_DEV === 'true';
+if (dev && process.env.NODE_ENV === 'development') {
+  (function() {
+    const {JSDOM} = require('jsdom');
+    global.window = (new JSDOM('')).window;
 
-  const app = express(); // You can also use Express
+		const sirv = require('sirv');
+		const express = require('express');
+		const compression = require('compression');
+    const sapper = require('@sapper/server');
+    const GraphQL = require('apollo-server-express').ApolloServer;
 
-  app.use((req, res, next) => {
-    res.set('Cache-Control', 'public, max-age=600, s-maxage=900');
-    return next();
-  });
-  app.use(compression({ threshold: 0 }));
-
-  let graphql;
-  if (dev) {
-    app.use(sirv('static', { dev }));
-    graphql = new devGraphQL(graphQLConfig);
+		const app = express() // You can also use Express
+		app.use(compression({ threshold: 0 }))
+		app.use(sirv('static', {dev}))
+    app.use(sapper.middleware())
+    graphql = new GraphQL(graphQLConfig);
     graphql.applyMiddleware({app});
-  }
 
-  app.use(sapper.middleware());
+		app.listen(3000, err => {
+			if (err) console.log('error', err);
+		})
+  }());
+}
+else {
+  server = functions.runWith({
+		timeoutSeconds: 5,
+		memory: '128MB',
+	}).https.onRequest((req, res) => {
+    const {JSDOM} = require('jsdom');
+    global.window = (new JSDOM('')).window;
+    const sapper = require('@sapper/server');
+    req.baseUrl = '';
+		return sapper.middleware()(req, res);
+  });
 
-  if (dev) {
-    app.listen(3000, err => {
-      if (err) console.log('error', err);
-    });
-    return graphql;
-  } else {
-    return app(...args);
-  }
-};
-
-if (dev) {
-  getApp();
+  graphql = functions.runWith({
+    timeoutSeconds: 30,
+    memory: '256MB',
+  }).https.onRequest(new prodGraphQL(graphQLConfig).createHandler());
 }
 
-export {
-  getApp,
-  sitemap,
-  graphQL,
-  collectStats,
-  collectRatings,
-  thinSnaps,
-  snapsSnapshotSubscriber,
-  newSnapsSubscriber,
-};
+export {server, graphql};

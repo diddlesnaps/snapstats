@@ -1,25 +1,25 @@
 import * as functions from 'firebase-functions';
 import {PubSub} from '@google-cloud/pubsub';
 
-import {ArchitecturesModel} from '../models/Architecture';
-import {BasesModel} from '../models/Base';
-import {ChannelsModel} from '../models/Channel';
-import {ConfinementsModel} from '../models/Confinement';
-import {DeveloperCountsModel} from '../models/DeveloperCount';
-import {LicensesModel} from '../models/License';
-import {SectionsModel} from '../models/Section';
-import {SnapCountsModel} from '../models/SnapCount';
-import {SnapsModel} from '../models/Snaps';
+import {ArchitecturesModel} from '../../models/Architecture';
+import {BasesModel} from '../../models/Base';
+import {ChannelsModel} from '../../models/Channel';
+import {ConfinementsModel} from '../../models/Confinement';
+import {DeveloperCountsModel} from '../../models/DeveloperCount';
+import {LicensesModel} from '../../models/License';
+import {SectionsModel} from '../../models/Section';
+import {SnapCountsModel} from '../../models/SnapCount';
+import {SnapsModel} from '../../models/Snaps';
 
-import {getStats} from '../snapstore-api';
+import {getStats} from '../../snapstore-api';
 import {updateLastUpdated} from './updateLastUpdated';
-import {LastUpdatedModel} from '../models/LastUpdated';
+import {LastUpdatedModel} from '../../models/LastUpdated';
 
-import snapshotVersion from '../snapshotVersion';
+import snapshotVersion from '../../snapshotVersion';
 
 const denysave = process.env.denysave === 'true' ? true : false;
 
-export const collectStats = (isDaily = false) => async () => {
+const collector = (isDaily = false) => async () => {
     const date = Date.now();
     console.log(`Updating stats at ${new Date(date).toLocaleString()}`);
     try {
@@ -193,3 +193,6 @@ export const collectStats = (isDaily = false) => async () => {
     }
     console.log(`Stats update completed at ${new Date().toLocaleString()}`);
 };
+
+export const hourly = collector(false)
+export const daily = collector(true);

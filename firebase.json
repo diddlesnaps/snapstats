@@ -1,5 +1,21 @@
 {
+  "emulators": {
+    "functions": {
+      "port": 5001
+    },
+    "hosting": {
+      "port": 5000
+    },
+    "pubsub": {
+      "port": 8085
+    }
+  },
   "functions": {
+    "predeploy": [
+      "npm install",
+      "npm run build",
+      "npm prune --production"
+    ],
     "source": "__sapper__/build",
     "ignore": [
       ".package*.json",
@@ -39,16 +55,5 @@
         "type": "301"
       }
     ]
-  },
-  "emulators": {
-    "functions": {
-      "port": 5001
-    },
-    "hosting": {
-      "port": 5000
-    },
-    "pubsub": {
-      "port": 8085
-    }
   }
 }

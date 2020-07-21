@@ -13,7 +13,7 @@ const twitter_consumer_secret = process.env.TWIT_APP_SECRET || functions.config(
 const twitter_access_token = process.env.TWIT_APP_ID || functions.config().twitter.access_token
 const twitter_access_secret = process.env.TWIT_APP_SECRET || functions.config().twitter.access_secret
 
-export const newSnapsSubscriber = async (message) => {
+export default async (message) => {
     if (message.json.name && message.json.slug) {
         console.log(`Publishing new snap: ${message.json.name} (${message.json.slug})`)
         const url = `https://snapstats.org/snaps/${message.json.slug}`

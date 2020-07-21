@@ -1,18 +1,18 @@
-import {LastUpdatedModel} from '../models/LastUpdated';
-import {ArchitecturesModel} from '../models/Architecture';
-import {BasesModel} from '../models/Base';
-import {ChannelsModel} from '../models/Channel';
-import {ConfinementsModel} from '../models/Confinement';
-import {DeveloperCountsModel} from '../models/DeveloperCount';
-import {LicensesModel} from '../models/License';
-import {SnapCountsModel} from '../models/SnapCount';
+import {LastUpdatedModel} from '../../models/LastUpdated';
+import {ArchitecturesModel} from '../../models/Architecture';
+import {BasesModel} from '../../models/Base';
+import {ChannelsModel} from '../../models/Channel';
+import {ConfinementsModel} from '../../models/Confinement';
+import {DeveloperCountsModel} from '../../models/DeveloperCount';
+import {LicensesModel} from '../../models/License';
+import {SnapCountsModel} from '../../models/SnapCount';
 
-import {promisify} from '../graphql/resolvers/promisify';
+import {promisify} from '../../graphql/resolvers/promisify';
 import {updateLastUpdated} from './updateLastUpdated';
 
 const denysave = process.env.denysave === 'true' ? true : false;
 
-export const thinSnaps = async () => {
+export default async () => {
     try {
         console.log(`Thinning stats at ${(new Date()).toLocaleString()}`);
 
