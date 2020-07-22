@@ -19,7 +19,7 @@ jobs:
         with:
           node-version: '12.x'
       - name: Deploy to Firebase
-        uses: w9jds/firebase-action@master
+        uses: w9jds/firebase-action@v1.5.0
         with:
           args: deploy --only hosting
         env:
