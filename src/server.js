@@ -1,7 +1,5 @@
 import * as functions from 'firebase-functions';
 import mongoose from 'mongoose';
-// import expressGraphQL from 'express-graphql';
-import {ApolloServer as prodGraphQL} from 'apollo-server-cloud-functions';
 import {MongooseDataloaderFactory} from 'graphql-dataloader-mongoose';
 
 import {schema} from "./graphql";
@@ -64,10 +62,10 @@ else {
   server = functions.runWith({
 		timeoutSeconds: 5,
 		memory: '128MB',
-	}).https.onRequest((req, res) => {
-    const {JSDOM} = require('jsdom');
+	}).https.onRequest(async (req, res) => {
+    const {JSDOM} = await import('jsdom');
     global.window = (new JSDOM('')).window;
-    const sapper = require('@sapper/server');
+    const sapper = await import('@sapper/server');
     req.baseUrl = '';
 		return sapper.middleware()(req, res);
   });
@@ -75,7 +73,10 @@ else {
   graphql = functions.runWith({
     timeoutSeconds: 30,
     memory: '256MB',
-  }).https.onRequest(new prodGraphQL(graphQLConfig).createHandler());
+  }).https.onRequest(async (req, res) => {
+    const prodGraphQL = (await import('apollo-server-cloud-functions')).ApolloServer;
+    return new prodGraphQL(graphQLConfig).createHandler()(req, res);
+  });
 }
 
 export {server, graphql};

@@ -1,5 +1,4 @@
 import { spider } from './config';
-import { request } from 'gaxios';
 
 const searchfields = [
     'aliases',
@@ -61,9 +60,8 @@ class SnapApi {
             headers['X-Ubuntu-Architecture'] = arch;
         }
 
-        const res = await request({
+        const res = await __fetch(url, {
             method: 'GET',
-            url,
             headers,
         })
 
@@ -159,9 +157,8 @@ class SnapApi {
             headers['X-Ubuntu-Architecture'] = arch;
         }
 
-        const res = await request({
+        const res = await __fetch(url, {
             method: 'GET',
-            url,
             headers,
         });
         

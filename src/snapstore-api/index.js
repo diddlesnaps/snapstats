@@ -1,4 +1,3 @@
-import { request } from 'gaxios';
 import { spider } from './config';
 import SnapApi from './api';
 function sort(array) {
@@ -11,9 +10,8 @@ export const getDetails = async (url) => {
         'Snap-Device-Series': '16',
     };
 
-    const res = await request({
+    const res = await __fetch(url, {
         method: 'GET',
-        url,
         headers,
     });
     

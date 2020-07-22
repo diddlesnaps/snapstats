@@ -1,5 +1,3 @@
-import {request} from 'gaxios';
-
 import {RatingsModel} from '../../models/Rating';
 
 const denysave = process.env.denysave === 'true' ? true : false;
@@ -7,9 +5,8 @@ const denysave = process.env.denysave === 'true' ? true : false;
 export default async () => {
     const url = `https://odrs.gnome.org/1.0/reviews/api/ratings`;
     try {
-        const res = await request({
+        const res = await __fetch(url, {
             method: 'GET',
-            url,
         });
         const data = res.data;
 
