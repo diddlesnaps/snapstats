@@ -13,7 +13,7 @@ on:
 
 jobs:
   build:
-    name: Build
+    name: Build and Deploy
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
@@ -25,29 +25,14 @@ jobs:
         run: npm install
       - name: Build
         run: npm run build
-      - name: Archive Production Artifact
-        uses: actions/upload-artifact@v2.1.0
-        with:
-          name: dist
-          path: __sapper__/build
-  deploy:
-    name: Deploy
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
-        with:
-          node-version: '12.x'
-      - name: Download Artifact
-        uses: actions/download-artifact@v2.0.1
-        with:
-          name: dist
-          path: __sapper__/build
       - name: Deploy to Firebase
         uses: w9jds/firebase-action@v1.5.0
         with:
           args: deploy --only functions
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+      - name: Archive Production Artifact
+        uses: actions/upload-artifact@v2.1.0
+        with:
+          name: dist
+          path: __sapper__/build
