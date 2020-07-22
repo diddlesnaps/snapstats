@@ -60,7 +60,7 @@ if (dev && process.env.NODE_ENV === 'development') {
 }
 else {
   server = functions.runWith({
-		timeoutSeconds: 5,
+		timeoutSeconds: 30,
 		memory: '128MB',
 	}).https.onRequest(async (req, res) => {
     const {JSDOM} = await import('jsdom');
