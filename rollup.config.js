@@ -71,6 +71,14 @@ export default {
 				'__fetch': 'require("node-fetch")',
 				'http://localhost:3000/graphql': dev ? 'http://localhost:3000/graphql' : 'https://snapstats.org/graphql',
 			}),
+			replace({
+				'"__sapper__/build"': 'process.cwd()',
+				'delimiters': ['',''],
+			}),
+			!dev && replace({
+				'!emitted_basepath && process.send': 'false',
+				'delimiters': ['',''],
+			}),
 			svelte({
 				generate: 'ssr',
 				dev,
