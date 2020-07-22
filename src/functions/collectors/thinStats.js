@@ -16,7 +16,6 @@ export default async () => {
     try {
         console.log(`Thinning stats at ${(new Date()).toLocaleString()}`);
 
-        const lastUpdated = await LastUpdatedModel.findOne({});
         if (!denysave) {
             let promises = [];
             for (const model of [
@@ -31,7 +30,6 @@ export default async () => {
                 promises.push(promisify(model.deleteMany({ isDaily: { $ne: true } })));
             }
 
-            promises.push(updateLastUpdated(lastUpdated.dailyDate));
             await Promise.all(promises);
         }
         console.log(`Stats thinning completed at ${(new Date()).toLocaleString()}`);
