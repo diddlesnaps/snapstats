@@ -11,11 +11,6 @@
     }
   },
   "functions": {
-    "predeploy": [
-      "npm install",
-      "npm run build",
-      "npm prune --production"
-    ],
     "source": "__sapper__/build",
     "ignore": [
       ".package*.json",
