@@ -15,7 +15,7 @@ export const getDetails = async (url) => {
         headers,
     });
     
-    return res.data;
+    return await res.json();
 }
 
 export const getStats = () => {

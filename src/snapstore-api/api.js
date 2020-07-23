@@ -65,14 +65,16 @@ class SnapApi {
             headers,
         })
 
+        const data = await res.json();
+
         // console.debug(`got package list page: ${url} (${arch}, ${section})`);
 
-        if (res.data && res.data._embedded && res.data._embedded['clickindex:package']) {
-            results = results.concat(res.data._embedded['clickindex:package']);
+        if (data && data._embedded && data._embedded['clickindex:package']) {
+            results = results.concat(data._embedded['clickindex:package']);
         }
 
-        if (res.data._links && res.data._links.next && res.data._links.next.href) {
-            let nextUrl = res.data._links.next.href;
+        if (data._links && data._links.next && data._links.next.href) {
+            let nextUrl = data._links.next.href;
 
             // Not sure why these links are coming back so weird, but this fixes it
             nextUrl = nextUrl.replace('http://snapdevicegw_cached', this.domain);
@@ -162,7 +164,7 @@ class SnapApi {
             headers,
         });
         
-        return res.data;
+        return await res.json();
     }
 
     async details(packageName, arches, section, series) {
