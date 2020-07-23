@@ -12,7 +12,6 @@ mongoose
   .connect(
     mongoUrl,
     {
-      autoReconnect: true,
       useCreateIndex: true,
       useNewUrlParser: true,
       useUnifiedTopology: true,
