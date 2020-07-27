@@ -3,7 +3,9 @@
 import ApolloClient from 'apollo-boost';
 // import {InMemoryCache} from 'apollo-cache-inmemory';
 
-const uri = 'http://localhost:5000/graphql';
+const uri = (process.env.NODE_ENV === 'production') ?
+    'https://snapstats.org/graphql' :
+    'http://localhost:5000/graphql';
 
 // let cache;
 // if (process.browser === true) {
