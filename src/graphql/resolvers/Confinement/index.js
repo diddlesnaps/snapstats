@@ -1,3 +1,5 @@
+// @ts-check
+
 import { ConfinementsModel } from "../../../models/Confinement";
 import { LastUpdatedModel } from '../../../models/LastUpdated';
 import { promisify } from '../promisify';

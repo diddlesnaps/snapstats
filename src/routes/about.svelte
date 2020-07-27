@@ -1,4 +1,6 @@
 <script>
+	// @ts-check
+
 	import DonateBtn from '../components/DonateBtn.svelte';
 </script>
 

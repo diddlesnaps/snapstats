@@ -1,3 +1,5 @@
+// @ts-check
+
 import * as functions from 'firebase-functions';
 
 const snapsSnapshotPubsubTopic = functions.config().pubsub.snaps_snapshot_topic;

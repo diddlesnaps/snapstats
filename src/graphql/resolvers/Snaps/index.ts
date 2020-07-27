@@ -1,8 +1,8 @@
 import { SnapsModel } from "../../../models/Snaps"
 import { RatingsModel } from "../../../models/Rating"
 import escapeRegExp from 'lodash.escaperegexp'
-import {Document} from 'mongoose';
-import {MongooseDataloaderFactory} from 'graphql-dataloader-mongoose';
+import type {Document} from 'mongoose';
+import type {MongooseDataloaderFactory} from 'graphql-dataloader-mongoose';
 
 type args = {
     query: {

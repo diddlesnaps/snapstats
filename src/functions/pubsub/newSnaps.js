@@ -1,3 +1,5 @@
+// @ts-check
+
 import * as functions from 'firebase-functions';
 // import {URLSearchParams} from 'url';
 

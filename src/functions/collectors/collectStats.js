@@ -1,3 +1,5 @@
+// @ts-check
+
 import * as functions from 'firebase-functions';
 import {PubSub} from '@google-cloud/pubsub';
 
@@ -19,7 +21,7 @@ import snapshotVersion from '../../snapshotVersion';
 
 const denysave = process.env.denysave === 'true' ? true : false;
 
-const collector = (isDaily = false) => async () => {
+const collector = (isDaily = false) => async (context) => {
     const date = Date.now();
     console.log(`Updating stats at ${new Date(date).toLocaleString()}`);
     try {

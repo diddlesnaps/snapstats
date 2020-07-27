@@ -1,21 +1,27 @@
-<script>
+<script type="ts">
     import { onMount } from 'svelte';
     import { shuffle, MersenneTwister19937 } from 'random-js';
     import Chart from 'chart.js';
     import Rainbow from 'color-rainbow';
 
-    export let getLegendItem = (title) => title
-    export let data;
-    export let title;
-    let chart;
-    let legend = '';
+    export let getLegendItem = (title: string) => title
+    export let data: {
+        items?: { _id?: string; date?: string; total?: number; count?: number; }[];
+        counts?: { _id?: string; date?: string; total?: number; count?: number; }[];
+        _id?: string;
+        title?: string;
+        name?: string;
+    }[];
+    export let title: string;
+    let chart: HTMLCanvasElement;
+    let legend: any = '';
 
-    let colors = [];
+    let colors: string[] = [];
 
     const twister = MersenneTwister19937.seed(823212621);
 
-    const Randomise = (array) => shuffle(twister, array);
-    colors = Randomise(Rainbow.create(data.length).map(color => color.hexString()))
+    const Randomise = (array: string[]): string[] => shuffle(twister, array);
+    colors = Randomise(Rainbow.create(data.length).map((color: any): string => color.hexString()))
 
     function sortNames(a, b) {
         if (a < b) {
@@ -28,25 +34,24 @@
     }
 
     onMount(() => {
-        let ctx = chart.getContext('2d');
-        let timelineChart = new Chart(ctx, {
+        let timelineChart = new Chart(chart, {
             type: 'line',
             data: {
                 datasets: data.map((line, idx) => {
                     let items = line.counts || line.items;
-                    items = items.map(item => ({
-                        x: new Date(item.date || item._id),
-                        y: item.count || item.total,
-                    })).sort((a, b) => a.x - b.x);
+                    let chartItems = items?.map(item => ({
+                        x: new Date(item.date ?? item._id ?? 0),
+                        y: item.count ?? item.total ?? 0,
+                    })).sort((a, b) => a.x.getTime() - b.x.getTime()) ?? [];
                     return {
-                        label: line._id || line.title || line.name,
+                        label: line._id ?? line.title ?? line.name,
                         backgroundColor: colors[idx],
                         borderColor: colors[idx],
                         borderWidth: 1,
                         pointRadius: 1,
                         lineTension: 0.2,
                         fill: false,
-                        data: items,
+                        data: chartItems,
                     };
                 }),
             },
@@ -72,12 +77,12 @@
                     display: false,
                 },
                 legendCallback: (chart) => {
-                    let text = [];
+                    let text: string[] = [];
                     text.push('<ul>');
-                    for (let i = 0; i < chart.data.datasets.length; i++) {
+                    for (let i = 0; i < (chart.data.datasets?.length ?? 0); i++) {
                         text.push(`<li class="legend-item">
                             <span class="line" style="background-color: ${colors[i]}"></span>
-                            ${getLegendItem(chart.data.datasets[i].label)}
+                            ${getLegendItem(chart.data.datasets?.[i].label ?? '')}
                         </li>`);
                     }
                     text.push('</ul>');

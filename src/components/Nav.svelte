@@ -1,16 +1,16 @@
-<script>
-    import {onMount} from 'svelte';
+<script type="ts">
+	import {onMount} from 'svelte';
 
-	export let segment;
+	export let segment: string;
 
-    let share_enabled;
-    
-    onMount(async () => {
-        share_enabled = !!navigator.share;
+	let share_enabled: boolean = false;
+
+	onMount(async () => {
+		share_enabled = !!navigator.share;
 	});
 	
-	function showNotice(message, isError = false) {
-		return function(error = null) {
+	function showNotice(message: string, isError = false) {
+		return function(error?: Error|void) {
 			let notice = document.createElement('div');
 			notice.innerText = message;
 			notice.style.position = 'absolute';
@@ -21,7 +21,7 @@
 			notice.style.backgroundColor = '#cfe';
 			notice.style.padding = '1.5rem';
 			notice.style.fontSize = '1.6rem';
-			notice.style.zIndex = 2;
+			notice.style.zIndex = '2';
 			document.body.prepend(notice);
 			notice.focus();
 
@@ -44,10 +44,11 @@
 		};
 	}
 
-    function share(e) {
+    function share(e: MouseEvent) {
 		e.preventDefault();
 		let title = document.title || 'Snap store statistics';
-		let text = document.head.querySelector('meta[name="description"]').content || 'Check it out on snapstats';
+		const description: HTMLMetaElement|null = document.head.querySelector('meta[name="description"]');
+		let text = description?.content || 'Check it out on snapstats';
 		let url = document.URL;
         if (navigator.share) {
             navigator.share({

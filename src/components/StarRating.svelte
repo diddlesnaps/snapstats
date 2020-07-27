@@ -1,4 +1,6 @@
 <script>
+  // @ts-check
+
   // import { onMount } from "svelte";
 
   export let rating = 0;
@@ -30,6 +32,13 @@
     );
   }
 
+  /**
+   * @param {number} centerX
+   * @param {number} centerY
+   * @param {number} innerCircleArms
+   * @param {number} innerRadius
+   * @param {number} outerRadius
+   */
   function calcStarPoints(
     centerX,
     centerY,
@@ -115,10 +124,8 @@
     {#each stars as star}
       <svg
         class="star-svg"
-        style="fill: url(#gradient{star.raw});height:{style.styleStarWidth}px;
-        width:{style.styleStarWidth}px">
-        <polygon points={getStarPoints()} style="fill-rule:nonzero;" />
-        <defs>
+        style="fill: url(#gradient{star.raw}); height: {style.styleStarWidth}px; width: {style.styleStarWidth}px;">
+        <polygon points={getStarPoints()} style={{ 'fill-rule': "nonzero" }} />        <defs>
           <linearGradient id="gradient{star.raw}">
             <stop
               id="stop1"

@@ -1,3 +1,5 @@
+// @ts-check
+
 import { mergeResolvers } from "merge-graphql-schemas";
 
 import Architecture from "./Architecture";

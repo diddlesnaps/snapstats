@@ -1,7 +1,9 @@
 <script>
+  // @ts-check
+
     import Paginator from 'paginator';
 
-    export let getPageUrl = () => '#';
+    export let getPageUrl = (page) => '#';
 
     export let limit;
     export let offset;

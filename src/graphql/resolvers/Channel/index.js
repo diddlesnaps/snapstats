@@ -1,3 +1,5 @@
+// @ts-check
+
 import { ChannelsModel } from "../../../models/Channel";
 import { LastUpdatedModel } from '../../../models/LastUpdated';
 import { promisify } from '../promisify';

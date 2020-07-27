@@ -1,7 +1,10 @@
+// @ts-check
+
 import { createSitemap, EnumChangefreq } from 'sitemap';
 import { SnapsModel } from './models/Snaps';
 
 export const sitemap = async (req, res) => {
+    /** @type {{url: string, changefreq?: EnumChangefreq, lastmodISO?: string}[]} */
     const static_pages = [
         { url: '/', changefreq: EnumChangefreq.DAILY },
         { url: '/snaps', changefreq: EnumChangefreq.DAILY },

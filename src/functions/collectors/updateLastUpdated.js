@@ -1,3 +1,5 @@
+// @ts-check
+
 import {LastUpdatedModel} from '../../models/LastUpdated';
 
 export const updateLastUpdated = async (date) => {

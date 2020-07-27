@@ -1,3 +1,5 @@
+// @ts-check
+
 import { Schema, model} from "mongoose";
 
 const SectionsSchema = new Schema({

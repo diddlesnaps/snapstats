@@ -1,3 +1,5 @@
+// @ts-check
+
 import { Feed } from "feed";
 import Snaps from '../../graphql/resolvers/Snaps';
 

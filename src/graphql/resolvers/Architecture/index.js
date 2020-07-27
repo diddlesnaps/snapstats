@@ -1,3 +1,5 @@
+// @ts-check
+
 import { ArchitecturesModel } from '../../../models/Architecture';
 import { LastUpdatedModel } from '../../../models/LastUpdated';
 import { promisify } from '../promisify';

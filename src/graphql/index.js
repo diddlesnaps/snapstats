@@ -1,3 +1,5 @@
+// @ts-check
+
 import { makeExecutableSchema } from "graphql-tools";
 
 import typeDefs from "./types";

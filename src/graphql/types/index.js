@@ -1,3 +1,5 @@
+// @ts-check
+
 import { mergeTypes } from "merge-graphql-schemas";
 
 import { schema as ArchitectureSchema } from "./Architecture";

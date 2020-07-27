@@ -1,3 +1,5 @@
+// @ts-check
+
 import feed from './_feed';
 
 export async function get(req, res, next) {

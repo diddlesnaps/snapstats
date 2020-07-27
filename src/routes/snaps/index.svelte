@@ -1,4 +1,6 @@
 <script context="module">
+    // @ts-check
+
     import { goto } from '@sapper/app';
     import SnapList from '../../components/SnapList.svelte';
     import Pagination from '../../components/Pagination.svelte';
@@ -67,14 +69,19 @@
 </script>
 
 <script>
+    // @ts-check
+
     import { onMount } from 'svelte';
     import { setClient, restore, query } from 'svelte-apollo';
 
     export let q;
     export let field;
     export let order;
+    /** @type {import("graphql").DocumentNode} */
     export let qlQuery;
+    /** @type {number} */
     export let offset;
+    /** @type {number} */
     export let limit;
     export let cache;
 

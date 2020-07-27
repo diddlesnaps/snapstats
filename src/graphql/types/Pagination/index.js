@@ -1,3 +1,5 @@
+// @ts-check
+
 export const schema = `
 input Sort {
     field: String!

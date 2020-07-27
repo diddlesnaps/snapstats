@@ -1,4 +1,6 @@
 <script>
+    // @ts-check
+
     import SnapPane from './SnapPane.svelte';
 
     export let snaps
@@ -26,14 +28,14 @@
 
 <div>
     {#if snaps}
-    <ul class='snaps' aria-label="Snap packages">
-        {#each snaps as snap}
-            <li>
-                <SnapPane {snap}/>
-            </li>
-        {/each}
-    </ul>
+        <ul class='snaps' aria-label="Snap packages">
+            {#each snaps as snap}
+                <li>
+                    <SnapPane {snap}/>
+                </li>
+            {/each}
+        </ul>
     {:else}
-    <p>Nothing found...</p>
+        <p>Nothing found...</p>
     {/if}
 </div>

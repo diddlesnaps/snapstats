@@ -1,9 +1,9 @@
-<script>
+<script type="ts">
     import StarRating from './StarRating.svelte'
 
-    export let snap;
+    export let snap: { title: string; summary: string; package_name: string; icon_url: string; ratings_average: number; };
 
-    let icon_url, icon2x_url;
+    let icon_url: string|undefined, icon2x_url: string|undefined;
     
     $: icon_url = `https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,h_92/${snap.icon_url}`;
     $: icon2x_url = `https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,h_184/${snap.icon_url}`;
@@ -46,28 +46,30 @@
 }
 </style>
 
-<div class='grid'>
-    {#if snap.icon_url}
-        <a class='icon' href={`snaps/${snap.package_name}`}>
-            <picture>
-                <source srcset={`${icon2x_url} 2x, ${icon_url} 1x`} />
-                <img width="92" height="92" src={icon_url} alt={`Icon of ${snap.title}`} loading="lazy" />
-            </picture>
-        </a>
-    {/if}
-    <p class='title'>
-        <a href={`snaps/${snap.package_name}`}>
-            {snap.title}
-        </a>
-    </p>
-    <div class='rating'><StarRating
-        style={{
-            styleStarWidth: 16,
-            styleFullStarColor: '#ffd219',
-            styleEmptyStarColor: '#eeeeee',
-        }}
-        isIndicatorActive={false}
-        rating={snap.ratings_average}
-    /></div>
-    <p class='summary'>{snap.summary}</p>
-</div>
+{#if snap}
+    <div class='grid'>
+        {#if snap.icon_url}
+            <a class='icon' href={`snaps/${snap.package_name}`}>
+                <picture>
+                    <source srcset={`${icon2x_url} 2x, ${icon_url} 1x`} />
+                    <img width="92" height="92" src={icon_url} alt={`Icon of ${snap.title}`} loading="lazy" />
+                </picture>
+            </a>
+        {/if}
+        <p class='title'>
+            <a href={`snaps/${snap.package_name}`}>
+                {snap.title}
+            </a>
+        </p>
+        <div class='rating'><StarRating
+            style={{
+                styleStarWidth: 16,
+                styleFullStarColor: '#ffd219',
+                styleEmptyStarColor: '#eeeeee',
+            }}
+            isIndicatorActive={false}
+            rating={snap.ratings_average}
+        /></div>
+        <p class='summary'>{snap.summary}</p>
+    </div>
+{/if}

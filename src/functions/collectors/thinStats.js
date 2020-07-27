@@ -1,3 +1,5 @@
+// @ts-check
+
 import {LastUpdatedModel} from '../../models/LastUpdated';
 import {ArchitecturesModel} from '../../models/Architecture';
 import {BasesModel} from '../../models/Base';
@@ -12,7 +14,7 @@ import {updateLastUpdated} from './updateLastUpdated';
 
 const denysave = process.env.denysave === 'true' ? true : false;
 
-export default async () => {
+export default async (context) => {
     try {
         console.log(`Thinning stats at ${(new Date()).toLocaleString()}`);
 

@@ -1,3 +1,5 @@
+// @ts-check
+
 import { spider } from './config';
 import SnapApi from './api';
 function sort(array) {

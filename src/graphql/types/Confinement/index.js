@@ -1,3 +1,5 @@
+// @ts-check
+
 export const schema = `
     type Confinement {
         _id: ID!

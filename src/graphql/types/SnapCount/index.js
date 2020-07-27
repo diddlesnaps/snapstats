@@ -1,3 +1,5 @@
+// @ts-check
+
 export const schema = `
     type SnapCount {
         _id: ID!

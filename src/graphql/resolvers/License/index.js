@@ -1,3 +1,5 @@
+// @ts-check
+
 import { LicensesModel } from "../../../models/License";
 import { LastUpdatedModel } from '../../../models/LastUpdated';
 import { promisify } from '../promisify';

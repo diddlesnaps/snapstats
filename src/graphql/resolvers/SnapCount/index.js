@@ -1,3 +1,5 @@
+// @ts-check
+
 import { SnapCountsModel } from "../../../models/SnapCount";
 import { LastUpdatedModel } from '../../../models/LastUpdated';
 import { promisify } from '../promisify';

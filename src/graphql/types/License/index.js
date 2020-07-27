@@ -1,3 +1,5 @@
+// @ts-check
+
 export const schema = `
     type License {
         _id: ID!

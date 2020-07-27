@@ -19,7 +19,7 @@ mongoose
       serverSelectionTimeoutMS: 5000,
     }
   )
-  .catch((err) => console.log(`Mongo failed to connect: ${err.toString()}`));
+  .catch((err) => console.log(`Mongo failed to connect: ${err.toString()}; ${mongoUrl}`));
 
 const graphQLConfig = {
   schema,
@@ -74,8 +74,9 @@ else {
     timeoutSeconds: 30,
     memory: '256MB',
   }).https.onRequest(async (req, res) => {
-    const prodGraphQL = (await import('apollo-server-cloud-functions')).ApolloServer;
-    return new prodGraphQL(graphQLConfig).createHandler()(req, res);
+    const GraphQL = (await import('apollo-server-cloud-functions')).ApolloServer;
+    const graphql = new GraphQL(graphQLConfig);
+    return graphql.createHandler()(req, res);
   });
 }
 

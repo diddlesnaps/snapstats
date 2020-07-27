@@ -1,3 +1,5 @@
+// @ts-check
+
 export const schema = `
     type DeveloperCount {
         _id: ID!

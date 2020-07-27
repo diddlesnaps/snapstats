@@ -1,9 +1,12 @@
 <script>
+	// @ts-check
+
 	import { stores } from '@sapper/app';
 	import { derived } from 'svelte/store';
 	import '@beyonk/gdpr-cookie-consent-banner/dist/style.css'
 	import GdprBanner from '@beyonk/gdpr-cookie-consent-banner/src/components/Banner.svelte'
 	import Nav from '../components/Nav.svelte';
+	import PacmanLoader from '../components/PacmanLoader.svelte';
 	
 	export let segment;
 
@@ -37,10 +40,24 @@
 		justify-content: center;
 		padding: 2rem 0;
 	}
+
+	.loading {
+		text-align: center;
+		display: grid;
+		place-content: center;
+		position: fixed;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		z-index: 1;
+		background: rgba(0,30,30,0.9);
+		color: #ffffff;
+	}
 </style>
 
 <svelte:head>
-	{@html `<script type="application/ld+json">
+	{@html `${'<script'} type="application/ld+json">
         ${JSON.stringify({
 			"@context": "http://schema.org/",
 			"@id": "https://snapstats.org/#organization",
@@ -56,7 +73,7 @@
 		})}
 	</${'script'}>`}
 
-	{@html `<script type="application/ld+json">
+	{@html `${'<script'} type="application/ld+json">
         ${JSON.stringify({
 			"@context": "http://schema.org",
 			"@id": "https://snapstats.org/#website",
@@ -74,10 +91,13 @@
 <Nav {segment}/>
 
 
-<main>
 {#if $preloading && $delayedPreloading}
-	Loading...
+	<div class="loading">
+		Loading...
+		<PacmanLoader style='--pacman-color: #87bea1; --pacman-balls-color: #f25f48' />
+	</div>
 {/if}
+<main>
 	<slot></slot>
 </main>
 

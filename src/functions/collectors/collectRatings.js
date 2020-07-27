@@ -1,8 +1,10 @@
+// @ts-check
+
 import {RatingsModel} from '../../models/Rating';
 
 const denysave = process.env.denysave === 'true' ? true : false;
 
-export default async () => {
+export default async (context) => {
     const url = `https://odrs.gnome.org/1.0/reviews/api/ratings`;
     try {
         const res = await __fetch(url, {

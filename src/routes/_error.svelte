@@ -1,5 +1,9 @@
 <script>
+	// @ts-check
+
+	/** @type {number} */
 	export let status;
+	/** @type {Error} */
 	export let error;
 
 	const dev = process.env.NODE_ENV === 'development';

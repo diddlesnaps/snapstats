@@ -1,4 +1,6 @@
 <script context="module">
+    // @ts-check
+
     import SnapList from '../../components/SnapList.svelte';
     import Pagination from '../../components/Pagination.svelte';
 
@@ -48,6 +50,8 @@
 </script>
 
 <script>
+    // @ts-check
+
 	import { setClient, restore, query } from 'svelte-apollo';
 
     export let base;

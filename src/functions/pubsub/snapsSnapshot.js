@@ -1,3 +1,5 @@
+// @ts-check
+
 import * as functions from 'firebase-functions';
 import {PubSub} from '@google-cloud/pubsub';
 import {getDetails} from '../../snapstore-api';

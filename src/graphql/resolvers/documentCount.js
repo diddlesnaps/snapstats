@@ -1,3 +1,5 @@
+// @ts-check
+
 import { LastUpdatedModel } from '../../models/LastUpdated';
 
 const documentCount = async (model) => {

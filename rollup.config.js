@@ -4,6 +4,8 @@ import commonjs from 'rollup-plugin-commonjs';
 import svelte from 'rollup-plugin-svelte';
 import babel from 'rollup-plugin-babel';
 import { terser } from 'rollup-plugin-terser';
+import typescript from '@rollup/plugin-typescript';
+import autoPreprocess from 'svelte-preprocess';
 import config from 'sapper/config/rollup.js';
 import pkg from './package.json';
 
@@ -28,13 +30,15 @@ export default {
 			svelte({
 				dev,
 				hydratable: true,
-				emitCss: true
+				emitCss: true,
+				preprocess: autoPreprocess(),
 			}),
 			resolve({
 				browser: true,
-				dedupe
+				dedupe,
 			}),
 			commonjs(),
+			typescript({ sourceMap: dev }),
 
 			legacy && babel({
 				extensions: ['.js', '.mjs', '.html', '.svelte'],
@@ -46,6 +50,8 @@ export default {
 					}]
 				],
 				plugins: [
+					'@babel/plugin-proposal-optional-chaining',
+					'@babel/plugin-proposal-nullish-coalescing-operator',
 					'@babel/plugin-syntax-dynamic-import',
 					['@babel/plugin-transform-runtime', {
 						useESModules: true
@@ -82,11 +88,27 @@ export default {
 			svelte({
 				generate: 'ssr',
 				dev,
+				preprocess: autoPreprocess(),
 			}),
 			resolve({
 				dedupe,
 			}),
 			commonjs(),
+			typescript({ sourceMap: dev }),
+			babel({
+				extensions: ['.js', '.mjs', '.html', '.svelte'],
+				runtimeHelpers: true,
+				exclude: ['node_modules/@babel/**'],
+				presets: [
+					['@babel/preset-env', {
+						targets: {node: "12"},
+					}]
+				],
+				plugins: [
+					'@babel/plugin-proposal-optional-chaining',
+					'@babel/plugin-proposal-nullish-coalescing-operator',
+				]
+			}),
 		],
 		external: Object.keys(pkg.dependencies).concat(
 			require('module').builtinModules || Object.keys(process.binding('natives'))

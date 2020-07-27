@@ -1,3 +1,5 @@
+// @ts-check
+
 import { DeveloperCountsModel } from "../../../models/DeveloperCount";
 import { SnapsModel } from "../../../models/Snaps";
 import { LastUpdatedModel } from '../../../models/LastUpdated';

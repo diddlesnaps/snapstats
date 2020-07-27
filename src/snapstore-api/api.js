@@ -1,3 +1,5 @@
+// @ts-check
+
 import { spider } from './config';
 
 const searchfields = [

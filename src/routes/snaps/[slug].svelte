@@ -1,4 +1,6 @@
 <script context="module">
+    // @ts-check
+
 	import client from '../../apollo'
     import { gql } from 'apollo-boost'
     import StarRating from '../../components/StarRating.svelte'
@@ -53,6 +55,8 @@
 </script>
 
 <script>
+    // @ts-check
+
     import { onMount } from 'svelte';
     import marked from 'marked'
     import createDOMPurify from 'dompurify'
@@ -285,7 +289,7 @@
         <meta name="twitter:image:alt" content="Icon of {result.data.snapByName.title || result.data.snapByName.package_name}" />
 
         <!-- Schema.org -->
-        {@html `<script type="application/ld+json">
+        {@html `${'<script'} type="application/ld+json">
             ${JSON.stringify({
                 "@context" : "http://schema.org",
                 "@type" : "SoftwareApplication",
@@ -465,16 +469,16 @@
                     {#if video && 'url' in video && 'type' in video}
                         {#if video.type === 'youtube'}
                             <iframe id="ytplayer" type="text/html" width="818" height="460" title="Youtube player"
-                                src="{video.url}?autoplay=1&mute=1&modestbranding=1&rel=0" frameborder="0"></iframe>
+                                src={`${video.url}?autoplay=1&mute=1&modestbranding=1&rel=0`} frameborder="0"></iframe>
                         {/if}
-                        {#if video.type === 'vimeo'}
+                        <!-- {#if video.type === 'vimeo'}
                             <iframe id="vimeoplayer" width="818" height="460" frameborder="0" title="Vimeo player"
                                 webkitallowfullscreen mozallowfullscreen allowfullscreen
-                                src="{video.url}?title=0&byline=0&portrait=0&transparent=0"></iframe>
+                                src={`${video.url}?title=0&byline=0&portrait=0&transparent=0`></iframe>
                         {/if}
                         {#if video.type === 'asciinema'}
-                            <script src="{video.url}" id="asciicast" async data-autoplay="1" data-preload="0"></script>
-                        {/if}
+                            <script src={video.url} id="asciicast" async data-autoplay="1" data-preload="0"></script>
+                        {/if} -->
                     {/if}
                     {#each result.data.snapByName.media.filter(
                         item => item.type === 'screenshot'

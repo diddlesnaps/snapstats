@@ -1,3 +1,5 @@
+// @ts-check
+
 export const spider = {
     search_api: 'https://api.snapcraft.io/api/v1/search',
     snap_search_api: 'https://api.snapcraft.io/api/v1/snaps/search',

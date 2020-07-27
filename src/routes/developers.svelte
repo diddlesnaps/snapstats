@@ -1,4 +1,6 @@
 <script context="module">
+	// @ts-check
+
 	import client from '../apollo'
 	import { gql } from 'apollo-boost'
 
@@ -34,6 +36,8 @@
 </script>
 
 <script>
+	// @ts-check
+
 	import { setClient, restore, query } from 'svelte-apollo';
 
 	export let cache;
