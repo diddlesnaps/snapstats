@@ -5,7 +5,7 @@ import ApolloClient from 'apollo-boost';
 
 const uri = (process.env.NODE_ENV === 'production') ?
     'https://snapstats.org/graphql' :
-    'http://localhost:5000/graphql';
+    'http://localhost:3000/graphql';
 
 // let cache;
 // if (process.browser === true) {

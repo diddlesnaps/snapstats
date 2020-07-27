@@ -35,39 +35,39 @@ let server, graphql;
 export * from './functions';
 
 const dev = process.env.SNAPSTATS_DEV === 'true';
-if (dev && process.env.NODE_ENV === 'development') {
-  (function() {
-    const {JSDOM} = require('jsdom');
+if (process.env.NODE_ENV === 'development') {
+  (async function() {
+    const {JSDOM} = await import('jsdom');
     global.window = (new JSDOM('')).window;
 
-		const sirv = require('sirv');
-		const express = require('express');
-		const compression = require('compression');
-    const sapper = require('@sapper/server');
-    const GraphQL = require('apollo-server-express').ApolloServer;
+    const sirv = (await import('sirv')).default;
+    const express = (await import('express')).default;
+    const compression = (await import('compression')).default;
+    const sapper = (await import('@sapper/server'));
+    const GraphQL = (await import('apollo-server-express')).ApolloServer;
 
-		const app = express() // You can also use Express
-		app.use(compression({ threshold: 0 }))
-		app.use(sirv('static', {dev}))
-    app.use(sapper.middleware())
+    const app = express() // You can also use Express
+    app.use(compression({ threshold: 0 }))
+    app.use(sirv('static', {dev}))
     graphql = new GraphQL(graphQLConfig);
     graphql.applyMiddleware({app});
+    app.use(sapper.middleware())
 
-		app.listen(3000, err => {
-			if (err) console.log('error', err);
-		})
+    app.listen(3000, err => {
+      if (err) console.log('error', err);
+    })
   }());
 }
 else {
   server = functions.runWith({
-		timeoutSeconds: 30,
-		memory: '128MB',
-	}).https.onRequest(async (req, res) => {
+    timeoutSeconds: 30,
+    memory: '128MB',
+  }).https.onRequest(async (req, res) => {
     const {JSDOM} = await import('jsdom');
     global.window = (new JSDOM('')).window;
     const sapper = await import('@sapper/server');
     req.baseUrl = '';
-		return sapper.middleware()(req, res);
+    return sapper.middleware()(req, res);
   });
 
   graphql = functions.runWith({
