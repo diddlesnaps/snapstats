@@ -19,12 +19,12 @@ export default async (message) => {
         try {
             details = (await getDetails(details_api_url))
         } catch (e) {
-            return console.error(`collectors/collectStats.js: Error: Unable to load Snap data from store API: ${e}`)
+            return console.error(`pubsub/snapsSnapshot.js: Error: Unable to load Snap data from store API: ${e}`)
         }
 
         const {
             snap: snapDetails,
-            snap: {publisher, yamlString},
+            snap: {publisher, snap_yaml_raw: yamlString},
         } = details
 
         let plugs = {}, slots = {}
@@ -64,11 +64,11 @@ export default async (message) => {
                 await new SnapsModel(snap).save()
             }
         } catch (e) {
-            return console.error(`collectors/collectStats.js: Error: Save Snap data: ${e}`, snap);
+            return console.error(`pubsub/snapsSnapshot.js: Error: Save Snap data: ${e}`, snap);
         }
 
         if (!snap.package_name.match(/(^(test|hello)-|-test$)/i) && new Date(snap.date_published).getTime() > prevSnapshotDate) {
-            console.debug(`collectors/collectStats.js: New Snap, Publishing to PubSub: ${snap.package_name}`)
+            console.debug(`pubsub/snapsSnapshot.js: New Snap, Publishing to PubSub: ${snap.package_name}`)
 
             const pubsub = new PubSub()
             const newSnapsPubsubTopic = pubsub.topic(functions.config().pubsub.newsnaps_topic)
