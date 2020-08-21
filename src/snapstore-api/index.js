@@ -2,6 +2,11 @@
 
 import { spider } from './config';
 import SnapApi from './api';
+
+// if (typeof __fetch === 'undefined') {
+//     var __fetch = require('node-fetch');
+// }
+
 function sort(array) {
     return array.sort((a, b) => b.count - a.count);
 }
@@ -11,13 +16,27 @@ export const getDetails = async (url) => {
         'User-Agent': spider.snaps.user_agent,
         'Snap-Device-Series': '16',
     };
+    const yamlHeaders = {
+        'User-Agent': spider.snaps.user_agent,
+        'X-Ubuntu-Series': '16',
+    };
 
     const res = await __fetch(url, {
         method: 'GET',
         headers,
     });
-    
-    return await res.json();
+
+    const snap = res.json();
+
+    const yamlRes = await __fetch(`https://search.apps.ubuntu.com/api/v1/snaps/details/${snap.package_name}`, {
+        method: 'GET',
+        headers: yamlHeaders,
+    })
+
+    return {
+        ...snap,
+        ...(await yamlRes.json()),
+    }
 }
 
 export const getStats = () => {

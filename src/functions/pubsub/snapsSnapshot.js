@@ -24,7 +24,8 @@ export default async (message) => {
 
         const {
             snap: snapDetails,
-            snap: {publisher, snap_yaml_raw: yamlString},
+            snap: {publisher},
+            snap_yaml_raw: yamlString,
         } = details
 
         let plugs = {}, slots = {}

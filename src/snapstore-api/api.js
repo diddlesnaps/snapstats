@@ -40,7 +40,6 @@ const detailsfields = [
     'prices',
     'private',
     'publisher',
-    'snap_yaml_raw',
     'summary',
     'title',
     'trending',
@@ -48,6 +47,9 @@ const detailsfields = [
     'website',
 ].join(',')
 
+// if (typeof __fetch === 'undefined') {
+//     var __fetch = require('node-fetch');
+// }
 class SnapApi {
     constructor({url, details_url, domain}) {
         this.url = url;
