@@ -30,19 +30,28 @@ export default async (message) => {
         let plugs = {}, slots = {}
         try {
             const yamlObj = jsYaml.safeLoad(yamlString)
-            plugs = yamlObj['plugs']
-            slots = yamlObj['slots']
+            if (typeof yamlObj === 'object') {
+                if ('plugs' in yamlObj) {
+                    plugs = yamlObj['plugs']
+                }
 
-            Object.keys(yamlObj['apps']).forEach(
-                k => k['plugs'].forEach(
-                    /** @param p {string} */
-                    p => p in plugs || (plugs[p] = {interface: p})
-                ))
-            Object.keys(yamlObj['apps']).forEach(
-                k => k['slots'].forEach(
-                    /** @param s {string} */
-                    s => s in slots || (slots[s] = {interface: s})
-                ))
+                if ('slots' in yamlObj) {
+                    slots = yamlObj['slots']
+                }
+
+                if ('apps' in yamlObj) {
+                    Object.keys(yamlObj['apps']).forEach(
+                        k => k['plugs'].forEach(
+                            /** @param p {string} */
+                            p => p in plugs || (plugs[p] = {interface: p})
+                        ))
+                    Object.keys(yamlObj['apps']).forEach(
+                        k => k['slots'].forEach(
+                            /** @param s {string} */
+                            s => s in slots || (slots[s] = {interface: s})
+                        ))
+                }
+            }
         } catch {}
 
         snap = {
