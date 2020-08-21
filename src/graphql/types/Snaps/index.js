@@ -8,6 +8,17 @@ export const schema = `
         url: String
     }
 
+    type SnapPlug {
+        plug_name: String
+        interface: String
+        content: String
+        default_provider: String
+    }
+    type SnapSlot {
+        slot_name: String
+        interface: String
+    }
+
     type Snap {
         _id: ID!
         architecture: [String]
@@ -33,6 +44,7 @@ export const schema = `
         screenshot_urls: [String]
         sections: [String]
         snap_id: String
+        snap_yaml_raw: String
         snapshot_date: Date
         summary: String
         title: String

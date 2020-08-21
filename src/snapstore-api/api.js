@@ -40,6 +40,7 @@ const detailsfields = [
     'prices',
     'private',
     'publisher',
+    'snap_yaml_raw',
     'summary',
     'title',
     'trending',

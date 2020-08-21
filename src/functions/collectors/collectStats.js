@@ -165,19 +165,23 @@ const collector = (isDaily = false) => async (context) => {
 
             const pubsub = new PubSub()
             const snapsSnapshotPubsubTopic = pubsub.topic(functions.config().pubsub.snaps_snapshot_topic)
-            const {date: prevSnapshotDate} = await LastUpdatedModel.findOne() || {date: new Date()}
+            const {date: prevSnapshotDateObj} = await LastUpdatedModel.findOne() || {date: new Date()}
+            const prevSnapshotDateTimestamp = prevSnapshotDateObj.getTime()
 
             promises = snaps
                 .map(addDate('snapshot_date'))
                 .map(addIsDaily)
-                .map(async ({snap, details_api_url}) => {
-                    console.debug(`collectors/collectStats.js: New Snap, Publishing to pubsub: ${snap.package_name}`)
-                    const data = { snap, details_api_url, prevSnapshotDate: prevSnapshotDate.getTime() }
+                .map(data => ({...data, prevSnapshotDate: prevSnapshotDateTimestamp}))
+                .filter(({snap: {last_updated, date_published}, prevSnapshotDate}) =>
+                    (new Date(last_updated)).getTime() > prevSnapshotDate ||
+                    (new Date(date_published)).getTime() > prevSnapshotDate)
+                .map(async (data) => {
+                    console.debug(`collectors/collectStats.js: New or Updated Snap, Publishing to pubsub: ${data.snap.package_name}`)
                     const dataBuffer = Buffer.from(JSON.stringify(data), 'utf8')
                     try {
                         await snapsSnapshotPubsubTopic.publish(dataBuffer);
                     } catch (e) {
-                        return console.error(`pubsub/snapsSnapshot.js: Error: New Snap PubSub publish: ${e}`);
+                        return console.error(`pubsub/snapsSnapshot.js: Error: New or Updated Snap PubSub publish: ${e}`);
                     }
                 })
 

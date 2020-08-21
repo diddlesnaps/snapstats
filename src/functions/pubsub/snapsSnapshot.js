@@ -2,6 +2,7 @@
 
 import * as functions from 'firebase-functions';
 import {PubSub} from '@google-cloud/pubsub';
+import jsYaml from 'js-yaml';
 import {getDetails} from '../../snapstore-api';
 import {SnapsModel} from '../../models/Snaps';
 
@@ -21,11 +22,34 @@ export default async (message) => {
             return console.error(`collectors/collectStats.js: Error: Unable to load Snap data from store API: ${e}`)
         }
 
-        const {snap: snapDetails, snap: {publisher}} = details
+        const {
+            snap: snapDetails,
+            snap: {publisher, yamlString},
+        } = details
+
+        let plugs = {}, slots = {}
+        try {
+            const yamlObj = jsYaml.safeLoad(yamlString)
+            plugs = yamlObj['plugs']
+            slots = yamlObj['slots']
+
+            Object.keys(yamlObj['apps']).forEach(
+                k => k['plugs'].forEach(
+                    /** @param p {string} */
+                    p => p in plugs || (plugs[p] = {interface: p})
+                ))
+            Object.keys(yamlObj['apps']).forEach(
+                k => k['slots'].forEach(
+                    /** @param s {string} */
+                    s => s in slots || (slots[s] = {interface: s})
+                ))
+        } catch {}
 
         snap = {
             ...snap,
             ...snapDetails,
+            plugs: Object.keys(plugs).map(p => ({...plugs[p], plug_name: p})),
+            slots: Object.keys(slots).map(s => ({...slots[s], slot_name: s})),
             snapshotVersion,
             publisher:            publisher['display-name'],
             publisher_username:   publisher.username,
@@ -44,7 +68,7 @@ export default async (message) => {
         }
 
         if (!snap.package_name.match(/(^(test|hello)-|-test$)/i) && new Date(snap.date_published).getTime() > prevSnapshotDate) {
-            console.debug(`collectors/collectStats.js: New Snap, Publishing to pubsub: ${snap.package_name}`)
+            console.debug(`collectors/collectStats.js: New Snap, Publishing to PubSub: ${snap.package_name}`)
 
             const pubsub = new PubSub()
             const newSnapsPubsubTopic = pubsub.topic(functions.config().pubsub.newsnaps_topic)

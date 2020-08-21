@@ -126,6 +126,11 @@ const SnapsSchema = new Schema({
         type: String,
         required: true,
     },
+    snap_yaml_raw: {
+        type: String,
+        required: false,
+        default: '',
+    },
     summary: { // human-readable
         type: String,
     },
@@ -152,6 +157,43 @@ const SnapsSchema = new Schema({
 
 
     // Snapstats.org stuff!
+    plugs: {
+        type: [{
+            plug_name: {
+                type: String,
+                required: true,
+            },
+            interface: {
+                type: String,
+                required: true,
+            },
+            content: {
+                type: String,
+                required: false
+            },
+            default_provider: {
+                type: String,
+                required: false,
+                alias: 'default-provider',
+            },
+        }],
+        required: false,
+        default: [],
+    },
+    slots: {
+        type: [{
+            slot_name: {
+                type: String,
+                required: true,
+            },
+            interface: {
+                type: String,
+                required: true,
+            },
+        }],
+        required: false,
+        default: [],
+    },
     snapshot_date: {
         type: Date,
         required: true,
