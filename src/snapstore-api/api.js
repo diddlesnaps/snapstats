@@ -1,5 +1,7 @@
 // @ts-check
 
+import fetch from 'node-fetch';
+
 import { spider } from './config';
 
 const searchfields = [
@@ -48,9 +50,6 @@ const detailsfields = [
     'website',
 ].join(',')
 
-if (typeof __fetch === 'undefined') {
-    var __fetch = require('node-fetch');
-}
 class SnapApi {
     constructor({url, details_url, domain}) {
         this.url = url;
@@ -66,7 +65,7 @@ class SnapApi {
             headers['X-Ubuntu-Architecture'] = arch;
         }
 
-        const res = await __fetch(url, {
+        const res = await fetch(url, {
             method: 'GET',
             headers,
         })
@@ -165,7 +164,7 @@ class SnapApi {
             headers['X-Ubuntu-Architecture'] = arch;
         }
 
-        const res = await __fetch(url, {
+        const res = await fetch(url, {
             method: 'GET',
             headers,
         });

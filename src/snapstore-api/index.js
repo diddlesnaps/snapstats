@@ -1,11 +1,8 @@
 // @ts-check
 
+import fetch from 'node-fetch';
 import { spider } from './config';
 import SnapApi from './api';
-
-if (typeof __fetch === 'undefined') {
-    var __fetch = require('node-fetch');
-}
 
 function sort(array) {
     return array.sort((a, b) => b.count - a.count);
@@ -17,7 +14,7 @@ export const getDetails = async (url) => {
         'Snap-Device-Series': '16',
     };
 
-    const res = await __fetch(url, {
+    const res = await fetch(url, {
         method: 'GET',
         headers,
     });
