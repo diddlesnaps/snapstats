@@ -147,21 +147,6 @@ const collector = (isDaily = false) => async (context) => {
             console.debug(`collectors/collectStats.js: Publishing Snaps to snapshot PubSub topic`)
 
             let snapNames = new Set(snaps.map(snap => snap.package_name))
-            let newNames  = new Set()
-
-            if (!isDaily) {
-                newNames = new Set(
-                    await SnapsModel
-                    .find({package_name: {$nin: [...snapNames]}})
-                    .map(snap => snap.package_name)
-                )
-                snaps    = snaps.filter(snap => !newNames.has(snap.package_name))
-            }
-
-            snapNames = new Set([
-                ...snapNames,
-                ...newNames,
-            ])
 
             const pubsub = new PubSub()
             const snapsSnapshotPubsubTopic = pubsub.topic(functions.config().pubsub.snaps_snapshot_topic)

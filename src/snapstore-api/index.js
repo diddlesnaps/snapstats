@@ -25,17 +25,17 @@ export const getDetails = async (url) => {
         method: 'GET',
         headers,
     });
-
     const snap = res.json();
 
-    const yamlRes = await __fetch(`https://search.apps.ubuntu.com/api/v1/snaps/details/${snap.package_name}`, {
+    const yamlRes = await __fetch(`https://search.apps.ubuntu.com/api/v1/snaps/details/${snap.package_name}?fields=snap_yaml_raw`, {
         method: 'GET',
         headers: yamlHeaders,
     })
+    const {snap_yaml_raw} = await yamlRes.json();
 
     return {
         ...snap,
-        ...(await yamlRes.json()),
+        snap_yaml_raw,
     }
 }
 
