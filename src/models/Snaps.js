@@ -126,10 +126,11 @@ const SnapsSchema = new Schema({
         type: String,
         required: true,
     },
-    snap_yaml_raw: {
+    snap_yaml: {
         type: String,
         required: false,
         default: '',
+        alias: 'snap-yaml',
     },
     summary: { // human-readable
         type: String,

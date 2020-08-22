@@ -44,7 +44,7 @@ export const schema = `
         screenshot_urls: [String]
         sections: [String]
         snap_id: String
-        snap_yaml_raw: String
+        snap_yaml: String
         snapshot_date: Date
         summary: String
         title: String
