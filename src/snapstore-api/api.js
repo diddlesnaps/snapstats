@@ -186,13 +186,14 @@ class SnapApi {
             'User-Agent': spider.snaps.user_agent,
         };
 
-        const res = await request({
+        const res = await fetch(url, {
             method: 'GET',
-            url,
             headers,
         });
 
-        return res.data._embedded['clickindex:sections'];
+        const data = await res.json()
+
+        return data._embedded['clickindex:sections'];
     }
 
     async searchSectionList() {
