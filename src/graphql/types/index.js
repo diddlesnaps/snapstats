@@ -1,6 +1,6 @@
 // @ts-check
 
-import { mergeTypes } from "merge-graphql-schemas";
+import { mergeTypeDefs } from '@graphql-tools/merge';
 
 import { schema as ArchitectureSchema } from "./Architecture";
 import { schema as BaseSchema } from "./Base";
@@ -14,7 +14,7 @@ import { schema as PriceTypeSchema } from "./Price";
 import { schema as SnapCountSchema } from "./SnapCount";
 import { schema as SnapsSchema } from "./Snaps";
 
-const _typeDefs = [
+const typeDefs = [
     ArchitectureSchema,
     BaseSchema,
     ChannelSchema,
@@ -28,4 +28,4 @@ const _typeDefs = [
     SnapsSchema,
 ];
 
-export default mergeTypes(_typeDefs, { all: true });
+export default mergeTypeDefs(typeDefs);

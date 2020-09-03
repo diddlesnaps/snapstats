@@ -1,3 +1,4 @@
+import * as functions from 'firebase-functions';
 import mongoose from 'mongoose';
 
 export function connectMongoose() {
