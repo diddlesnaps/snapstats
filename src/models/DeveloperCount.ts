@@ -1,8 +1,15 @@
-// @ts-check
+import { Schema, model, Document, Model } from "mongoose";
 
-import { Schema, model} from "mongoose";
+export interface IDeveloperCountsDocument extends Document {
+    total: number
+    mean: number
+    mode: number
+    median: number
+    date: Date
+    isDaily: boolean
+}
 
-const DeveloperCountsSchema = new Schema({
+const DeveloperCountsSchema = new Schema<IDeveloperCountsDocument>({
     total: {
         type: Number,
         required: true,
@@ -34,4 +41,5 @@ const DeveloperCountsSchema = new Schema({
     },
 });
 
-export const DeveloperCountsModel = model("DeveloperCounts", DeveloperCountsSchema);
+export const DeveloperCountsModel = model<IDeveloperCountsDocument, ILastUpdatedModel>("DeveloperCounts", DeveloperCountsSchema);
+export interface ILastUpdatedModel extends Model<IDeveloperCountsDocument> {}

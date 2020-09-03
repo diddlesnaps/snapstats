@@ -1,8 +1,6 @@
 <script>
   // @ts-check
 
-  // import { onMount } from "svelte";
-
   export let rating = 0;
   export let isIndicatorActive = true;
   export let style = {
@@ -91,16 +89,17 @@
     }
   }
 
+  /**
+   * @param {{ raw: number; }} starData
+   */
   function getFullFillColor(starData) {
     return starData.raw !== emptyStar
       ? style.styleFullStarColor
       : style.styleEmptyStarColor;
   }
 
-  // onMount(() => {
-    initStars();
-    setStars();
-  // });
+  initStars();
+  setStars();
 </script>
 
 <style>
@@ -125,7 +124,8 @@
       <svg
         class="star-svg"
         style="fill: url(#gradient{star.raw}); height: {style.styleStarWidth}px; width: {style.styleStarWidth}px;">
-        <polygon points={getStarPoints()} style={{ 'fill-rule': "nonzero" }} />        <defs>
+        <polygon points={getStarPoints()} style="fill-rule: nonzero" />
+        <defs>
           <linearGradient id="gradient{star.raw}">
             <stop
               id="stop1"

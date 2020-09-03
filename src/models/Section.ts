@@ -1,6 +1,11 @@
-// @ts-check
+import { Schema, model, Document, Model } from "mongoose";
 
-import { Schema, model} from "mongoose";
+export interface ISectionDocument extends Document {
+    name: string
+    count: number
+    date: Date
+    isDaily: boolean
+}
 
 const SectionsSchema = new Schema({
     name: {
@@ -24,4 +29,5 @@ const SectionsSchema = new Schema({
     },
 });
 
-export const SectionsModel = model("Sections", SectionsSchema);
+export interface ISectionModel extends Model<ISectionDocument> {}
+export const SectionsModel = model<ISectionDocument, ISectionModel>("Sections", SectionsSchema);

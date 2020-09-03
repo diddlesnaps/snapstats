@@ -2,8 +2,10 @@
 
 import { createSitemap, EnumChangefreq } from 'sitemap';
 import { SnapsModel } from './models/Snaps';
+import {connectMongoose} from './mongodb';
 
 export const sitemap = async (req, res) => {
+    connectMongoose();
     /** @type {{url: string, changefreq?: EnumChangefreq, lastmodISO?: string}[]} */
     const static_pages = [
         { url: '/', changefreq: EnumChangefreq.DAILY },

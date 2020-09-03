@@ -1,8 +1,17 @@
-// @ts-check
+import { Schema, model, Document, Model } from "mongoose";
 
-import { Schema, model} from "mongoose";
+export interface IRatingDocument extends Document {
+    app_id: string
+    star0: number
+    star1: number
+    star2: number
+    star3: number
+    star4: number
+    star5: number
+    total: number
+}
 
-const RatingsSchema = new Schema({
+const RatingsSchema = new Schema<IRatingDocument>({
     app_id: {
         type: String,
         required: true,
@@ -45,4 +54,5 @@ const RatingsSchema = new Schema({
     },
 });
 
-export const RatingsModel = model("Ratings", RatingsSchema);
+export interface IRatingModel extends Model<IRatingDocument> {}
+export const RatingsModel = model<IRatingDocument, IRatingModel>("Ratings", RatingsSchema);

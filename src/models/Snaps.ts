@@ -1,8 +1,82 @@
 // @ts-check
 
-import { Schema, model} from "mongoose";
+import { Schema, model, Document, Types, Model} from "mongoose";
 
-const SnapsSchema = new Schema({
+export enum Architecture {
+    amd64 = "amd64",
+    i386 = "i386",
+    arm64 = "arm64",
+    armhf = "armhf",
+    ppc64el = "ppc64el",
+    s390x = "s390x",
+}
+export enum Confinement {
+    strict = "strict",
+    devmode = "devmode",
+    classic = "classic",
+}
+export enum DeveloperValidation {
+    verified = "verified",
+    unproven = "unproven",
+}
+
+type SnapAlias = {
+    name: string
+    target: string
+};
+
+type SnapMedia = {
+    type: string
+    url: string
+    height: number
+    width: number
+};
+
+export interface ISnapDocument extends Document {
+    aliases: Types.Array<SnapAlias>
+    anon_download_url: string
+    apps: Types.Array<string>
+    architecture: Architecture
+    base_snap: string
+    binary_filesize: number
+    channel: string
+    common_ids: Types.Array<string>
+    confinement: Confinement
+    contact: string
+    date_published: Date
+    description: string
+    developer_id: string
+    developer_name: string
+    developer_validation: DeveloperValidation
+    download_url: string
+    icon_url: string
+    last_updated: Date
+    license: string
+    media: Types.Array<SnapMedia>
+    name: string
+    origin: string
+    package_name: string
+    // prices: Map<string,number>
+    private: boolean
+    publisher: string
+    publisher_username: string
+    ratings_average: number
+    release: Types.Array<string>
+    revision: number
+    screenshot_urls: Types.Array<string>
+    sections: Types.Array<string>
+    snap_id: string
+    snap_yaml: string
+    summary: string
+    support_url: string
+    title: string
+    trending: boolean
+    unlisted: boolean
+    version: string
+    website: string
+}
+
+const SnapsSchema = new Schema<ISnapDocument>({
     aliases: {
         type: [{
             name: String,
@@ -110,8 +184,7 @@ const SnapsSchema = new Schema({
         type: Number,
     },
     release: {
-        type: Array,
-        of: String,
+        type: [String],
     },
     revision: {
         type: Number,
@@ -207,4 +280,5 @@ const SnapsSchema = new Schema({
     }
 });
 
-export const SnapsModel = model("Snaps", SnapsSchema);
+export interface ISnapModel extends Model<ISnapDocument> {}
+export const SnapsModel = model<ISnapDocument, ISnapModel>("Snaps", SnapsSchema);
