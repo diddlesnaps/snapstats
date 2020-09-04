@@ -9,3 +9,9 @@ firebase-debug.log
 .firebase
 .envrc
 
+src/graphql/resolvers/index.js
+src/graphql/resolvers/promisify.js
+src/graphql/resolvers/SnapCount/index.js
+src/graphql/resolvers/Snaps/index.js
+src/models/*.js
+*.js.map
