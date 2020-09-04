@@ -36,7 +36,7 @@ if (process.env.NODE_ENV === 'development') {
 else {
   server = functions.runWith({
     timeoutSeconds: 30,
-    memory: '128MB',
+    memory: '256MB',
   }).https.onRequest(async (req, res) => {
     const {JSDOM} = await import('jsdom');
     global.window = (new JSDOM('')).window;
