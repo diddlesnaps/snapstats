@@ -1,9 +1,11 @@
 // @ts-check
 
 import { Feed } from "feed";
+import {connectMongoose} from '../../mongodb';
 import Snaps from '../../graphql/resolvers/Snaps';
 
 export default async function() {
+    connectMongoose();
     const now = new Date();
     const feed = new Feed({
         title: "Latest Snap Packages",
