@@ -1,9 +1,20 @@
-<script type="ts">
+<script>
+    // @ts-check
     import StarRating from './StarRating.svelte'
 
-    export let snap: { title: string; summary: string; package_name: string; icon_url: string; ratings_average: number; };
+    /** @type {{
+        title: string;
+        summary: string;
+        package_name: string;
+        icon_url: string;
+        ratings_average: number;
+    }} */
+    export let snap;
 
-    let icon_url: string|undefined, icon2x_url: string|undefined;
+    /** @type {string?} */
+    let icon_url;
+    /** @type {string?} */
+    let icon2x_url;
     
     $: icon_url = `https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,h_92/${snap.icon_url}`;
     $: icon2x_url = `https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,h_184/${snap.icon_url}`;

@@ -1,16 +1,27 @@
-<script type="ts">
+<script>
+	// @ts-check
+
 	import {onMount} from 'svelte';
 
-	export let segment: string;
+	/** @type {string} */
+	export let segment;
 
-	let share_enabled: boolean = false;
+	/** @type {boolean} */
+	let share_enabled = false;
 
 	onMount(async () => {
 		share_enabled = !!navigator.share;
 	});
 	
-	function showNotice(message: string, isError = false) {
-		return function(error?: Error|void) {
+	/**
+	 * @param {string} message
+	 * @param {boolean} isError
+	 */
+	function showNotice(message, isError = false) {
+		/**
+		 * @param {Error?} error
+		 */
+		return function(error) {
 			let notice = document.createElement('div');
 			notice.innerText = message;
 			notice.style.position = 'absolute';
@@ -44,10 +55,14 @@
 		};
 	}
 
-    function share(e: MouseEvent) {
+	/**
+	 * @param {MouseEvent} e
+	 */
+    function share(e) {
 		e.preventDefault();
 		let title = document.title || 'Snap store statistics';
-		const description: HTMLMetaElement|null = document.head.querySelector('meta[name="description"]');
+		/** @type {HTMLMetaElement?} */
+		const description = document.head.querySelector('meta[name="description"]');
 		let text = description?.content || 'Check it out on snapstats';
 		let url = document.URL;
         if (navigator.share) {
