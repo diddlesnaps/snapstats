@@ -43,6 +43,7 @@
     "dompurify": "^2.0.15",
     "fb": "^2.0.0",
     "feed": "^4.2.1",
+    "firebase-admin": "^9.1.1",
     "firebase-functions": "^3.11.0",
     "fslightbox": "^3.2.1",
     "graphql": "^15.3.0",
