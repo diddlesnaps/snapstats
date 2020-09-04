@@ -32,7 +32,9 @@ export default {
 				dev,
 				hydratable: true,
 				emitCss: true,
-				preprocess: autoPreprocess(),
+				preprocess: autoPreprocess({
+					postcss: true,
+				}),
 			}),
 			resolve({
 				browser: true,
@@ -61,7 +63,18 @@ export default {
 			}),
 
 			!dev && terser({
-				module: true
+				compress: {
+					drop_console: true,
+					keep_fargs: false,
+					passes: 5,
+					unsafe: true,
+					unsafe_Function: true,
+					unsafe_math: true,
+					unsafe_proto: true,
+					unsafe_regexp: true,
+				},
+				ecma: 6,
+				module: true,
 			})
 		],
 
@@ -115,7 +128,7 @@ export default {
 				'process.env.NODE_ENV': JSON.stringify(mode)
 			}),
 			commonjs(),
-			!dev && terser()
+			!dev && terser({ecma: 6})
 		],
 
 		onwarn,
