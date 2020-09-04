@@ -99,7 +99,7 @@
             video = result.data.snapByName.media.filter(m => m.type === 'video').shift()
             if (typeof video === 'object' && 'url' in video) {
                 if (video.url.match(/youtube/)) {
-                    video.url = video.url.replace('watch?w=', 'embed/')
+                    video.url = video.url.replace('watch?v=', 'embed/')
                     video.type = 'youtube'
                 }
                 if (video.url.match(/youtu\.be/)) {
@@ -289,7 +289,7 @@
         <meta name="twitter:image:alt" content="Icon of {result.data.snapByName.title || result.data.snapByName.package_name}" />
 
         <!-- Schema.org -->
-        {@html `${'<script'} type="application/ld+json">
+        {@html `<${'script'} type="application/ld+json">
             ${JSON.stringify({
                 "@context" : "http://schema.org",
                 "@type" : "SoftwareApplication",
