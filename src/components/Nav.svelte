@@ -1,27 +1,14 @@
-<script>
-	// @ts-check
-
+<script type="ts">
 	import {onMount} from 'svelte';
 
-	/** @type {string} */
-	export let segment;
+	export let segment: string;
 
-	/** @type {boolean} */
-	let share_enabled = false;
+	let share_enabled: boolean = false;
 
-	onMount(async () => {
-		share_enabled = !!navigator.share;
-	});
-	
-	/**
-	 * @param {string} message
-	 * @param {boolean} isError
-	 */
-	function showNotice(message, isError = false) {
-		/**
-		 * @param {Error?} error
-		 */
-		return function(error) {
+	onMount(() => share_enabled = !!navigator.share);
+
+	function showNotice(message: string, isError: boolean = false) {
+		return function(error: Error?) {
 			let notice = document.createElement('div');
 			notice.innerText = message;
 			notice.style.position = 'absolute';
@@ -46,23 +33,21 @@
 		}
 	}
 
-	function logShare(url) {
+	function logShare(url: string) {
 		return function() {
-			firebase.analytics().logEvent('share', {
-				'content_type': 'page',
-				'item_id': url,
-			});
+			if (typeof firebase !== 'undefined') {
+				firebase?.analytics().logEvent('share', {
+					'content_type': 'page',
+					'item_id': url,
+				});
+			}
 		};
 	}
 
-	/**
-	 * @param {MouseEvent} e
-	 */
-    function share(e) {
+    function share(e: MouseEvent) {
 		e.preventDefault();
 		let title = document.title || 'Snap store statistics';
-		/** @type {HTMLMetaElement?} */
-		const description = document.head.querySelector('meta[name="description"]');
+		const description: HTMLMetaElement? = document.head.querySelector('meta[name="description"]');
 		let text = description?.content || 'Check it out on snapstats';
 		let url = document.URL;
         if (navigator.share) {

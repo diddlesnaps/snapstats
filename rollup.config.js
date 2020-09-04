@@ -113,27 +113,11 @@ export default {
 			}),
 			commonjs(),
 			typescript({ sourceMap: dev }),
-			babel({
-				extensions: ['.js', '.mjs', '.html', '.svelte'],
-				babelHelpers: 'bundled',
-				exclude: ['node_modules/@babel/**'],
-				presets: [
-					['@babel/preset-env', {
-						targets: {
-							node: '12',
-						},
-					}],
-				],
-				plugins: [
-					'@babel/plugin-proposal-optional-chaining',
-					'@babel/plugin-proposal-nullish-coalescing-operator',
-				],
-			}),
 			json(),
 		],
 		external: Object.keys(pkg.dependencies).concat(require('module').builtinModules),
 
-		preserveEntrySignatures: false,
+		preserveEntrySignatures: true, // true because we need exports for Firebase Cloud Functions
 		onwarn,
 	},
 

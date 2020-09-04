@@ -1,34 +1,27 @@
-<script>
-	// @ts-check
+<script type="ts">
     import { onMount } from 'svelte';
     import { shuffle, MersenneTwister19937 } from 'random-js';
     import Chart from 'chart.js';
     import Rainbow from 'color-rainbow';
 
-    /** @type {(title: string) => string} */
-    export let getLegendItem = (title) => title;
-    /** @type {{
+    export let getLegendItem: (title: string) => string = (title) => title;
+    export let data: {
         items?: { _id?: string; date?: string; total?: number; count?: number; }[];
         counts?: { _id?: string; date?: string; total?: number; count?: number; }[];
         _id?: string;
         title?: string;
         name?: string;
-    }[]} */
-    export let data;
-    /** @type {string} */
-    export let title;
-    /** @type {HTMLCanvasElement} */
-    let chart;
-    /** @type {any} */
-    let legend = '';
+    }[];
 
-    /** @type {string[]} */
-    let colors = [];
+    export let title: string;
+    let chart: HTMLCanvasElement;
+    let legend: any = '';
+
+    let colors: string[] = [];
 
     const twister = MersenneTwister19937.seed(823212621);
 
-    /** @type {(array: string[]) => string[]} */
-    const Randomise = (array) => shuffle(twister, array);
+    const Randomise: (array: string[]) => string[] = (array) => shuffle(twister, array);
     colors = Randomise(Rainbow.create(data.length).map((color) => color.hexString()))
 
     function sortNames(a, b) {
@@ -85,8 +78,7 @@
                     display: false,
                 },
                 legendCallback: (chart) => {
-                    /** @type {string[]} */
-                    let text = [];
+                    let text: string[] = [];
                     text.push('<ul>');
                     for (let i = 0; i < (chart.data.datasets?.length ?? 0); i++) {
                         text.push(`<li class="legend-item">
