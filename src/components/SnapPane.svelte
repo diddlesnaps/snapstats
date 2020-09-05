@@ -11,9 +11,11 @@
 
     let icon_url: string?;
     let icon2x_url: string?;
+    let icon3x_url: string?;
     
     $: icon_url = `https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,h_92/${snap.icon_url}`;
     $: icon2x_url = `https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,h_184/${snap.icon_url}`;
+    $: icon3x_url = `https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,h_276/${snap.icon_url}`;
 </script>
 
 <style>
@@ -58,7 +60,7 @@
         {#if snap.icon_url}
             <a class='icon' href={`snaps/${snap.package_name}`}>
                 <picture>
-                    <source srcset={`${icon2x_url} 2x, ${icon_url} 1x`} />
+                    <source srcset={`${icon3x_url} 3x, ${icon2x_url} 2x, ${icon_url} 1x`} />
                     <img width="92" height="92" src={icon_url} alt={`Icon of ${snap.title}`} loading="lazy" />
                 </picture>
             </a>
