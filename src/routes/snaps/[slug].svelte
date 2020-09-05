@@ -481,7 +481,7 @@
                         <a data-fslightbox="screenshots" href="https://res.cloudinary.com/canonical/image/fetch/{screenshot.url}">
                             <picture>
                                 <source srcset="https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,h_240/{screenshot.url},
-                                    https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,h_480/{screenshot.url} 2x
+                                    https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,h_480/{screenshot.url} 2x,
                                     https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,h_720/{screenshot.url} 3x" />
                                 <img loading="lazy" width={Math.ceil(screenshot.width * (240 / screenshot.height)) || 'auto'} height={240}
                                     src="https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,h_240/{screenshot.url}"
