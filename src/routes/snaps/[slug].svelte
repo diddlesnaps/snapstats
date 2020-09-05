@@ -259,7 +259,8 @@
     }
 }
 
-.verified {
+.verified:before {
+    content: '✔️';
     color: #2a2;
 }
 </style>
@@ -431,7 +432,7 @@
                         <dd>
                             {result.data.snapByName.developer_name || result.data.snapByName.publisher}
                             {#if result.data.snapByName.developer_validation === 'verified'}
-                                <span class="verified">✔️️ (Author is verified)</span>
+                                <span class="verified">(Author is verified)</span>
                             {/if}
                         </dd>
                     {/if}
