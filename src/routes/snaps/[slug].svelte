@@ -470,23 +470,19 @@
                         {#if video.type === 'youtube'}
                             <iframe id="ytplayer" type="text/html" width="818" height="460" title="Youtube player"
                                 src={`${video.url}?autoplay=1&mute=1&modestbranding=1&rel=0`} frameborder="0"></iframe>
-                        {/if}
-                        <!-- {#if video.type === 'vimeo'}
+                        {:else if video.type === 'vimeo'}
                             <iframe id="vimeoplayer" width="818" height="460" frameborder="0" title="Vimeo player"
-                                webkitallowfullscreen mozallowfullscreen allowfullscreen
-                                src={`${video.url}?title=0&byline=0&portrait=0&transparent=0`></iframe>
-                        {/if}
-                        {#if video.type === 'asciinema'}
+                                src={`${video.url}?title=0&byline=0&portrait=0&transparent=0`}></iframe>
+                        {:else if video.type === 'asciinema'}
                             <script src={video.url} id="asciicast" async data-autoplay="1" data-preload="0"></script>
-                        {/if} -->
+                        {/if}
                     {/if}
-                    {#each result.data.snapByName.media.filter(
-                        item => item.type === 'screenshot'
-                    ) as screenshot}
+                    {#each result.data.snapByName.media.filter(item => item.type === 'screenshot') as screenshot}
                         <a data-fslightbox="screenshots" href="https://res.cloudinary.com/canonical/image/fetch/{screenshot.url}">
                             <picture>
                                 <source srcset="https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,h_240/{screenshot.url},
-                                    https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,h_480/{screenshot.url} 2x" />
+                                    https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,h_480/{screenshot.url} 2x
+                                    https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,h_720/{screenshot.url} 3x" />
                                 <img loading="lazy" width={Math.ceil(screenshot.width * (240 / screenshot.height)) || 'auto'} height={240}
                                     src="https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,h_240/{screenshot.url}"
                                     alt="{result.data.snapByName.title || result.data.snapByName.package_name} screenshot" />
