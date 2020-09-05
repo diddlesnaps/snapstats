@@ -474,7 +474,7 @@
                             <iframe id="vimeoplayer" width="818" height="460" frameborder="0" title="Vimeo player"
                                 src="{video.url}?title=0&byline=0&portrait=0&transparent=0"></iframe>
                         {:else if video.type === 'asciinema'}
-                            <script src="{video.url}" id="asciicast" async data-autoplay="1" data-preload="0"></script>
+                            {@html `<${'script'} src="${video.url}" id="asciicast" async data-autoplay="1" data-preload="0"></${'script'}>`}
                         {/if}
                     {/if}
                     {#each result.data.snapByName.media.filter(item => item.type === 'screenshot') as screenshot}
