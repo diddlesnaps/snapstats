@@ -183,7 +183,7 @@ const collector = (isDaily = false) => async (context) => {
                     {package_name: {$nin: [...snapNames]}},
                 ]
             })
-            await updateLastUpdated(date);
+            await updateLastUpdated(new Date(date));
         }
     } catch (err) {
         console.error(`collectors/collectStats.js: Error: collectStats(): ${err}`);

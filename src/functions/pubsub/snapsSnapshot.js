@@ -22,44 +22,40 @@ export default async (message) => {
             return console.error(`pubsub/snapsSnapshot.js: Error: Unable to load Snap data from store API: ${e}`)
         }
 
-        const {
-            snap: snapDetails,
-            snap: {publisher},
-            snap_yaml_raw: yamlString,
-        } = details
+        const {snap: snapDetails, snap: {publisher}} = details
 
-        let plugs = {}, slots = {}
-        try {
-            const yamlObj = jsYaml.safeLoad(yamlString)
-            if (typeof yamlObj === 'object') {
-                if ('plugs' in yamlObj) {
-                    plugs = yamlObj['plugs']
-                }
+        // let plugs = {}, slots = {}
+        // try {
+        //     const yamlObj = jsYaml.safeLoad(yamlString)
+        //     if (typeof yamlObj === 'object') {
+        //         if ('plugs' in yamlObj) {
+        //             plugs = yamlObj['plugs']
+        //         }
 
-                if ('slots' in yamlObj) {
-                    slots = yamlObj['slots']
-                }
+        //         if ('slots' in yamlObj) {
+        //             slots = yamlObj['slots']
+        //         }
 
-                if ('apps' in yamlObj) {
-                    Object.keys(yamlObj['apps']).forEach(
-                        k => k['plugs'].forEach(
-                            /** @param p {string} */
-                            p => p in plugs || (plugs[p] = {interface: p})
-                        ))
-                    Object.keys(yamlObj['apps']).forEach(
-                        k => k['slots'].forEach(
-                            /** @param s {string} */
-                            s => s in slots || (slots[s] = {interface: s})
-                        ))
-                }
-            }
-        } catch {}
+        //         if ('apps' in yamlObj) {
+        //             Object.keys(yamlObj['apps']).forEach(
+        //                 k => k['plugs'].forEach(
+        //                     /** @param p {string} */
+        //                     p => p in plugs || (plugs[p] = {interface: p})
+        //                 ))
+        //             Object.keys(yamlObj['apps']).forEach(
+        //                 k => k['slots'].forEach(
+        //                     /** @param s {string} */
+        //                     s => s in slots || (slots[s] = {interface: s})
+        //                 ))
+        //         }
+        //     }
+        // } catch {}
 
         snap = {
             ...snap,
             ...snapDetails,
-            plugs: Object.keys(plugs).map(p => ({...plugs[p], plug_name: p})),
-            slots: Object.keys(slots).map(s => ({...slots[s], slot_name: s})),
+            // plugs: Object.keys(plugs).map(p => ({...plugs[p], plug_name: p})),
+            // slots: Object.keys(slots).map(s => ({...slots[s], slot_name: s})),
             snapshotVersion,
             publisher:            publisher['display-name'],
             publisher_username:   publisher.username,
