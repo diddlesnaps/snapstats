@@ -1,6 +1,6 @@
 // @ts-check
 
-import fetch, { Headers } from 'node-fetch';
+import fetch from 'node-fetch';
 
 import { spider } from './config';
 
@@ -61,7 +61,6 @@ class SnapApi {
     }
 
     /**
-     * 
      * @param {string} url 
      * @param {string} arch 
      * @param {string} section 
@@ -91,7 +90,7 @@ class SnapApi {
             results = results.concat(data._embedded['clickindex:package']);
         }
 
-        if (data._links && data._links.next && data._links.next.href) {
+        if (data?._links?.next?.href) {
             let nextUrl = data._links.next.href;
 
             // Not sure why these links are coming back so weird, but this fixes it
