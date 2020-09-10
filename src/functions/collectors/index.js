@@ -3,11 +3,11 @@
 import * as functions from 'firebase-functions';
 
 export const hourlyStats = functions.runWith({
-    timeoutSeconds: 300,
+    timeoutSeconds: 540,
     memory: '512MB'
 }).pubsub.schedule('every 1 hours').onRun(async (context) => (await import('./collectStats')).hourly(context));
 export const dailyStats = functions.runWith({
-    timeoutSeconds: 300,
+    timeoutSeconds: 540,
     memory: '512MB'
 }).pubsub.schedule('38 23 * * *').onRun(async (context) => (await import('./collectStats')).daily(context));
 // export const dailyStats = functions.pubsub.schedule('every 24 hours').onRun(collectStats(true));
