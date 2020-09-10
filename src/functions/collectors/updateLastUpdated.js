@@ -2,6 +2,7 @@
 
 import {LastUpdatedModel} from '../../models/LastUpdated';
 
+/** @type {(date: Date) => Promise<void>} */
 export const updateLastUpdated = async (date) => {
     const lastUpdatedDoc = (await LastUpdatedModel.findOne()) || new LastUpdatedModel({date});
     lastUpdatedDoc.date = date;

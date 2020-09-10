@@ -1,12 +1,14 @@
 // @ts-check
 
 import fetch from 'node-fetch';
+import * as functions from 'firebase-functions';
 
 import {RatingsModel} from '../../models/Rating';
 import { connectMongoose } from '../../mongodb';
 
 const denysave = process.env.denysave === 'true' ? true : false;
 
+/** @type {(context: functions.EventContext) => Promise<void>} */
 export default async (context) => {
     const url = `https://odrs.gnome.org/1.0/reviews/api/ratings`;
     try {

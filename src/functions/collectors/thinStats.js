@@ -1,6 +1,6 @@
 // @ts-check
 
-import {LastUpdatedModel} from '../../models/LastUpdated';
+import * as functions from 'firebase-functions';
 import {ArchitecturesModel} from '../../models/Architecture';
 import {BasesModel} from '../../models/Base';
 import {ChannelsModel} from '../../models/Channel';
@@ -10,11 +10,11 @@ import {LicensesModel} from '../../models/License';
 import {SnapCountsModel} from '../../models/SnapCount';
 
 import {promisify} from '../../graphql/resolvers/promisify';
-import {updateLastUpdated} from './updateLastUpdated';
 import { connectMongoose } from '../../mongodb';
 
 const denysave = process.env.denysave === 'true' ? true : false;
 
+/** @type {(context: functions.EventContext) => Promise<void>} */
 export default async (context) => {
     try {
         console.log(`Thinning stats at ${(new Date()).toLocaleString()}`);
