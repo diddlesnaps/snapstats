@@ -1,6 +1,7 @@
 // @ts-check
 
 import {RatingsModel} from '../../models/Rating';
+import { connectMongoose } from '../../mongodb';
 
 const denysave = process.env.denysave === 'true' ? true : false;
 
@@ -26,6 +27,7 @@ export default async (context) => {
         ));
 
         if (!denysave) {
+            connectMongoose();
             await RatingsModel.bulkWrite(tasks)
         }
     } catch(err) {

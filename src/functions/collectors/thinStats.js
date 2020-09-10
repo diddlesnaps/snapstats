@@ -11,14 +11,17 @@ import {SnapCountsModel} from '../../models/SnapCount';
 
 import {promisify} from '../../graphql/resolvers/promisify';
 import {updateLastUpdated} from './updateLastUpdated';
+import { connectMongoose } from '../../mongodb';
 
 const denysave = process.env.denysave === 'true' ? true : false;
 
 export default async (context) => {
     try {
         console.log(`Thinning stats at ${(new Date()).toLocaleString()}`);
-
+        
         if (!denysave) {
+            connectMongoose();
+
             let promises = [];
             for (const model of [
                 ArchitecturesModel,

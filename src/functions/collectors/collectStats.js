@@ -18,6 +18,7 @@ import {updateLastUpdated} from './updateLastUpdated';
 import {LastUpdatedModel} from '../../models/LastUpdated';
 
 import snapshotVersion from '../../snapshotVersion';
+import { connectMongoose } from '../../mongodb';
 
 const denysave = process.env.denysave === 'true' ? true : false;
 
@@ -91,6 +92,7 @@ const collector = (isDaily = false) => async (context) => {
             console.debug(`collectors/collectStats.js: NOT saving stats`)
         } else {
             console.debug(`collectors/collectStats.js: Saving stats`)
+            connectMongoose();
             /** @type {Promise<any>[]} */
             let promises = [
                 ArchitecturesModel.insertMany(
