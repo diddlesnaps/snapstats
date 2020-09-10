@@ -21,6 +21,9 @@ import snapshotVersion from '../../snapshotVersion';
 
 const denysave = process.env.denysave === 'true' ? true : false;
 
+/**
+ * @return {(context: functions.EventContext) => Promise<void>}
+ */
 const collector = (isDaily = false) => async (context) => {
     const date = Date.now();
     console.log(`Updating stats at ${new Date(date).toLocaleString()}`);
@@ -88,6 +91,7 @@ const collector = (isDaily = false) => async (context) => {
             console.debug(`collectors/collectStats.js: NOT saving stats`)
         } else {
             console.debug(`collectors/collectStats.js: Saving stats`)
+            /** @type {Promise<any>[]} */
             let promises = [
                 ArchitecturesModel.insertMany(
                     architectures.map(architecture => (architecture.name) ? architecture : { ...architecture, name: 'unset' })
@@ -141,12 +145,12 @@ const collector = (isDaily = false) => async (context) => {
                     .map(addIsDaily)
                 ).catch(err => console.error(`collectors/collectStats.js: Error: snapCounts: ${err.toString()}`)),
             ];
-            
+
             await Promise.all(promises);
 
             console.debug(`collectors/collectStats.js: Publishing Snaps to snapshot PubSub topic`)
 
-            let snapNames = new Set(snaps.map(snap => snap.package_name))
+            let snapNames = new Set(snaps.map(({snap}) => snap.package_name))
 
             const pubsub = new PubSub()
             const snapsSnapshotPubsubTopic = pubsub.topic(functions.config().pubsub.snaps_snapshot_topic)

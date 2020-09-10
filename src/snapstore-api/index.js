@@ -8,6 +8,7 @@ function sort(array) {
     return array.sort((a, b) => b.count - a.count);
 }
 
+/** @type {(url: string) => Promise<any>} */
 export const getDetails = async (url) => {
     const headers = {
         'User-Agent': spider.snaps.user_agent,
@@ -57,6 +58,7 @@ export const getStats = () => {
         let bases_total = 0;
         Object.keys(base_counts).forEach((key) => bases_total += base_counts[key]);
 
+        /** @type {(cnts: {[key: string]: number}) => (key: string) => {name: string, count: number}} */
         const mapCounts = (cnts) => (key) => ({name: key, count: cnts[key]});
 
         console.debug('snapstore-api/index.js: Formatting count data')
@@ -88,6 +90,7 @@ export const getStats = () => {
     }));
 };
 
+/** @type {(cnts: {[key: string]: number}) => {[key: string]: number}} */
 const extractCombinedLicenseCounts = (cnts) => {
     const matchRegex = /\s+(?:AND|OR)\s+/g;
     const replaceRegex = /\(|\)/g;
@@ -108,6 +111,7 @@ const extractCombinedLicenseCounts = (cnts) => {
     return cnts;
 }
 
+/** @type {(field: string, json: any) => any} */
 const getCounts = (field, json) => {
     const [parentField, childField] = field.split('.', 2)
     const items = json.reduce((carry, snap) => {
@@ -140,6 +144,7 @@ const getCounts = (field, json) => {
     return item_counts;
 };
 
+/** @type {(items: any, count: number) => number} */
 const computeMean = (items, count) => {
     const length = Object.keys(items).length;
     if (length < 1) {
@@ -148,6 +153,7 @@ const computeMean = (items, count) => {
     const unbounded = count / length;
     return Number.parseFloat(unbounded.toPrecision(4));
 }
+/** @type {(items: any) => number} */
 const computeMode = (items) => {
     const buckets = {};
     let highestFrequency = 0;
@@ -163,6 +169,7 @@ const computeMode = (items) => {
     };
     return mode;
 }
+/** @type {(items: any) => number} */
 const computeMedian = (items) => {
     let values = [];
     for (const key of Object.keys(items)) {

@@ -1,6 +1,6 @@
 // @ts-check
 
-import fetch from 'node-fetch';
+import fetch, { Headers } from 'node-fetch';
 
 import { spider } from './config';
 
@@ -51,15 +51,28 @@ const detailsfields = [
 ].join(',')
 
 class SnapApi {
-    constructor({url, details_url, domain}) {
-        this.url = url;
-        this.details_url = details_url;
-        this.domain = domain;
+    /**
+     * @param {{url: string, details_url: string, domain: string}} props 
+     */
+    constructor(props) {
+        this.url = props.url;
+        this.details_url = props.details_url;
+        this.domain = props.domain;
     }
 
+    /**
+     * 
+     * @param {string} url 
+     * @param {string} arch 
+     * @param {string} section 
+     * @param {import('./types').SnapApiSnap[]} previousResults 
+     * @return {Promise<import('./types').SnapApiSnap[]>}
+     */
     async listArch(url, arch, section, previousResults) {
+        /** @type {import('./types').SnapApiSnap[]} */
         let results = previousResults || [];
 
+        /** @type HeadersInit */
         const headers = {'User-Agent': spider.snaps.user_agent};
         if (arch) {
             headers['X-Ubuntu-Architecture'] = arch;
@@ -74,7 +87,7 @@ class SnapApi {
 
         // console.debug(`got package list page: ${url} (${arch}, ${section})`);
 
-        if (data && data._embedded && data._embedded['clickindex:package']) {
+        if (data?._embedded?.['clickindex:package']) {
             results = results.concat(data._embedded['clickindex:package']);
         }
 
@@ -91,14 +104,15 @@ class SnapApi {
         }
     }
 
+    /** @return {Promise<{snap: import('./types').SnapApiSnap, details_api_url: string}[]>} */
     async searchList() {
         const url = `${this.url}/search?size=${spider.snaps.page_size}&confinement=strict,devmode,classic&scope=wide&fields=${searchfields}`;
-        const promises = spider.snaps.architectures.map((architecture) => {
-            return this.listArch(url, architecture);
-        });
-        promises.unshift(this.listArch(url));
+        /** @type Promise<import('./types').SnapApiSnap[]>[] */
+        const promises = spider.snaps.architectures.map((architecture) => this.listArch(url, architecture, null, null));
+        promises.unshift(this.listArch(url, null, null, null));
 
         const results = await Promise.all(promises);
+        /** @type {{[key: string]: {snap: import('./types').SnapApiSnap, details_api_url: string}}} */
         const snapMap = {};
         let arch = 'all';
         let index = 0;
@@ -112,6 +126,7 @@ class SnapApi {
                 snap.architecture = (snap.architecture) ? snap.architecture : [arch];
                 const name = snap.package_name;
 
+                /** @type {string} */
                 const details_api_url = `${this.details_url}/${name}?fields=${detailsfields}`
                 if (!snapMap[name]) {
                     snapMap[name] = {
@@ -121,7 +136,7 @@ class SnapApi {
                 } else {
                     const oldSnap = snapMap[name].snap;
 
-                    let arches = snap.architecture.concat(oldSnap.architecture || '');
+                    let arches = snap.architecture.concat(oldSnap.architecture ?? []);
                     arches = arches.filter((value, index_1, self) => {
                         return self.indexOf(value) === index_1;
                     });

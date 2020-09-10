@@ -9,6 +9,7 @@ export enum Architecture {
     armhf = "armhf",
     ppc64el = "ppc64el",
     s390x = "s390x",
+    all = "all",
 }
 export enum Confinement {
     strict = "strict",
@@ -36,7 +37,7 @@ export interface ISnapDocument extends Document {
     aliases: Types.Array<SnapAlias>
     anon_download_url: string
     apps: Types.Array<string>
-    architecture: Architecture
+    architecture: Types.Array<Architecture>
     base_snap: string
     binary_filesize: number
     channel: string
