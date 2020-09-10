@@ -49,17 +49,17 @@ export default {
 				exclude: ['node_modules/@babel/**'],
 				presets: [
 					['@babel/preset-env', {
-						targets: '> 0.25%, not dead'
-					}]
+						targets: '> 0.25%, not dead',
+					}],
 				],
 				plugins: [
 					'@babel/plugin-proposal-optional-chaining',
 					'@babel/plugin-proposal-nullish-coalescing-operator',
 					'@babel/plugin-syntax-dynamic-import',
 					['@babel/plugin-transform-runtime', {
-						useESModules: true
-					}]
-				]
+						useESModules: true,
+					}],
+				],
 			}),
 
 			!dev && terser({
@@ -107,10 +107,26 @@ export default {
 				preprocess: autoPreprocess(),
 			}),
 			resolve({
-				dedupe: ['svelte']
+				dedupe: ['svelte'],
 			}),
 			commonjs(),
 			typescript({ sourceMap: dev }),
+			babel({
+				extensions: ['.js', '.mjs', '.html', '.svelte'],
+				babelHelpers: 'runtime',
+				exclude: ['node_modules/@babel/**'],
+				presets: [
+					['@babel/preset-env', {
+						targets: {node: true},
+					}],
+				],
+				plugins: [
+					'@babel/plugin-proposal-optional-chaining',
+					'@babel/plugin-proposal-nullish-coalescing-operator',
+					'@babel/plugin-syntax-dynamic-import',
+					'@babel/plugin-transform-runtime',
+				],
+			}),
 			json(),
 		],
 		external: Object.keys(pkg.dependencies).concat(require('module').builtinModules),
