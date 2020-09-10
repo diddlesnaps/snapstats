@@ -1,6 +1,6 @@
 // @ts-check
 
-import { createSitemap, EnumChangefreq } from 'sitemap';
+import { SitemapStream, streamToPromise, EnumChangefreq } from 'sitemap';
 import { SnapsModel } from './models/Snaps';
 import {connectMongoose} from './mongodb';
 
@@ -31,11 +31,10 @@ export const sitemap = async (req, res) => {
                     lastmodISO: snap.last_updated.toISOString(),
                 })));
         res.setHeader('Content-Type', 'application/xml');
-        return res.end(createSitemap({
-            hostname: 'https://snapstats.org',
-            cacheTime: 86400,
-            urls,
-        }).toXML());
+        const stream = new SitemapStream({ hostname: 'https://snapstats.org/' });
+        urls.forEach( link => stream.write( link ) );
+        stream.end();
+        return res.end((await streamToPromise( stream )).toString());
     } catch(e) {
         console.log(e);
         return res.status(500).end();

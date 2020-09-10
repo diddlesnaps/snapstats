@@ -34,9 +34,7 @@ export default {
 				dev,
 				hydratable: true,
 				emitCss: true,
-				preprocess: autoPreprocess({
-					postcss: true,
-				}),
+				preprocess: autoPreprocess(),
 			}),
 			resolve({
 				browser: true,
