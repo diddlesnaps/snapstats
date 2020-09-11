@@ -59,8 +59,6 @@
             q,
             field,
             order,
-            // qlQuery: q ? searchQuery : latestQuery,
-            qlQuery: searchQuery,
             offset,
             limit,
             cache: (await data).data,
@@ -77,19 +75,17 @@
     export let q;
     export let field;
     export let order;
-    /** @type {import("graphql").DocumentNode} */
-    export let qlQuery;
     /** @type {number} */
     export let offset;
     /** @type {number} */
     export let limit;
     export let cache;
 
-	restore(client, qlQuery, cache);
+	restore(client, searchQuery, cache);
 	setClient(client);
 
     let data = query(client, {
-        query: qlQuery,
+        query: searchQuery,
         variables: {q, field, order, offset, limit}
     });
 
