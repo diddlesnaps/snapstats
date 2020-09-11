@@ -18,6 +18,9 @@ export default async (message) => {
         let details = {}
         try {
             details = (await getDetails(details_api_url))
+            if (!details?.snap?.publisher) {
+                throw new Error(`snap publisher is undefined (${snap.package_name} from ${details_api_url})`)
+            }
         } catch (e) {
             return console.error(`pubsub/snapsSnapshot.js: Error: Unable to load Snap data from store API: ${e}`)
         }
