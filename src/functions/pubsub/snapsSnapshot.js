@@ -2,8 +2,9 @@
 
 import * as functions from 'firebase-functions';
 import {PubSub} from '@google-cloud/pubsub';
-import jsYaml from 'js-yaml';
+// import jsYaml from 'js-yaml';
 import {getDetails} from '../../snapstore-api';
+import { connectMongoose } from '../../mongodb';
 import {SnapsModel} from '../../models/Snaps';
 
 import snapshotVersion from '../../snapshotVersion';
@@ -66,6 +67,7 @@ export default async (message) => {
         }
 
         try {
+            connectMongoose();
             const s = await SnapsModel.findOne({package_name: snap.package_name})
             if (s) {
                 await s.update(snap)
