@@ -70,7 +70,7 @@ export default async (message) => {
             connectMongoose();
             const s = await SnapsModel.findOne({package_name: snap.package_name})
             if (s) {
-                await s.update(snap)
+                await s.updateOne(snap)
             } else {
                 await new SnapsModel(snap).save()
             }
