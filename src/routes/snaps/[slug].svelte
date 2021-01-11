@@ -470,10 +470,10 @@
                     {#if video && 'url' in video && 'type' in video}
                         {#if video.type === 'youtube'}
                             <iframe id="ytplayer" type="text/html" width="818" height="460" title="Youtube player"
-                                src="{video.url}?autoplay=1&mute=1&modestbranding=1&rel=0" frameborder="0"></iframe>
+                                src="{video.url}?autoplay=1&mute=1&modestbranding=1&rel=0" frameborder="0" allowfullscreen></iframe>
                         {:else if video.type === 'vimeo'}
                             <iframe id="vimeoplayer" width="818" height="460" frameborder="0" title="Vimeo player"
-                                src="{video.url}?title=0&byline=0&portrait=0&transparent=0"></iframe>
+                                src="{video.url}?title=0&byline=0&portrait=0&transparent=0" allowfullscreen></iframe>
                         {:else if video.type === 'asciinema'}
                             {@html `<${'script'} src="${video.url}" id="asciicast" async data-autoplay="1" data-preload="0"></${'script'}>`}
                         {/if}
