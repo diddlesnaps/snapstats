@@ -7,7 +7,7 @@ export interface ISectionDocument extends Document {
     isDaily: boolean
 }
 
-const SectionsSchema = new Schema({
+const SectionsSchema = new Schema<ISectionDocument>({
     name: {
         type: String,
         required: true,
