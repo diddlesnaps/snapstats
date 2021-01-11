@@ -118,7 +118,7 @@
             }
         }
         await import('fslightbox')
-        refreshFsLightbox()
+        globalThis.refreshFsLightbox()
     })
 
     function vimeo() {
