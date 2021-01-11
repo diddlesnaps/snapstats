@@ -3,7 +3,7 @@
   "description": "snapstats",
   "version": "0.0.1",
   "engines": {
-    "node": "12"
+    "node": "14"
   },
   "scripts": {
     "dev": "run-p dev:typescript dev:sapper",
