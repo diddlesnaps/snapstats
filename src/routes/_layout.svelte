@@ -17,8 +17,8 @@
 
 	function enableAnalytics() {
 		if (process.env.NODE_ENV === 'production') {
-			firebase.analytics();
-			firebase.performance();
+			globalThis.firebase?.analytics();
+			globalThis.firebase?.performance();
 		}
 	}
 	let GDPRCategories = {

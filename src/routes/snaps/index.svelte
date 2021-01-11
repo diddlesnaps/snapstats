@@ -93,12 +93,10 @@
     // const initialsearch = `q=${q}&offset=${offset}&limit=${limit}&field=${field}&order=${order}`
 
     $: {
-        if (typeof firebase !== 'undefined' && firebase) {
-            firebase.analytics().logEvent('search', {
-                search_term: q,
-                page: offset / limit,
-            });
-        }
+        globalThis.firebase?.analytics().logEvent('search', {
+            search_term: q,
+            page: offset / limit,
+        });
         
         const search = `q=${q}&offset=${offset}&limit=${limit}&field=${field}&order=${order}`
         if (mounted) {
@@ -180,7 +178,7 @@ label {
         </select></label>
         <label>Enter a term to search
             <input name="q" type="text" value={q} placeholder="spotify"
-                on:blur={(e) => q = e.target.value} />
+                on:blur={(e) => q = e.currentTarget.value} />
         </label>
     </form>
 </div>

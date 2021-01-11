@@ -8,7 +8,7 @@
 	onMount(() => share_enabled = !!navigator.share);
 
 	function showNotice(message: string, isError: boolean = false) {
-		return function(error: Error?) {
+		return function(error: Error | void) {
 			let notice = document.createElement('div');
 			notice.innerText = message;
 			notice.style.position = 'absolute';
@@ -35,20 +35,18 @@
 
 	function logShare(url: string) {
 		return function() {
-			if (typeof firebase !== 'undefined') {
-				firebase?.analytics().logEvent('share', {
-					'content_type': 'page',
-					'item_id': url,
-				});
-			}
+			globalThis.firebase?.analytics().logEvent('share', {
+				'content_type': 'page',
+				'item_id': url,
+			});
 		};
 	}
 
     function share(e: MouseEvent) {
 		e.preventDefault();
 		let title = document.title || 'Snap store statistics';
-		const description: HTMLMetaElement? = document.head.querySelector('meta[name="description"]');
-		let text = description?.content || 'Check it out on snapstats';
+		const description: HTMLMetaElement = document.head.querySelector('meta[name="description"]');
+		let text = description.content || 'Check it out on snapstats';
 		let url = document.URL;
         if (navigator.share) {
             navigator.share({
