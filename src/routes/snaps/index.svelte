@@ -101,7 +101,7 @@
         const search = `q=${q}&offset=${offset}&limit=${limit}&field=${field}&order=${order}`
         if (mounted) {
             goto(`snaps?${search}`)
-            data.refetch({q, offset, limit, field, order})
+            // data.refetch({q, offset, limit, field, order})
             // window.location.search = search
         }
     }
