@@ -16,11 +16,11 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v2
         with:
           node-version: '14.x'
       - name: Deploy to Firebase
-        uses: w9jds/firebase-action@v2.0.0
+        uses: diddledan/firebase-action@master
         with:
           args: deploy --only hosting
         env:
