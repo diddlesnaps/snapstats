@@ -4,7 +4,6 @@
 	import client from '../apollo'
 	import { gql } from 'apollo-boost'
 
-	import Timeline from '../components/Timeline.svelte';
 	import DonateBtn from '../components/DonateBtn.svelte';
 
 	const q = gql`

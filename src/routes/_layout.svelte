@@ -2,7 +2,7 @@
 	// @ts-check
 
 	import { stores } from '@sapper/app';
-	import { derived } from 'svelte/store';
+	import { derived, Readable } from 'svelte/store';
 	import '@beyonk/gdpr-cookie-consent-banner/dist/style.css'
 	import GdprBanner from '@beyonk/gdpr-cookie-consent-banner/src/components/Banner.svelte'
 	import Nav from '../components/Nav.svelte';
@@ -11,9 +11,16 @@
 	export let segment;
 
 	const { preloading, page } = stores();
-	const delayedPreloading = derived(preloading, (currentPreloading, set) => {
-		setTimeout(() => set(currentPreloading), 250);
-	});
+	/** @type Readable<boolean> */
+	const delayedPreloading = derived(preloading,
+		/**
+		 * @param {boolean} currentPreloading
+		 * @param {(preloading: boolean) => void} set
+		 */
+		(currentPreloading, set) => {
+			setTimeout(() => set(!!currentPreloading), 250);
+		}
+	);
 
 	function enableAnalytics() {
 		if (process.env.NODE_ENV === 'production') {

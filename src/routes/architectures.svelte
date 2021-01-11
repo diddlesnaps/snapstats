@@ -1,7 +1,6 @@
 <script context="module">
 	// @ts-check
 
-    import SnapList from '../components/SnapList.svelte';
     import DonateBtn from '../components/DonateBtn.svelte';
 	import Timeline from '../components/Timeline.svelte';
 
