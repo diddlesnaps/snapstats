@@ -29,7 +29,7 @@
   },
   "dependencies": {
     "@beyonk/gdpr-cookie-consent-banner": "^7.0.1",
-    "@google-cloud/pubsub": "^2.7.0",
+    "@google-cloud/pubsub": "^2.8.0",
     "@graphql-tools/merge": "^6.2.1",
     "@grpc/grpc-js": "^0.6.18",
     "apollo-boost": "^0.4.9",
