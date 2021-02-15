@@ -1,7 +1,6 @@
 <script context="module">
     // @ts-check
 
-    import { goto } from '@sapper/app';
     import SnapList from '../../components/SnapList.svelte';
     import Pagination from '../../components/Pagination.svelte';
 
@@ -69,6 +68,7 @@
 <script>
     // @ts-check
 
+    import { goto } from '@sapper/app';
     import { onMount } from 'svelte';
     import { setClient, restore, query } from 'svelte-apollo';
 

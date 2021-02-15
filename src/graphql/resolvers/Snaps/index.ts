@@ -1,7 +1,7 @@
 import { SnapsModel, ISnapDocument, DeveloperValidation, Architecture } from "../../../models/Snaps"
 import { RatingsModel } from "../../../models/Rating"
 import escapeRegExp from 'lodash.escaperegexp'
-import type {DocumentQuery, Query, MongooseFilterQuery, FilterQuery} from 'mongoose';
+import type {Query, FilterQuery} from 'mongoose';
 import type {MongooseDataloaderFactory} from 'graphql-dataloader-mongoose';
 
 type args = {
@@ -23,7 +23,7 @@ type args = {
     developerValidated?: boolean
 }
 
-type SearchFn = (args?: args) => DocumentQuery<ISnapDocument[], ISnapDocument, {}>;
+type SearchFn = (args?: args) => Query<ISnapDocument[], ISnapDocument>;
 
 const getRatingAverage: (snap: ISnapDocument) => Promise<number> = async (snap) => {
     const rating = await RatingsModel.findOne({
@@ -55,7 +55,7 @@ const getRatingCount: (snap: ISnapDocument) => Promise<number> = async (snap) =>
 const snapsByDateFn: SearchFn = () => SnapsModel.find({ name: { $not: /(^(test|hello)-|-test$)/i } })
 
 const searchSnapsFn: SearchFn = (args) => {
-    let query: MongooseFilterQuery<ISnapDocument> = {}
+    let query: FilterQuery<ISnapDocument> = {}
 
     if (args.name) {
         const name = escapeRegExp(args.name)

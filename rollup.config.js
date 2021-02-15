@@ -31,8 +31,10 @@ export default {
 				'http://localhost:3000/graphql': dev ? 'http://localhost:3000/graphql' : 'https://snapstats.org/graphql',
 			}),
 			svelte({
-				dev,
-				hydratable: true,
+				compilerOptions: {
+					dev,
+					hydratable: true,
+				},
 				emitCss: true,
 				preprocess: autoPreprocess(),
 			}),
@@ -101,9 +103,11 @@ export default {
 				'delimiters': ['',''],
 			}),
 			svelte({
-				generate: 'ssr',
-				hydratable: true,
-				dev,
+				compilerOptions: {
+					dev,
+					generate: 'ssr',
+					hydratable: true,
+				},
 				preprocess: autoPreprocess(),
 			}),
 			resolve({

@@ -2,7 +2,7 @@
 	// @ts-check
 
 	import { stores } from '@sapper/app';
-	import { derived, Readable } from 'svelte/store';
+	import { derived } from 'svelte/store';
 	import '@beyonk/gdpr-cookie-consent-banner/dist/style.css'
 	import GdprBanner from '@beyonk/gdpr-cookie-consent-banner/src/components/Banner.svelte'
 	import Nav from '../components/Nav.svelte';
@@ -11,7 +11,7 @@
 	export let segment;
 
 	const { preloading, page } = stores();
-	/** @type Readable<boolean> */
+	/** @type require('svelte/store').Readable<boolean> */
 	const delayedPreloading = derived(preloading,
 		/**
 		 * @param {boolean} currentPreloading
