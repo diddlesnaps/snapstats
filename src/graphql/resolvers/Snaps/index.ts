@@ -74,7 +74,7 @@ const searchSnapsFn: SearchFn = (args) => {
     if (args.publisherOrDeveloper) {
         const publisherOrDeveloper: string = escapeRegExp(args.publisherOrDeveloper)
 
-        let publisherOrDeveloperQuery: FilterQuery<ISnapDocument>[]
+        let publisherOrDeveloperQuery: FilterQuery<ISnapDocument>[] = []
         publisherOrDeveloperQuery.push({publisher: {$regex: publisherOrDeveloper, $options: 'i'}})
         publisherOrDeveloperQuery.push({developer_name: {$regex: publisherOrDeveloper, $options: 'i'}})
 
