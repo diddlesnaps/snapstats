@@ -34,7 +34,7 @@
 
         publisherName = publisherName || '';
         field = field || 'package_name';
-        order = order ? parseInt(order) || -1 : -1;
+        order = order ? parseInt(order) || 1 : 1;
         offset = offset ? parseInt(offset) || 0 : 0;
         limit = limit ? parseInt(limit) || 20 : 20;
 
