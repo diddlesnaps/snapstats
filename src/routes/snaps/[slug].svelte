@@ -430,7 +430,9 @@
                     {#if result.data.snapByName.developer_name || result.data.snapByName.publisher}
                         <dt>Published to the Snap Store by:</dt>
                         <dd>
-                            {result.data.snapByName.developer_name || result.data.snapByName.publisher}
+                            <a href="/publishers/{result.data.snapByName.developer_name || result.data.snapByName.publisher}">
+                                {result.data.snapByName.developer_name || result.data.snapByName.publisher}
+                            </a>
                             {#if result.data.snapByName.developer_validation === 'verified'}
                                 <span class="verified">(Author is verified)</span>
                             {/if}
