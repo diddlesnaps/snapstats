@@ -33,7 +33,7 @@
         let {field, order, offset, limit} = query;
 
         publisherName = publisherName || '';
-        field = field || 'package_name';
+        field = field || 'title';
         order = order ? parseInt(order) || 1 : 1;
         offset = offset ? parseInt(offset) || 0 : 0;
         limit = limit ? parseInt(limit) || 20 : 20;
