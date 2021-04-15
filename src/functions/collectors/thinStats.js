@@ -9,7 +9,7 @@ import {DeveloperCountsModel} from '../../models/DeveloperCount';
 import {LicensesModel} from '../../models/License';
 import {SnapCountsModel} from '../../models/SnapCount';
 
-import {promisify} from '../../graphql/resolvers/promisify';
+import {promisify} from '../../promisify';
 import { connectMongoose } from '../../mongodb';
 
 const denysave = process.env.denysave === 'true' ? true : false;
