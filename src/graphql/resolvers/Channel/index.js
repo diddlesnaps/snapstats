@@ -2,7 +2,7 @@
 
 import { ChannelsModel } from "../../../models/Channel";
 import { LastUpdatedModel } from '../../../models/LastUpdated';
-import { promisify } from '../promisify';
+import { promisify } from '../../../promisify';
 import { documentCount } from '../documentCount';
 
 export default {

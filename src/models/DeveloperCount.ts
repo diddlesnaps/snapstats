@@ -1,4 +1,5 @@
-import { Schema, model, Document, Model } from "mongoose";
+import mongoose, {Document, Model} from 'mongoose'
+const { Schema, model } = mongoose
 
 export interface IDeveloperCountsDocument extends Document {
     total: number

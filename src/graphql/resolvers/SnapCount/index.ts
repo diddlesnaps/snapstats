@@ -1,6 +1,6 @@
 import { SnapCountsModel, ISnapCountsDocument } from "../../../models/SnapCount";
 import { LastUpdatedModel } from '../../../models/LastUpdated';
-import { promisify } from '../promisify';
+import { promisify } from '../../../promisify';
 import { documentCount } from '../documentCount';
 
 type args = {

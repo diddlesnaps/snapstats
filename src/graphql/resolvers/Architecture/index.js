@@ -2,7 +2,7 @@
 
 import { ArchitecturesModel } from '../../../models/Architecture';
 import { LastUpdatedModel } from '../../../models/LastUpdated';
-import { promisify } from '../promisify';
+import { promisify } from '../../../promisify';
 import { documentCount } from '../documentCount';
 
 export default {

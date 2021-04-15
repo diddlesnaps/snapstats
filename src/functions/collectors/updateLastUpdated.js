@@ -1,6 +1,6 @@
 // @ts-check
 
-import {LastUpdatedModel} from '../../models/LastUpdated';
+import {LastUpdatedModel} from '../../models/LastUpdated.js';
 
 /** @type {(date: Date) => Promise<void>} */
 export const updateLastUpdated = async (date) => {

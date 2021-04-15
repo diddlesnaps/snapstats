@@ -3,22 +3,23 @@
 import * as functions from 'firebase-functions';
 import {PubSub} from '@google-cloud/pubsub';
 
-import {ArchitecturesModel} from '../../models/Architecture';
-import {BasesModel} from '../../models/Base';
-import {ChannelsModel} from '../../models/Channel';
-import {ConfinementsModel} from '../../models/Confinement';
-import {DeveloperCountsModel} from '../../models/DeveloperCount';
-import {LicensesModel} from '../../models/License';
-import {SectionsModel} from '../../models/Section';
-import {SnapCountsModel} from '../../models/SnapCount';
-import {SnapsModel} from '../../models/Snaps';
+import {ArchitecturesModel} from '../../models/Architecture.js';
+import {BasesModel} from '../../models/Base.js';
+import {ChannelsModel} from '../../models/Channel.js';
+import {ConfinementsModel} from '../../models/Confinement.js';
+import {DeveloperCountsModel} from '../../models/DeveloperCount.js';
+import {LicensesModel} from '../../models/License.js';
+import {SectionsModel} from '../../models/Section.js';
+import {SnapCountsModel} from '../../models/SnapCount.js';
+import {SnapsModel} from '../../models/Snaps.js';
 
-import {getStats} from '../../snapstore-api';
-import {updateLastUpdated} from './updateLastUpdated';
-import {LastUpdatedModel} from '../../models/LastUpdated';
+import {getStats} from '../../snapstore-api/index.js';
+import {updateLastUpdated} from './updateLastUpdated.js';
+import {LastUpdatedModel} from '../../models/LastUpdated.js';
 
-import snapshotVersion from '../../snapshotVersion';
-import { connectMongoose } from '../../mongodb';
+import snapshotVersion from '../../snapshotVersion.js';
+import { connectMongoose } from '../../mongodb.js';
+import { sort, extractCombinedLicenseCounts, getCounts, mapCounts } from '../../statsHelpers.js';
 
 const denysave = process.env.denysave === 'true' ? true : false;
 
@@ -39,7 +40,6 @@ const collector = (isDaily = false) => async (context) => {
             channels,
             confinements,
             developer_counts,
-            licenses,
             sections,
             snap_counts,
         } = stats;
@@ -93,6 +93,11 @@ const collector = (isDaily = false) => async (context) => {
         } else {
             console.debug(`collectors/collectStats.js: Saving stats`)
             connectMongoose();
+
+            const snaps          = await SnapsModel.find().select({license:1, _id:0})
+            const license_counts = extractCombinedLicenseCounts(getCounts('license', snaps));
+            const licenses       = sort(Object.keys(license_counts).map(mapCounts(license_counts)));
+
             /** @type {Promise<any>[]} */
             let promises = [
                 ArchitecturesModel.insertMany(

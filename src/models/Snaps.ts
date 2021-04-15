@@ -1,6 +1,5 @@
-// @ts-check
-
-import { Schema, model, Document, Types, Model} from "mongoose";
+import mongoose, {Document, Model} from 'mongoose'
+const { Schema, model } = mongoose
 
 export enum Architecture {
     amd64 = "amd64",

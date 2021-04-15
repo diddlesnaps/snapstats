@@ -2,7 +2,7 @@
 
 import fetch from 'node-fetch';
 
-import { spider } from './config';
+import { spider } from './config.js';
 
 const searchfields = [
     'aliases',
@@ -21,6 +21,7 @@ const searchfields = [
     'download_url',
     'icon_url',
     'last_updated',
+    'license',
     'origin',
     'package_name',
     'ratings_average',
@@ -130,7 +131,7 @@ class SnapApi {
                 if (!snapMap[name]) {
                     snapMap[name] = {
                         snap,
-                        details_api_url
+                        details_api_url,
                     };
                 } else {
                     const oldSnap = snapMap[name].snap;

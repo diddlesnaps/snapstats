@@ -3,7 +3,7 @@
 import { DeveloperCountsModel } from "../../../models/DeveloperCount";
 import { SnapsModel } from "../../../models/Snaps";
 import { LastUpdatedModel } from '../../../models/LastUpdated';
-import { promisify } from '../promisify';
+import { promisify } from '../../../promisify';
 import { documentCount } from '../documentCount';
 
 export default {
