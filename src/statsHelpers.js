@@ -1,7 +1,7 @@
 // @ts-check
 
 /** @type {(array: {name: string, count: number}[]) => {name: string, count: number}[]} */
-function sort(array) {
+export function sort(array) {
     return array.sort((a, b) => b.count - a.count);
 }
 
