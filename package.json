@@ -9,7 +9,7 @@
     "dev": "run-p dev:typescript dev:sapper",
     "dev:sapper": "sapper dev",
     "dev:typescript": "tsc --watch",
-    "build": "run-s build:sapper build:exports build:packagejson build:npminstall",
+    "build": "run-s build:typescript build:sapper build:exports build:packagejson build:npminstall",
     "build:exports": "shx sed -i 's/(require.*)/module.exports = $1/' __sapper__/build/index.js",
     "build:sapper": "sapper build --legacy",
     "build:packagejson": "shx cp package*.json __sapper__/build/",
