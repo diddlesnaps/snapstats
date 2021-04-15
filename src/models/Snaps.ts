@@ -1,4 +1,4 @@
-import mongoose, {Document, Model} from 'mongoose'
+import mongoose, {Document, Model, Types} from 'mongoose'
 const { Schema, model } = mongoose
 
 export enum Architecture {
