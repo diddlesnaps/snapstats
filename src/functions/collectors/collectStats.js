@@ -8,7 +8,6 @@ import {BasesModel} from '../../models/Base.js';
 import {ChannelsModel} from '../../models/Channel.js';
 import {ConfinementsModel} from '../../models/Confinement.js';
 import {DeveloperCountsModel} from '../../models/DeveloperCount.js';
-import {LicensesModel} from '../../models/License.js';
 import {SectionsModel} from '../../models/Section.js';
 import {SnapCountsModel} from '../../models/SnapCount.js';
 import {SnapsModel} from '../../models/Snaps.js';
@@ -19,7 +18,6 @@ import {LastUpdatedModel} from '../../models/LastUpdated.js';
 
 import snapshotVersion from '../../snapshotVersion.js';
 import { connectMongoose } from '../../mongodb.js';
-import { sort, extractCombinedLicenseCounts, getCounts, mapCounts } from '../../statsHelpers.js';
 
 const denysave = process.env.denysave === 'true' ? true : false;
 
@@ -94,10 +92,6 @@ const collector = (isDaily = false) => async (context) => {
             console.debug(`collectors/collectStats.js: Saving stats`)
             connectMongoose();
 
-            const snaps          = await SnapsModel.find().select({license:1, _id:0})
-            const license_counts = extractCombinedLicenseCounts(getCounts('license', snaps));
-            const licenses       = sort(Object.keys(license_counts).map(mapCounts(license_counts)));
-
             /** @type {Promise<any>[]} */
             let promises = [
                 ArchitecturesModel.insertMany(
@@ -123,12 +117,6 @@ const collector = (isDaily = false) => async (context) => {
                     .map(addDate())
                     .map(addIsDaily)
                 ).catch(err => console.error(`collectors/collectStats.js: Error: confinements: ${err.toString()}`)),
-
-                LicensesModel.insertMany(
-                    licenses.map(license => (license.name) ? license : { ...license, name: 'unset' })
-                    .map(addDate())
-                    .map(addIsDaily)
-                ).catch(err => console.error(`collectors/collectStats.js: Error: licenses: ${err.toString()}`)),
 
                 SectionsModel.insertMany(
                     sections.map(section => (section.name) ? section: { ...section, name: 'unset' })

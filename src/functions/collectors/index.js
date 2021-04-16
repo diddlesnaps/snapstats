@@ -6,6 +6,14 @@ export const hourlyStats = functions.runWith({
     timeoutSeconds: 540,
     memory: '512MB'
 }).pubsub.schedule('every 1 hours').onRun(async (context) => (await import('./collectStats')).hourly(context));
+export const hourlyLicenses = functions.runWith({
+    timeoutSeconds: 30,
+    memory: '256MB',
+}).pubsub.schedule('every 1 hours').onRun(async (context) => (await import('./extractLicenses')).hourly(context));
+export const dailyLicenses = functions.runWith({
+    timeoutSeconds: 30,
+    memory: '256MB',
+}).pubsub.schedule('every 1 hours').onRun(async (context) => (await import('./extractLicenses')).daily(context));
 export const dailyStats = functions.runWith({
     timeoutSeconds: 540,
     memory: '512MB'
