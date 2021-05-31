@@ -1,4 +1,4 @@
-import { mergeResolvers } from '@graphql-tools/merge';
+import { mergeResolvers } from '@@graphql-tools/merge/merge';
 
 import Architecture from "./Architecture";
 import Base from "./Base";
