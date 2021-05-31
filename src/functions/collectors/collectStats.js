@@ -156,9 +156,9 @@ const collector = (isDaily = false) => async (context) => {
                 .map(addDate('snapshot_date'))
                 .map(addIsDaily)
                 .map(data => ({...data, prevSnapshotDate: prevSnapshotDateTimestamp}))
-                // .filter(({snap: {last_updated, date_published}, prevSnapshotDate}) =>
-                //     (new Date(last_updated)).getTime() > prevSnapshotDate ||
-                //     (new Date(date_published)).getTime() > prevSnapshotDate)
+                .filter(({snap: {last_updated, date_published}, prevSnapshotDate}) =>
+                    Date.parse(last_updated) > prevSnapshotDate ||
+                    Date.parse(date_published) > prevSnapshotDate)
                 .map(async (data) => {
                     console.debug(`collectors/collectStats.js: New or Updated Snap, Publishing to pubsub: ${data.snap.package_name}`)
                     const dataBuffer = Buffer.from(JSON.stringify(data), 'utf8')
