@@ -1,6 +1,6 @@
 // @ts-check
 
-import { makeExecutableSchema } from "@graphql-tools/merge";
+import { makeExecutableSchema } from '@graphql-tools/schema';
 
 import typeDefs from "./types";
 import resolvers from "./resolvers";
