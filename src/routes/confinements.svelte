@@ -38,9 +38,9 @@
 
 	export let cache;
 
-	restore(client, q, cache);
 	setClient(client);
-	let data = query(client, { query: q });
+	restore(q, cache);
+	let result = query(q);
 </script>
 
 <style>
@@ -90,12 +90,14 @@
 </svelte:head>
 
 <div>
-{#await $data}
+{#if $result.loading}
 	<p>Loading...</p>
-{:then result}
+{:else if $result.error}
+	<p>Error...</p>
+{:else}
 	<h1>Confinements</h1>
 	<DonateBtn/>
-	<Timeline title="Confinements timeline" data={result.data.confinementTimeline} />
+	<Timeline title="Confinements timeline" data={$result.data?.confinementTimeline} />
 	<a href="/">Go back to the homepage...</a>
-{/await}
+{/if}
 </div>

@@ -60,11 +60,10 @@
     export let limit;
     export let cache;
 
-	restore(client, qlQuery, cache);
 	setClient(client);
+	restore(qlQuery, cache);
 
-    let data = query(client, {
-        query: qlQuery,
+    let data = query(qlQuery, {
         variables: {base, offset, limit}
     });
 

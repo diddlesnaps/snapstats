@@ -70,11 +70,10 @@
     export let limit;
     export let cache;
 
-	restore(client, searchQuery, cache);
 	setClient(client);
+	restore(searchQuery, cache);
 
-    let data = query(client, {
-        query: searchQuery,
+    let data = query(searchQuery, {
         variables: {publisherName, field, order, offset, limit}
     });
 

@@ -48,19 +48,17 @@
         offset = offset ? parseInt(offset) || 0 : 0;
         limit = limit ? parseInt(limit) || 20 : 20;
 
-        let data = client.query({
-            // query: q ? searchQuery : latestQuery,
-            query: searchQuery,
-            variables: {q, field, order, offset, limit},
-        });
-
         return {
             q,
             field,
             order,
             offset,
             limit,
-            cache: (await data).data,
+            cache: (await client.query({
+                // query: q ? searchQuery : latestQuery,
+                query: searchQuery,
+                variables: {q, field, order, offset, limit},
+            })).data,
         };
     }
 </script>
@@ -81,11 +79,10 @@
     export let limit;
     export let cache;
 
-	restore(client, searchQuery, cache);
 	setClient(client);
+	restore(searchQuery, cache);
 
-    let data = query(client, {
-        query: searchQuery,
+    let result = query(searchQuery, {
         variables: {q, field, order, offset, limit}
     });
 
@@ -97,11 +94,11 @@
             search_term: q,
             page: offset / limit,
         });
-        
+
         const search = `q=${q}&offset=${offset}&limit=${limit}&field=${field}&order=${order}`
         if (mounted) {
             goto(`snaps?${search}`)
-            data.refetch({q, offset, limit, field, order})
+            result.refetch({q, offset, limit, field, order})
             // window.location.search = search
         }
     }
@@ -183,18 +180,22 @@ label {
     </form>
 </div>
 
-{#await $data}
-    <p>Loading...</p>
-{:then result}
+<div>
+{#if $result.loading}
+	<p>Loading...</p>
+{:else if $result.error}
+	<p>Error...</p>
+{:else}
     <!-- {#if 'findSnapsByNameCount' in result.data } -->
         <h2>Search results:</h2>
-        <SnapList snaps={result.data.findSnapsByName} />
-        <Pagination count={result.data.findSnapsByNameCount.count} {limit} {offset} {getPageUrl} />
+        <SnapList snaps={$result.data?.findSnapsByName} />
+        <Pagination count={$result.data?.findSnapsByNameCount.count} {limit} {offset} {getPageUrl} />
     <!-- {:else}
         <h2>Newest Snaps: <a href="/snaps/feed.rss"><img class="rssicon" src="/rssfeed.svg" title="Newest Snaps RSS feed" alt="RSS feed"></a></h2>
         <SnapList snaps={result.data.snapsByDate} />
         <Pagination count={result.data.snapsByDateCount.count} {limit} {offset} {getPageUrl} />
     {/if} -->
-{/await}
+{/if}
+</div>
 
 <a href="/">Go back to the homepage</a>

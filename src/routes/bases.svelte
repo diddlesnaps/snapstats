@@ -38,9 +38,9 @@
 
 	export let cache;
 
-	restore(client, q, cache);
 	setClient(client);
-	let data = query(client, { query: q });
+	restore(q, cache);
+	let result = query(q);
 
 	const getLegendItem = (title) => `<a href="/snaps-by-base/${title}">${title}</a>`
 </script>
@@ -92,12 +92,14 @@
 </svelte:head>
 
 <div>
-{#await $data}
+{#if $result.loading}
 	<p>Loading...</p>
-{:then result}
+{:else if $result.error}
+	<p>Error...</p>
+{:else}
 	<h1>Bases</h1>
 	<DonateBtn/>
-	<Timeline title="Bases timeline" data={result.data.baseTimeline} {getLegendItem} />
+	<Timeline title="Bases timeline" data={$result.data?.baseTimeline} {getLegendItem} />
 	<a href="/">Go back to the homepage...</a>
-{/await}
+{/if}
 </div>

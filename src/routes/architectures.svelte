@@ -38,9 +38,9 @@
 
 	export let cache;
 
-	restore(client, q, cache);
 	setClient(client);
-	let data = query(client, { query: q });
+	restore(q, cache);
+	let data = query(q);
 </script>
 
 <style>

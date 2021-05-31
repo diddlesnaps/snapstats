@@ -41,9 +41,9 @@
 
 	export let cache;
 
-	restore(client, q, cache);
 	setClient(client);
-	let data = query(client, { query: q });
+	restore(q, cache);
+	let result = query(q);
 </script>
 
 <svelte:head>
@@ -81,31 +81,35 @@
 	}
 </style>
 
-{#await $data}
+<div>
+{#if $result.loading}
 	<p>Loading...</p>
-{:then result}
+{:else if $result.error}
+	<p>Error...</p>
+{:else}
 	<h1>Developers</h1>
 
-	{#if (result.data.developerCountsByDate.length > 0 && result.data.developerCountsByDate[0].developerCounts.length > 0)}
-		<p>There are <strong>{result.data.developerCountsByDate[0].developerCounts[0].total || 0}</strong> developers who have published at least one snap.</p>
+	{#if ($result.data.developerCountsByDate.length > 0 && $result.data.developerCountsByDate[0].developerCounts.length > 0)}
+		<p>There are <strong>{$result.data.developerCountsByDate[0].developerCounts[0].total || 0}</strong> developers who have published at least one snap.</p>
 	{:else}
 		<p>There are an unknown number of developers who have published at least one snap.</p>
 	{/if}
 
 	<p>
-		Developers with published Snaps have each published an average (<a href="https://en.wikipedia.org/wiki/Arithmetic_mean">mean</a>) of <strong>{result.data.developerCountsByDate[0].developerCounts[0].mean || 0}</strong> Snaps.
-		The most common number of Snaps published per developer (<a href="https://en.wikipedia.org/wiki/Mode_(statistics)">mode</a>) is <strong>{result.data.developerCountsByDate[0].developerCounts[0].mode || 0}</strong>.
+		Developers with published Snaps have each published an average (<a href="https://en.wikipedia.org/wiki/Arithmetic_mean">mean</a>) of <strong>{$result.data.developerCountsByDate[0].developerCounts[0].mean || 0}</strong> Snaps.
+		The most common number of Snaps published per developer (<a href="https://en.wikipedia.org/wiki/Mode_(statistics)">mode</a>) is <strong>{$result.data.developerCountsByDate[0].developerCounts[0].mode || 0}</strong>.
 	</p>
 
 	<DonateBtn/>
 
-	{#if result.data.verifiedDevelopers.length > 0}
+	{#if $result.data.verifiedDevelopers.length > 0}
 		<h2>Verified Developers</h2>
-		<p>Below is a list of the <strong>{result.data.verifiedDeveloperCount.count}</strong> known <span class='verified'>Verified</span> developers. Between them they have published <strong>{result.data.findSnapsCount.count}</strong> Snaps:</p>
+		<p>Below is a list of the <strong>{$result.data.verifiedDeveloperCount.count}</strong> known <span class='verified'>Verified</span> developers. Between them they have published <strong>{$result.data.findSnapsCount.count}</strong> Snaps:</p>
 		<ul>
-			{#each result.data.verifiedDevelopers as developer}
+			{#each $result.data.verifiedDevelopers as developer}
 				<li>{developer._id}</li>
 			{/each}
 		</ul>
 	{/if}
-{/await}
+{/if}
+</div>

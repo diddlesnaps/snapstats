@@ -66,8 +66,8 @@
 	export let cache;
 
 	setClient(client);
-	restore(client, q, cache);
-	let data = query(client, { query: q });
+	restore(q, cache);
+	let result = query(q);
 </script>
 
 <style>
@@ -135,36 +135,39 @@
 </svelte:head>
 
 <div>
-{#await $data}
-	<p>Loading...</p>
-{:then result}
-	<h1>Total Snaps count</h1>
-	{#if result.data.snapCountsByDate.length > 0 && result.data.snapCountsByDate[0].snapCounts.length > 0}
-		<p>There are <strong>{result.data.snapCountsByDate[0].snapCounts[0].total || 0}</strong> Snaps currently in the Store, of which <strong>{(result.data.snapCountsByDate[0].snapCounts[0].total || 0) - (result.data.snapCountsByDate[0].snapCounts[0].filtered || 0)}</strong> appear to be test or hello-world Snaps. Test and hello-world Snaps are identified by a name that begins with <code>hello-</code> or <code>test-</code>, or a name that ends with <code>-test</code>. All other statistics on this site exclude those test or hello-world Snaps.</p>
-		<p><span class="verified">Verified</span> developers, a total of <strong>{result.data.verifiedDeveloperCount.count}</strong> developers, have published <strong>{result.data.findSnapsCount.count}</strong> Snaps.</p>
+	{#if $result.loading}
+		<p>Loading...</p>
+	{:else if $result.error}
+		<p>Error...</p>
 	{:else}
-		<p>There are an unknown number of Snaps currently in the Store.</p>
+		<h1>Total Snaps count</h1>
+		{#if $result.data?.snapCountsByDate?.length > 0 && $result.data?.snapCountsByDate[0]?.snapCounts?.length > 0}
+			<p>There are <strong>{$result.data.snapCountsByDate[0].snapCounts[0].total || 0}</strong> Snaps currently in the Store, of which <strong>{($result.data.snapCountsByDate[0].snapCounts[0].total || 0) - ($result.data.snapCountsByDate[0].snapCounts[0].filtered || 0)}</strong> appear to be test or hello-world Snaps. Test and hello-world Snaps are identified by a name that begins with <code>hello-</code> or <code>test-</code>, or a name that ends with <code>-test</code>. All other statistics on this site exclude those test or hello-world Snaps.</p>
+			<p><span class="verified">Verified</span> developers, a total of <strong>{$result.data.verifiedDeveloperCount.count}</strong> developers, have published <strong>{$result.data.findSnapsCount.count}</strong> Snaps.</p>
+		{:else}
+			<p>There are an unknown number of Snaps currently in the Store.</p>
+		{/if}
+	
+		<h2>The six most-recently added Snaps <a href="/snaps/feed.rss"><img class="rssicon" src="/rssfeed.svg" title="Newest Snaps RSS feed" alt="RSS feed"></a></h2>
+		<SnapList snaps={$result.data.snapsByDate} />
+	
+		<h2>Developers</h2>
+		{#if $result.data.developerCountsByDate.length > 0 && $result.data.developerCountsByDate[0].developerCounts.length > 0}
+			<p>There are <strong>{$result.data.developerCountsByDate[0].developerCounts[0].total || 0}</strong> developers who have published at least one snap.</p>
+		{:else}
+			<p>There are an unknown number of developers who have published at least one snap.</p>
+		{/if}
+	
+		<h3>Developer Averages</h3>
+		<p>
+			Developers with published Snaps have each published an average (<a href="https://en.wikipedia.org/wiki/Arithmetic_mean">mean</a>) of <strong>{$result.data.developerCountsByDate[0].developerCounts[0].mean || 0}</strong> Snaps.
+			The most common number of Snaps published per developer (<a href="https://en.wikipedia.org/wiki/Mode_(statistics)">mode</a>) is <strong>{$result.data.developerCountsByDate[0].developerCounts[0].mode || 0}</strong>.
+		</p>
+		<DonateBtn/>
+		<Timeline title="Developer counts timeline" data={[
+			{title: "Developer Count", items: $result.data.developerCountTimeline},
+			{title: "Snap Count", items: $result.data.snapCountTimeline},
+		]} />
 	{/if}
-
-	<h2>The six most-recently added Snaps <a href="/snaps/feed.rss"><img class="rssicon" src="/rssfeed.svg" title="Newest Snaps RSS feed" alt="RSS feed"></a></h2>
-	<SnapList snaps={result.data.snapsByDate} />
-
-	<h2>Developers</h2>
-	{#if result.data.developerCountsByDate.length > 0 && result.data.developerCountsByDate[0].developerCounts.length > 0}
-		<p>There are <strong>{result.data.developerCountsByDate[0].developerCounts[0].total || 0}</strong> developers who have published at least one snap.</p>
-	{:else}
-		<p>There are an unknown number of developers who have published at least one snap.</p>
-	{/if}
-
-	<h3>Developer Averages</h3>
-	<p>
-		Developers with published Snaps have each published an average (<a href="https://en.wikipedia.org/wiki/Arithmetic_mean">mean</a>) of <strong>{result.data.developerCountsByDate[0].developerCounts[0].mean || 0}</strong> Snaps.
-		The most common number of Snaps published per developer (<a href="https://en.wikipedia.org/wiki/Mode_(statistics)">mode</a>) is <strong>{result.data.developerCountsByDate[0].developerCounts[0].mode || 0}</strong>.
-	</p>
-	<DonateBtn/>
-	<Timeline title="Developer counts timeline" data={[
-		{title: "Developer Count", items: result.data.developerCountTimeline},
-		{title: "Snap Count", items: result.data.snapCountTimeline},
-	]} />
-{/await}
 </div>
+	
