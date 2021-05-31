@@ -4,8 +4,8 @@
     import SnapList from '../../components/SnapList.svelte';
     import Pagination from '../../components/Pagination.svelte';
 
-	import client from '../../apollo';
-    import { gql } from 'apollo-boost';
+    import { gql } from '@apollo/client/core';
+	import {client} from '../../apollo';
 
     const limit = 20
 

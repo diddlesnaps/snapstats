@@ -1,8 +1,8 @@
 <script context="module">
 	// @ts-check
 
-	import client from '../apollo'
-	import { gql } from 'apollo-boost'
+	import { gql } from '@apollo/client/core';
+	import {client} from '../apollo';
 
 	import DonateBtn from '../components/DonateBtn.svelte';
 

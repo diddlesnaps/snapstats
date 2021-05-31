@@ -5,9 +5,9 @@
     import DonateBtn from '../components/DonateBtn.svelte';
 	import Timeline from '../components/Timeline.svelte';
 
-	import client from '../apollo';
+	import { gql } from '@apollo/client/core'; 
+	import {client} from '../apollo';
 
-	import { gql } from 'apollo-boost'; 
 	const q = gql`
 		query {
 			licensesByDate(query:{}){

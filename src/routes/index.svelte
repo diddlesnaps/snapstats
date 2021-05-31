@@ -5,8 +5,8 @@
     import DonateBtn from '../components/DonateBtn.svelte';
 	import Timeline from '../components/Timeline.svelte';
 
-	import client from '../apollo';
-	import { gql } from 'apollo-boost';
+	import { gql } from '@apollo/client/core';
+	import {client} from '../apollo';
 
 	const q = gql`
 		query {
@@ -65,8 +65,8 @@
 
 	export let cache;
 
-	restore(client, q, cache);
 	setClient(client);
+	restore(client, q, cache);
 	let data = query(client, { query: q });
 </script>
 
