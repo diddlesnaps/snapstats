@@ -169,7 +169,7 @@ const collector = (isDaily = false) => async (context) => {
                     }
                 })
 
-            await Promise.all(promises);
+            await Promise.allSettled(promises);
             await SnapsModel.deleteMany({
                 $or: [
                     {snapshotVersion: {$lt: snapshotVersion}},
