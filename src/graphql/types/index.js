@@ -1,6 +1,6 @@
 // @ts-check
 
-import { mergeTypeDefs } from '@@graphql-tools/merge/merge';
+import { mergeTypeDefs } from '@graphql-tools/merge';
 
 import { schema as ArchitectureSchema } from "./Architecture";
 import { schema as BaseSchema } from "./Base";
