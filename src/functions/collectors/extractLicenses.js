@@ -28,7 +28,7 @@ const collector = (isDaily = false) => async (context) => {
 
     const date = Date.now();
 
-    connectMongoose();
+    await connectMongoose();
 
     const snap_licenses  = await promisify(SnapsModel.aggregate([
         { $group: {

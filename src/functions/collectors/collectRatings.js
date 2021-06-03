@@ -31,7 +31,7 @@ export default async (context) => {
         ));
 
         if (!denysave) {
-            connectMongoose();
+            await connectMongoose();
             await RatingsModel.bulkWrite(tasks)
         }
     } catch(err) {

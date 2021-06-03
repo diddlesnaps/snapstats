@@ -20,7 +20,7 @@ export default async (context) => {
         console.log(`Thinning stats at ${(new Date()).toLocaleString()}`);
         
         if (!denysave) {
-            connectMongoose();
+            await connectMongoose();
 
             let promises = [];
             for (const model of [

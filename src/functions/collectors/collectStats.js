@@ -90,7 +90,7 @@ const collector = (isDaily = false) => async (context) => {
             console.debug(`collectors/collectStats.js: NOT saving stats`)
         } else {
             console.debug(`collectors/collectStats.js: Saving stats`)
-            connectMongoose();
+            await connectMongoose();
 
             /** @type {Promise<any>[]} */
             let promises = [
