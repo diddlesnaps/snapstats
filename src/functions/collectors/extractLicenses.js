@@ -45,11 +45,15 @@ const collector = (isDaily = false) => async (context) => {
     const license_counts = extractCombinedLicenseCounts(getCounts(snap_licenses))
     const licenses       = sort(Object.keys(license_counts).map(mapCounts(license_counts)));
 
-    await LicensesModel.insertMany(
-        licenses.map(license => (license.name) ? license : { ...license, name: 'unset' })
-        .map(addDate())
-        .map(addIsDaily)
-    ).catch(err => console.error(`collectors/extractLicenses.js: Error: licenses: ${err.toString()}`))
+    try {
+        await LicensesModel.insertMany(
+            licenses.map(license => (license.name) ? license : { ...license, name: 'unset' })
+            .map(addDate())
+            .map(addIsDaily)
+        )
+    } catch (err) {
+        console.error(`collectors/extractLicenses.js: Error: licenses: ${err.toString()}`)
+    }
 }
 
 export const hourly = collector(false)
