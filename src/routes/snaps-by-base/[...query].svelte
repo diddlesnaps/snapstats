@@ -9,19 +9,15 @@
 
     const limit = 20
 
-    const queryFields = `
-        snap_id
-        package_name
-        title
-        summary
-        icon_url
-        ratings_average
-    `;
-
     const searchQuery = gql`
         query($base: String!, $offset: Int!, $limit: Int!){
             findSnapsByBase(base:$base, query:{offset:$offset, limit:$limit}){
-                ${queryFields}
+                snap_id
+                package_name
+                title
+                summary
+                icon_url
+                ratings_average
             }
             findSnapsByBaseCount(base:$base){
                 count
@@ -29,21 +25,22 @@
         }
     `;
 
-    export async function preload({params}, session) {
-        let [base, page] = params.query;
-
-        let offset = (parseInt(page) || 0) * limit
+    export async function preload({params: [base, page], query: {field, order}}, session) {
+        let offset = parseInt(page) * limit;
+        base ??= '';
+        field ??= 'title';
+        order = order ? parseInt(order) || 1 : 1;
 
         let data = client.query({
             query: searchQuery,
-            variables: {base, offset, limit},
+            variables: {base, field, order, offset, limit},
         });
 
         return {
             base,
-            qlQuery: searchQuery,
-            offset,
-            limit,
+            field,
+            order,
+            page: parseInt(page),
             cache: (await data).data,
         };
     }
@@ -52,24 +49,38 @@
 <script>
     // @ts-check
 
+    import { goto } from '@sapper/app';
 	import { setClient, restore, query } from 'svelte-apollo';
 
+    /** @type {string} */
     export let base;
-    export let qlQuery;
-    export let offset;
-    export let limit;
+    /** @type {string} */
+    export let field;
+    /** @type {number} */
+    export let order;
+    /** @type {number} */
+    export let page;
     export let cache;
 
 	setClient(client);
-	restore(qlQuery, cache);
+	restore(searchQuery, cache);
 
-    let data = query(qlQuery, {
-        variables: {base, offset, limit}
+    let data = query(searchQuery, {
+        variables: {base, field, order, offset: page*limit, limit}
     });
 
-    $: data.refetch({ base, offset, limit })
+    $: {
+        if (process.browser) {
+            data.refetch({ base, field, order, offset: page*limit, limit })
+            goto(`/snaps-by-base/${base}/${page}?field=${field}&order=${order}`);
+            globalThis.firebase?.analytics().logEvent('showPublisherPage', {
+                base,
+                page,
+            });
+        }
+    }
 
-    let getPageUrl = (page) => `/snaps-by-base/${base}/${page}`;
+    let getPageUrl = (page) => `/snaps-by-base/${base}/${page}?field=${field}&order=${order}`;
 </script>
 
 <svelte:head>
@@ -102,7 +113,7 @@
 {:then result}
     <h1>Snaps using base snap '{base}':</h1>
     <SnapList snaps={result.data.findSnapsByBase} />
-    <Pagination count={result.data.findSnapsByBaseCount.count} {limit} {offset} {getPageUrl} />
+    <Pagination count={result.data.findSnapsByBaseCount.count} {limit} offset={page*limit} {getPageUrl} />
 {/await}
 
 <a href="/bases">Go back to the bases list</a>, or {' '}

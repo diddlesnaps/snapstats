@@ -40,9 +40,7 @@
         }
     `;
 
-    export async function preload(page, session) {
-        const {slug} = page.params
-
+    export async function preload({params: {slug}}, session) {
         const result = await client.query({ query: q, variables: {slug} })
         const data = await result.data
         

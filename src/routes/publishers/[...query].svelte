@@ -7,19 +7,17 @@
     import { gql } from '@apollo/client/core';
 	import {client} from '../../apollo';
 
-    const queryFields = `
-        snap_id
-        package_name
-        title
-        summary
-        icon_url
-        ratings_average
-    `;
+    const limit = 20;
 
     const searchQuery = gql`
         query($publisherName: String!, $offset: Int!, $limit: Int!, $field: String!, $order: Int!){
             findSnaps(publisherOrDeveloper:$publisherName, query:{offset:$offset, limit:$limit, sort:{field:$field,order:$order}}){
-                ${queryFields}
+                snap_id
+                package_name
+                title
+                summary
+                icon_url
+                ratings_average
             }
             findSnapsCount(publisherOrDeveloper:$publisherName){
                 count
@@ -27,16 +25,11 @@
         }
     `;
 
-    export async function preload(page, session) {
-        let {query} = page;
-        let {name: publisherName} = page.params
-        let {field, order, offset, limit} = query;
-
-        publisherName = publisherName || '';
-        field = field || 'title';
+    export async function preload({params: [publisherName, page], query: {field, order}}, session) {
+        let offset = parseInt(page) * limit;
+        publisherName ??= '';
+        field ??= 'title';
         order = order ? parseInt(order) || 1 : 1;
-        offset = offset ? parseInt(offset) || 0 : 0;
-        limit = limit ? parseInt(limit) || 20 : 20;
 
         let data = client.query({
             query: searchQuery,
@@ -48,7 +41,6 @@
             field,
             order,
             offset,
-            limit,
             cache: (await data).data,
         };
     }
@@ -58,45 +50,37 @@
     // @ts-check
 
     import { goto } from '@sapper/app';
-    import { onMount } from 'svelte';
     import { setClient, restore, query } from 'svelte-apollo';
 
+    /** @type {string} */
     export let publisherName;
+    /** @type {string} */
     export let field;
+    /** @type {number} */
     export let order;
     /** @type {number} */
-    export let offset;
-    /** @type {number} */
-    export let limit;
+    export let page;
     export let cache;
 
 	setClient(client);
 	restore(searchQuery, cache);
-
+        
     let data = query(searchQuery, {
-        variables: {publisherName, field, order, offset, limit}
+        variables: {publisherName, field, order, offset: page*limit, limit}
     });
 
-    let mounted = false;
-
     $: {
-        globalThis.firebase?.analytics().logEvent('showPublisherPage', {
-            publisher_name: publisherName,
-            page: offset / limit,
-        });
-        
-        const search = `offset=${offset}&limit=${limit}&field=${field}&order=${order}`
-        if (mounted) {
-            goto(`publishers/${publisherName}?${search}`)
-            data.refetch({offset, limit, field, order})
+        if (process.browser) {
+            data.refetch({ publisherName, field, order, offset: page*limit, limit })
+            goto(`/publishers/${publisherName}/${page}?field=${field}&order=${order}`);
+            globalThis.firebase?.analytics().logEvent('showPublisherPage', {
+                publisherName,
+                page,
+            });
         }
     }
 
-    let getPageUrl = (page) => `publishers/${publisherName}?offset=${limit*page}&limit=${limit}&field=${field}&order=${order}`;
-
-    onMount(() => {
-        mounted = true;
-    })
+    let getPageUrl = (page) => `/publishers/${publisherName}/${page}?field=${field}&order=${order}`;
 </script>
 
 <style>
@@ -170,7 +154,7 @@ label {
 {:then result}
         <h2>Snaps by {publisherName}:</h2>
         <SnapList snaps={result.data.findSnaps} />
-        <Pagination count={result.data.findSnapsCount.count} {limit} {offset} {getPageUrl} />
+        <Pagination count={result.data.findSnapsCount.count} {limit} offset={page*limit} {getPageUrl} />
 {/await}
 
 <a href="/">Go back to the homepage</a>

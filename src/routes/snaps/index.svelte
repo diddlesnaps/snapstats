@@ -7,15 +7,6 @@
     import { gql } from '@apollo/client/core';
 	import {client} from '../../apollo';
 
-    const queryFields = `
-        snap_id
-        package_name
-        title
-        summary
-        icon_url
-        ratings_average
-    `;
-
     // const latestQuery = gql`
     //     query($offset: Int!, $limit: Int!){
     //         snapsByDate(query:{limit:$limit, offset:$offset}){
@@ -30,7 +21,12 @@
     const searchQuery = gql`
         query($q: String!, $offset: Int!, $limit: Int!, $field: String!, $order: Int!){
             findSnapsByName(name:$q, query:{offset:$offset, limit:$limit, sort:{field:$field,order:$order}}){
-                ${queryFields}
+                snap_id
+                package_name
+                title
+                summary
+                icon_url
+                ratings_average
             }
             findSnapsByNameCount(name:$q){
                 count
@@ -38,12 +34,9 @@
         }
     `;
 
-    export async function preload(page, session) {
-        let {query} = page;
-        let {q, field, order, offset, limit} = query;
-
-        q = q || '';
-        field = field || 'date_published';
+    export async function preload({query: {q, field, order, offset, limit}}) {
+        q ??= '';
+        field ??= 'date_published';
         order = order ? parseInt(order) || -1 : -1;
         offset = offset ? parseInt(offset) || 0 : 0;
         limit = limit ? parseInt(limit) || 20 : 20;
@@ -86,28 +79,19 @@
         variables: {q, field, order, offset, limit}
     });
 
-    let mounted = false;
-    // const initialsearch = `q=${q}&offset=${offset}&limit=${limit}&field=${field}&order=${order}`
-
     $: {
-        globalThis.firebase?.analytics().logEvent('search', {
-            search_term: q,
-            page: offset / limit,
-        });
+        if (process.browser){
+            globalThis.firebase?.analytics().logEvent('search', {
+                search_term: q,
+                page: offset / limit,
+            });
 
-        const search = `q=${q}&offset=${offset}&limit=${limit}&field=${field}&order=${order}`
-        if (mounted) {
-            goto(`snaps?${search}`)
+            goto(`/snaps?q=${q}&offset=${offset}&limit=${limit}&field=${field}&order=${order}`)
             result.refetch({q, offset, limit, field, order})
-            // window.location.search = search
         }
     }
 
-    let getPageUrl = (page) => `snaps?q=${q}&offset=${limit*page}&limit=${limit}&field=${field}&order=${order}`;
-
-    onMount(() => {
-        mounted = true;
-    })
+    let getPageUrl = (page) => `/snaps?q=${q}&offset=${limit*page}&limit=${limit}&field=${field}&order=${order}`;
 </script>
 
 <style>
