@@ -18,6 +18,8 @@ const getCounts = items => {
     return item_counts
 }
 const collector = (isDaily = false) => async (context) => {
+    const date = Date.now();
+
     const addDate = (dateKey = null) => (data) => {
         const key = dateKey || 'date';
         return { ...data, [key]: date };
@@ -25,8 +27,6 @@ const collector = (isDaily = false) => async (context) => {
     const addIsDaily = (data) => {
         return { ...data, isDaily };
     }
-
-    const date = Date.now();
 
     await connectMongoose();
 
