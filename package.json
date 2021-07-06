@@ -5,7 +5,6 @@
   "engines": {
     "node": "14"
   },
-  "type": "module",
   "scripts": {
     "dev": "run-p dev:typescript dev:sapper",
     "dev:sapper": "sapper dev",
