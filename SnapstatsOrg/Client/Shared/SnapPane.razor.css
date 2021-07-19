@@ -1,0 +1,35 @@
+﻿.grid {
+    display: grid;
+    margin: 1em 0;
+    gap: 0.4em 1em;
+    grid-template-columns: 92px 1fr;
+    grid-template-rows: auto auto;
+    grid-template-areas:
+        "icon title"
+        "icon rating"
+        "icon summary";
+}
+
+.icon {
+    grid-area: icon;
+}
+
+.icon img {
+    width: 92px;
+    height: 92px;
+}
+
+.title {
+    grid-area: title;
+    margin: 0;
+}
+
+.rating {
+    grid-area: rating;
+    margin: 0;
+}
+
+.summary {
+    grid-area: summary;
+    margin: 0;
+}

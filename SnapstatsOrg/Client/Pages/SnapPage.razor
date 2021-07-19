@@ -1,0 +1,233 @@
+﻿@page "/snaps/{slug}"
+@inject IGraphQLClient Client
+@inject NavigationManager NavManager
+@using System.Text.RegularExpressions
+
+<div class='snapinfo'>
+    @if (snap?.Banner() is not null)
+    {
+        <picture>
+            <source media="(min-width: 896px)"
+                    srcset="https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,w_896/@snap?.Banner()?.url 1x, https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,w_1792/@snap?.Banner()?.url 2x" />
+            <source media="(max-width: 720px)"
+                    srcset="https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,w_720/@snap?.Banner()?.url 1x, https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,w_1440/@snap?.Banner()?.url 2x" />
+            <source media="(max-width: 640px)"
+                    srcset="https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,w_640/@snap?.Banner()?.url 1x, https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,w_1280/@snap?.Banner()?.url 2x" />
+            <source media="(max-width: 480px)"
+                    srcset="https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,w_480/@snap?.Banner()?.url 1x, https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,w_960/@snap?.Banner()?.url 2x" />
+            <img class='bannerImage' loading="lazy"
+                 width=@snap?.Banner()?.width
+                 height=@snap?.Banner()?.height
+                 src="https://res.cloudinary.com/canonical/image/fetch/@snap?.Banner()?.url"
+                 alt="@snap?.SnapTitle() banner" />
+        </picture>
+    }
+
+    <div class='banner'>
+        @if (snap?.icon_url is not "")
+        {
+            <p class='icon'>
+                <picture>
+                    <source srcset="https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,w_128/@snap?.icon_url 1x, https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,w_256/@snap?.icon_url 2x" />
+                    <img height="128" width="128" loading="lazy"
+                         src="https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,w_128/@snap?.icon_url"
+                         alt="Icon for @snap?.SnapTitle()" />
+                </picture>
+            </p>
+        }
+        <h1 class='title'>@snap?.SnapTitle()</h1>
+        <div class='rating'>
+            <StarRating Rating=@(snap?.ratings_average ?? 0)
+                        IsIndicatorActive="false"
+                        StarWidth="16"
+                        FullStarColor="#ffd219"
+                        EmptyStarColor="#eeeeee" />
+        </div>
+        <p class='version'>Version @snap?.version</p>
+        <p class='summary'>@snap?.summary</p>
+    </div>
+    <aside class='meta'>
+        <dl>
+            <dt>Architectures supported:</dt>
+            @if (snap?.architecture is not null && snap.architecture.Length > 0)
+            {
+                <dd>@String.Join(", ", snap.architecture)</dd>
+            }
+            else
+            {
+                <dd>none</dd>
+            }
+            @if (snap?.sections is not null && snap.sections.Length > 0)
+            {
+                <dt>Category:</dt>
+                <dd>@String.Join(", ", snap.sections)</dd>
+            }
+            @if (snap?.license is not null and not "")
+            {
+                <dt>License:</dt>
+                <dd>@snap.license</dd>
+            }
+            @if (snap?.website is not null and not "")
+            {
+                <dt>Application website:</dt>
+                <dd><a href=@snap.website rel="nofollow ugc">@snap.website</a></dd>
+            }
+            @if (snap?.contact is not null and not "")
+            {
+                <dt>Snap support contact:</dt>
+                <dd><a href=@snap.contact rel="nofollow ugc help">@snap.contact</a></dd>
+            }
+            <dt>Published to the Snap Store by:</dt>
+            <dd>
+                @if (snap?.developer_name is not null and not "")
+                {
+                    <a href="/publishers/@snap.developer_name">@snap.developer_name</a>
+                }
+                else if (snap?.publisher is not null and not "")
+                {
+                    <a href="/publishers/@snap.publisher">@snap.publisher</a>
+                }
+
+                @if (snap?.developer_validation == Validation.verified)
+                {
+                    <span class="verified">(Author is verified)</span>
+                }
+            </dd>
+            @if (snap?.date_published is not null)
+            {
+                <dt>Published on:</dt>
+                <dd>
+                    <time dateTime=@snap.date_published.ToUniversalTime().ToString("o")>
+                        @snap.date_published.ToLocalTime().ToLongDateString()
+                    </time>
+                </dd>
+            }
+            @if (snap?.last_updated is not null)
+            {
+                <dt>Last modified on:</dt>
+                <dd>
+                    <time dateTime=@snap.last_updated.ToUniversalTime().ToString("o")>
+                        @snap.last_updated.ToLocalTime().ToLongDateString()
+                    </time>
+                </dd>
+            }
+        </dl>
+    </aside>
+
+    <DonateButton />
+
+    <h2>Description</h2>
+    <!-- html DOMPurify.sanitize(marked($result.data?.snapByName.description), DOMPurifyOpts) -->
+    <div>
+        @if (snap?.description is not null and not "")
+        {
+            @snap.description
+        }
+    </div>
+
+    @if (snap is not null && snap.Screenshots()?.Length > 0 || snap?.Video() is not null)
+    {
+        <div class='screenshots-wrapper'>
+            <h2>Screenshots</h2>
+            <div class='screenshots'>
+                @if (snap.Video() != null)
+                {
+                    @if (snap.Video().Provider == VideoProvider.Youtube)
+                    {
+                    <iframe id="ytplayer" type="text/html" width="818" height="460" title="Youtube player"
+                            src="@snap.Video().Url" frameborder="0" allowfullscreen></iframe>
+                    }
+                    else if (snap.Video().Provider == VideoProvider.Vimeo)
+                    {
+                    <iframe id="vimeoplayer" width="818" height="460" frameborder="0" title="Vimeo player"
+                            src="@snap.Video().Url" allowfullscreen></iframe>
+                    }
+                    else if (snap.Video().Provider == VideoProvider.Asciinema)
+                    {
+                        <a href="@snap.Video().Url"><img src="@snap.Video().Url" alt="Asciinema recording of @snap.SnapTitle()"></a>
+                    }
+                }
+                @foreach (var Screenshot in snap.Screenshots())
+                {
+                    <a data-fslightbox="screenshots" href="https://res.cloudinary.com/canonical/image/fetch/@Screenshot.url">
+                        <picture>
+                            <source srcset="https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,h_240/@Screenshot.url 1x, https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,h_480/@Screenshot.url 2x, https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,h_720/@Screenshot.url 3x" />
+                            <img loading="lazy" width=@Screenshot.MediaWidth() height="@Screenshot.MediaHeight()"
+                                 src="https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,h_240/@Screenshot.url"
+                                 alt="@snap.SnapTitle() screenshot" />
+                        </picture>
+                    </a>
+                }
+            </div>
+        </div>
+    }
+
+    @if (snap?.package_name is not null and not "")
+    {
+        <p class='storeButton'>
+            <a href="https://snapcraft.io/@snap.package_name">
+                <img alt="Get it from the Snap Store" src="https://snapcraft.io/static/images/badges/en/snap-store-black.svg" />
+            </a>
+        </p>
+    }
+</div>
+
+<a href="/snaps">Search for another snap</a>, or
+<a href="/">go back to the homepage</a>.
+
+@code {
+    private const string Query = @"
+        query($slug:String!) {
+            snapByName(name:$slug) {
+                architecture
+                sections
+                contact
+                date_published
+                description
+                developer_name
+                developer_validation
+                icon_url
+                last_updated
+                license
+                media{
+                    url
+                    type
+                    width
+                    height
+                }
+                name
+                package_name
+                publisher
+                publisher_username
+                ratings_average
+                ratings_count
+                screenshot_urls
+                summary
+                title
+                version
+                website
+            }
+        }
+    ";
+
+    [Parameter]
+    public string? slug { get; set; }
+
+    protected Snap? snap;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (snap is not null) return;
+
+        GraphQLRequest request = new GraphQLRequest
+        {
+            Query = Query,
+            Variables = new
+            {
+                slug = slug,
+            },
+        };
+        var response = await Client.SendQueryAsync<SnapByName>(request).ConfigureAwait(false);
+        snap = response.Data.snapByName ?? new Snap();
+    }
+}

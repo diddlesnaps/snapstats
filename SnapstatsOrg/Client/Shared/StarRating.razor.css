@@ -1,0 +1,16 @@
+﻿.star-rating {
+    display: flex;
+    align-items: center;
+}
+
+.star-container {
+    display: flex;
+}
+
+.indicator {
+    font-size: 2.5rem;
+}
+
+.star-container:not(:last-child) {
+    margin-right: 5px;
+}

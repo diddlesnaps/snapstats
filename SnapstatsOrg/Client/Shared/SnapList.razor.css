@@ -1,0 +1,17 @@
+﻿.snaps {
+    list-style: none;
+    padding-left: 0;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.snaps li {
+    width: 100%;
+    margin: 0 1em;
+}
+
+@media (min-width: 640px) {
+    .snaps li {
+        width: calc(50% - 2em);
+    }
+}

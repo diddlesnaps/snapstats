@@ -1,0 +1,22 @@
+﻿<div>
+    @if (snaps.Length > 0)
+    {
+        <ul class='snaps' aria-label="Snap packages">
+            @foreach (var snap in snaps)
+            {
+                <li>
+                    <SnapPane snap="@snap" />
+                </li>
+            }
+        </ul>
+    }
+    else
+    {
+        <p>Nothing found...</p>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public Snap[] snaps { get; set; } = Array.Empty<Snap>();
+}

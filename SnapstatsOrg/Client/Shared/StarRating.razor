@@ -1,0 +1,133 @@
+﻿<div class="star-container">
+    <div class="star-rating">
+        @foreach (var star in Stars)
+        {
+            <svg class="star-svg"
+                 style="fill: url(#@star.GradientId); height: @getStarWidth(); width: @getStarWidth();">
+                <polygon points=@StarPoints style="fill-rule: nonzero" />
+                <defs>
+                    <linearGradient id="@star.GradientId">
+                        <stop id="stop1"
+                              offset=@star.Percent
+                              stop-opacity="1"
+                              stop-color=@StarFillColor(star.FillColor) />
+                        <stop id="stop2"
+                              offset=@star.Percent
+                              stop-opacity="0"
+                              stop-color=@StarFillColor(star.FillColor) />
+                        <stop id="stop3"
+                              offset=@star.Percent
+                              stop-opacity="1"
+                              stop-color=@EmptyStarColor />
+                        <stop id="stop4"
+                              offset="100%"
+                              stop-opacity="1"
+                              stop-color=@EmptyStarColor />
+                    </linearGradient>
+                </defs>
+            </svg>
+        }
+        @if (IsIndicatorActive)
+        {
+            <div class="indicator">@Rating</div>
+        }
+    </div>
+</div>
+
+@code {
+    public enum FillColorType
+    {
+        Empty,
+        Full,
+    }
+
+    public class Star
+    {
+        private Guid Id = Guid.NewGuid();
+        public double Raw { get; set; }
+        public string Percent { get => $"{Raw * 100}{"%"}"; }
+        public FillColorType FillColor
+        {
+            get => Raw == 0 ? FillColorType.Empty : FillColorType.Full;
+        }
+        public string GradientId { get => $"gradient{Id}"; }
+    }
+
+    [Parameter]
+    public double Rating { get; set; }
+
+    [Parameter]
+    public bool IsIndicatorActive { get; set; } = true;
+
+    [Parameter]
+    public string EmptyStarColor { get; set; } = "#737373";
+
+    [Parameter]
+    public string FullStarColor { get; set; } = "#ffd219";
+
+    [Parameter]
+    public int StarWidth { get; set; } = 50;
+
+    private string StarPoints
+    {
+        get
+        {
+            const int innerCircleArms = 5;
+            const int totalArms = innerCircleArms * 2;
+            const int angleOffsetToCenterStar = 60;
+            const double angle = Math.PI / innerCircleArms;
+            var center = StarWidth / 2;
+            var innerRadius = StarWidth / innerCircleArms;
+            var outerRadius = innerRadius * 2.5;
+            var points = "";
+            for (var i = 0; i < totalArms; i++)
+            {
+                var isEvenIndex = i % 2 == 0;
+                var r = isEvenIndex ? outerRadius : innerRadius;
+                var currX = center + Math.Cos(i * angle + angleOffsetToCenterStar) * r;
+                var currY = center + Math.Sin(i * angle + angleOffsetToCenterStar) * r;
+                points += $"{currX},{currY} ";
+            }
+            return points;
+        }
+    }
+
+    private string StarFillColor(FillColorType type)
+    {
+        return type switch
+        {
+            FillColorType.Full => FullStarColor,
+            FillColorType.Empty => EmptyStarColor,
+            _ => EmptyStarColor,
+        };
+    }
+
+    private string getStarWidth() => StarWidth.ToString() + "px";
+
+    private Star[] Stars = new Star[5];
+
+    protected override void OnParametersSet()
+    {
+        for (var i = 0; i < Stars.Length; i++)
+        {
+            Stars[i] = new Star();
+        }
+
+        var counter = Math.Floor(Rating);
+        for (var i = 0; i < Stars.Length; i++)
+        {
+            if (counter > 0)
+            {
+                Stars[i].Raw = 1;
+                counter--;
+            }
+            else
+            {
+                var surplus = Math.Round((Rating % 1) * 10) / 10;
+                // to one decimal place
+                Stars[i].Raw = Math.Round(surplus * 10) / 10;
+                break;
+            }
+        }
+    }
+}

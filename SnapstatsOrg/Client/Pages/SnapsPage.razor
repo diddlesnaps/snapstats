@@ -1,0 +1,102 @@
+﻿@page "/snaps"
+@inject IGraphQLClient Client
+@inject NavigationManager NavManager
+@using System.Text.RegularExpressions
+
+<h1>Search the Snap Store</h1>
+<div class='search'>
+    <EditForm Model="@searchModel">
+        <label>
+            Enter a term to search
+            <InputText @bind-Value=searchModel.SearchString @onchange="Search" class="form-control" />
+        </label>
+    </EditForm>
+</div>
+
+<div>
+    <h2>Search results:</h2>
+    <SnapList snaps="@Results" />
+    <button @onclick="@FetchMore">Load more...</button>
+</div>
+
+<a href="/">Go back to the homepage</a>
+
+@code {
+    private const string Query = @"
+        query($q: String!, $continuationToken: String!){
+            findSnapsByName(name:$q,continuationToken:$continuationToken){
+                results{
+                    snap_id
+                    package_name
+                    title
+                    summary
+                    icon_url
+                    ratings_average
+                }
+                continuationToken
+            }
+        }
+    ";
+
+    protected class SearchModel
+    {
+        public string SearchString { get; set; } = "";
+    }
+
+    SearchModel searchModel = new();
+
+    Snap[] Results = Array.Empty<Snap>();
+    string? ContinuationToken;
+
+    protected override async Task OnInitializedAsync()
+    {
+        string? newSearchString;
+        NavManager.TryGetQueryString<string>("q", out newSearchString, "");
+        searchModel.SearchString = newSearchString ?? "";
+        NavManager.LocationChanged += HandleLocationChanged;
+        if (!Results.Any()) Results = await Fetch();
+    }
+
+    protected async void HandleLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        NavManager.TryGetQueryString<string>("q", out var newSearchString, "");
+        if (searchModel.SearchString == newSearchString || newSearchString is null) return;
+
+        ContinuationToken = null;
+        Results = Array.Empty<Snap>();
+        searchModel.SearchString = newSearchString;
+        Results = await Fetch();
+        StateHasChanged();
+    }
+
+    void Search()
+    {
+        NavManager.NavigateTo(new Regex(@"\?.*$").Replace(NavManager.Uri, "") + $"?q={searchModel.SearchString}");
+    }
+
+    async Task FetchMore()
+    {
+        Results = Results.Concat(await Fetch()).ToArray();
+    }
+
+    async Task<Snap[]> Fetch()
+    {
+        GraphQLRequest request = new GraphQLRequest
+        {
+            Query = Query,
+            Variables = new
+            {
+                q = searchModel.SearchString,
+                ContinuationToken = ContinuationToken ?? "",
+            },
+        };
+        var response = await Client.SendQueryAsync<FindSnapsByName>(request);
+        ContinuationToken = response?.Data.findSnapsByName?.ContinuationToken;
+        return response?.Data?.findSnapsByName?.results ?? Array.Empty<Snap>();
+    }
+
+    public void Dispose()
+    {
+        NavManager.LocationChanged -= HandleLocationChanged;
+    }
+}

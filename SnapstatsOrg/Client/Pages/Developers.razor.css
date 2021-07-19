@@ -1,0 +1,11 @@
+﻿.verified:after {
+    content: '✓';
+    color: #0a0;
+}
+
+ul {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    list-style: none;
+    padding-left: initial;
+}

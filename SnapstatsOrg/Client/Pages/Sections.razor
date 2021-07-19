@@ -1,0 +1,56 @@
+﻿@page "/sections"
+@inject IGraphQLClient Client
+
+<Title>Snap Store sections statistics | Snapstats.org</Title>
+<Meta name="description" content="Statistics about Snap Package sections within the Snap Store for Linux" />
+
+@* Facebook *@
+<Meta property="og:type" content="website" />
+<Meta property="og:title" content="Snap Store architectures statistics | Snapstats.org" />
+<Meta property="og:description" content="Statistics about Snap Package sections within the Snap Store for Linux" />
+<Meta property="og:image" content="/favicons/android-icon-512x512.png" />
+<Meta property="og:image:secure_url" content="/favicons/android-icon-512x512.png" />
+<Meta property="og:image:width" content="512" />
+<Meta property="og:image:height" content="512" />
+<Meta property="og:image:alt" content="Icon of Snapstats.org" />
+
+@* Twitter *@
+<Meta name="twitter:card" content="summary" />
+<Meta name="twitter:creator" content="@("diddledan")" />
+<Meta name="twitter:image" content="/favicons/android-icon-512x512.png" />
+<Meta name="twitter:title" content="Snap Store architectures statistics | Snapstats.org" />
+<Meta name="twitter:description" content="Statistics about Snap Package sections within the Snap Store for Linux" />
+
+<h1>Sections</h1>
+
+<DonateButton/>
+
+@*<Timeline title="Sections timeline" data={timeline} />*@
+
+<a href="/">Go back to the homepage...</a>
+
+@code {
+	private const string Query = @"
+		query {
+			sectionTimeline{
+				_id
+				counts{
+					date
+					count
+				}
+			}
+		}
+	";
+
+	protected Timeline? timeline;
+
+	protected override async Task OnInitializedAsync()
+    {
+        GraphQLRequest request = new GraphQLRequest
+        {
+            Query = Query,
+        };
+        var response = await Client.SendQueryAsync<SectionsTimeline>(request).ConfigureAwait(false);
+        timeline = response.Data.sectionTimeline ?? new Timeline();
+    }
+}

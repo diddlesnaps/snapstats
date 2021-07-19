@@ -1,0 +1,30 @@
+﻿<div class='grid'>
+    @if (snap.icon_url != "")
+    {
+        <a class='icon' href="/snaps/@snap.package_name">
+            <picture>
+                <source srcset="https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,h_276/@snap.icon_url 3x, https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,h_184/@snap.icon_url 2x, https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,h_92/@snap.icon_url 1x" />
+                <img width="92" height="92" loading="lazy"
+                     src="https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,h_92/@snap.icon_url"
+                     alt="Icon of @snap.SnapTitle()" />
+            </picture>
+        </a>
+    }
+    <p class='title'>
+        <a href="/snaps/@snap.package_name">@snap.SnapTitle()</a>
+    </p>
+    <div class='rating'>
+        <StarRating Rating=@snap.ratings_average
+                    IsIndicatorActive="false"
+                    StarWidth="16"
+                    FullStarColor="#ffd219"
+                    EmptyStarColor="#eeeeee"
+                    />
+    </div>
+    <p class='summary'>@snap.summary</p>
+</div>
+
+@code {
+    [Parameter]
+    public Snap snap { get; set; } = new Snap();
+}

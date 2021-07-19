@@ -1,0 +1,151 @@
+﻿.snapinfo {
+    display: flex;
+    flex-direction: column;
+}
+
+@media screen and (min-width: 720px) {
+    .snapinfo {
+        display: initial;
+    }
+}
+
+.bannerImage {
+    width: 100%;
+    height: auto;
+}
+
+.banner {
+    display: grid;
+    gap: 0.3rem 0.6rem;
+    grid-template-areas:
+        "title"
+        "icon"
+        "rating"
+        "version"
+        "summary";
+}
+
+.icon {
+    grid-area: icon;
+    display: grid;
+    align-items: center;
+    justify-content: center;
+}
+
+.title {
+    text-align: center;
+    grid-area: title;
+    line-height: 1em;
+    margin: 0;
+}
+
+.rating {
+    display: flex;
+    justify-content: center;
+    grid-area: rating;
+    margin: 0;
+}
+
+.version {
+    text-align: center;
+    grid-area: version;
+    font-size: 1.2rem;
+    margin: 0;
+}
+
+.summary {
+    grid-area: summary;
+    margin: 0;
+}
+
+@media screen and (min-width: 360px) {
+    .banner {
+        grid-template-areas:
+            "icon title"
+            "icon rating"
+            "icon version"
+            "icon summary";
+    }
+
+    .title {
+        text-align: initial;
+    }
+
+    .rating {
+        display: initial;
+    }
+
+    .version {
+        text-align: initial;
+    }
+}
+
+.screenshots-wrapper {
+    order: 1;
+}
+
+.screenshots {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.screenshots img {
+    max-height: 240px;
+    max-width: 100%;
+    margin: 0 0.6rem;
+}
+
+@media screen and (min-width: 640px) {
+    .screenshots img {
+        max-width: calc(50vw - 3rem);
+    }
+}
+
+.storeButton {
+    text-align: center;
+}
+
+@media screen and (min-width: 720px) {
+    .storeButton {
+        text-align: right;
+    }
+}
+
+.storeButton img {
+    border-radius: 1rem;
+}
+
+.meta dl {
+    color: #000000;
+    background: rgba(135, 190, 161, 0.4); /* #87bea1; */
+    border-radius: 0rem 2rem 2rem 0rem;
+    font-size: 0.7rem;
+    line-height: 1.2rem;
+    order: 1;
+    padding: 0.4em 1rem;
+    max-width: 50rem;
+    box-sizing: content-box;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+@media screen and (min-width: 360px) {
+    .meta dl {
+        display: grid;
+        gap: 0 0.4rem;
+        grid-template-columns: minmax(min-content, max-content) auto;
+    }
+
+    .meta dd {
+        margin: 0;
+    }
+}
+
+.verified:before {
+    content: '✔️';
+    color: #2a2;
+}
