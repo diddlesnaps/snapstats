@@ -1,3 +1,4 @@
+using Ganss.XSS;
 using GraphQL.Client.Abstractions;
 using GraphQL.Client.Http;
 using GraphQL.Client.Serializer.SystemTextJson;
@@ -33,6 +34,13 @@ namespace SnapstatsOrg.Client
                 };
                 var graphQlClient = new GraphQLHttpClient(graphQlOptions, new SystemTextJsonSerializer());
                 return graphQlClient;
+            });
+
+            builder.Services.AddScoped<IHtmlSanitizer, HtmlSanitizer>(x =>
+            {
+                var sanitizer = new Ganss.XSS.HtmlSanitizer();
+                //sanitizer.AllowedAttributes.Add("class");
+                return sanitizer;
             });
 
             builder.Services.AddHeadElementHelper();

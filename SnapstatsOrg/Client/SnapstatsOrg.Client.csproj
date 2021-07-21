@@ -5,6 +5,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <PropertyGroup Condition=" '$(RunConfiguration)' == 'SnapstatsOrg' ">
+    <ExternalConsole>true</ExternalConsole>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="GraphQL.Client" Version="3.2.4" />
     <PackageReference Include="GraphQL.Client.Serializer.SystemTextJson" Version="3.2.4" />
@@ -14,10 +17,16 @@
     <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="2.2.0" />
     <PackageReference Include="System.Net.Http.Json" Version="5.0.0" />
     <PackageReference Include="Toolbelt.Blazor.HeadElement" Version="5.4.2" />
+    <PackageReference Include="Markdig" Version="0.25.0" />
+    <PackageReference Include="HtmlSanitizer" Version="5.0.404" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Shared\SnapstatsOrg.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="Markdig" />
+    <None Remove="HtmlSanitizer" />
+  </ItemGroup>
 </Project>
