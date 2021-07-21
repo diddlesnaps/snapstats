@@ -38,7 +38,7 @@ namespace SnapstatsOrg.Client
 
             builder.Services.AddScoped<IHtmlSanitizer, HtmlSanitizer>(x =>
             {
-                var sanitizer = new Ganss.XSS.HtmlSanitizer();
+                var sanitizer = new HtmlSanitizer();
                 //sanitizer.AllowedAttributes.Add("class");
                 return sanitizer;
             });
