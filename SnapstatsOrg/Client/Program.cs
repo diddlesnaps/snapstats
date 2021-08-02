@@ -1,4 +1,5 @@
 using Blazorise;
+using Ganss.XSS;
 using GraphQL.Client.Abstractions;
 using GraphQL.Client.Http;
 using GraphQL.Client.Serializer.SystemTextJson;
@@ -41,6 +42,13 @@ namespace SnapstatsOrg.Client
                 options.ChangeTextOnKeyPress = true;
             });
             builder.Services.AddEmptyProviders();
+
+            builder.Services.AddScoped<IHtmlSanitizer, HtmlSanitizer>(x =>
+            {
+                var sanitizer = new HtmlSanitizer();
+                //sanitizer.AllowedAttributes.Add("class");
+                return sanitizer;
+            });
 
             builder.Services.AddHeadElementHelper();
 

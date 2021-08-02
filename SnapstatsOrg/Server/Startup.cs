@@ -1,4 +1,5 @@
 using Blazorise;
+using Ganss.XSS;
 using GraphQL;
 using GraphQL.Client.Abstractions;
 using GraphQL.Client.Http;
@@ -61,6 +62,13 @@ namespace SnapstatsOrg.Server
                 };
                 var graphQlClient = new GraphQLHttpClient(graphQlOptions, new SystemTextJsonSerializer());
                 return graphQlClient;
+            });
+
+            services.AddScoped<IHtmlSanitizer, HtmlSanitizer>(x =>
+            {
+                var sanitizer = new HtmlSanitizer();
+                //sanitizer.AllowedAttributes.Add("class");
+                return sanitizer;
             });
 
             services.AddScoped<SnapstatsSchema>();

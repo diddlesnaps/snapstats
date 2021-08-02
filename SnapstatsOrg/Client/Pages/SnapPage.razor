@@ -117,7 +117,9 @@
     <DonateButton />
 
     <h2>Description</h2>
-    <!-- html DOMPurify.sanitize(marked($result.data?.snapByName.description), DOMPurifyOpts) -->
+
+    <Markdown Content=@snap?.description />
+
     <div>
         @if (snap?.description is not null and not "")
         {
