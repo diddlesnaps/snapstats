@@ -120,7 +120,7 @@
 
 	<!-- Twitter -->
     <meta name="twitter:card" content="summary" />
-    <meta name="twitter:creator" content="@diddledan" />
+    <meta name="twitter:creator" content="@diddledani" />
     <meta name="twitter:title" content="Snapstats.org Snap Store statistics" />
     <meta name="twitter:description" content="Statistics about Snap Packages within the Snap Store for Linux" />
     <meta name="twitter:image" content="/favicons/android-icon-512x512.png" />

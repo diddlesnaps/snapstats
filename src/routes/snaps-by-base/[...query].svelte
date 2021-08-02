@@ -102,7 +102,7 @@
     <!-- Twitter -->
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:site" content="@snapstats_org" />
-    <meta name="twitter:creator" content="@diddledan" />
+    <meta name="twitter:creator" content="@diddledani" />
     <meta name="twitter:title" content="Snaps using base snap '{base}'" />
     <meta name="twitter:description" content="Snaps in the Snap Store using base snap '{base}' found by SnapStats.org" />
     <meta name="twitter:image" content="/favicons/android-icon-512x512.png" />

@@ -17,7 +17,7 @@ export const spider = {
         rate_limit: 100,
         page_size: 1000,
         architectures: ['i386', 'amd64', 'armhf', 'arm64', 'ppc64el', 's390x'],
-        user_agent: 'https://snapstats.org/ spider: run by Daniel Llewellyn: https://launchpad.net/~diddledan',
+        user_agent: 'https://snapstats.org/ spider: run by Dani Llewellyn: https://launchpad.net/~diddledani',
         stores: [
             {
                 name: 'Ubuntu Store',

@@ -118,7 +118,7 @@ label {
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary" />
-    <meta name="twitter:creator" content="@diddledan" />
+    <meta name="twitter:creator" content="@diddledani" />
     <meta name="twitter:title" content="Snap packages by {publisherName}" />
     <meta name="twitter:description" content="Snap packages by {publisherName} on SnapStats.org" />
     <meta name="twitter:image" content="/favicons/android-icon-512x512.png" />

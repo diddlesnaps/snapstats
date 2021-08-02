@@ -20,7 +20,7 @@
 
 	<!-- Twitter -->
     <meta name="twitter:card" content="summary" />
-    <meta name="twitter:creator" content="@diddledan" />
+    <meta name="twitter:creator" content="@diddledani" />
     <meta name="twitter:title" content="About Snapstats.org" />
     <meta name="twitter:description" content="Find out about the Snapstats.org website" />
     <meta name="twitter:image" content="/favicons/android-icon-512x512.png" />
@@ -29,7 +29,7 @@
 <h1>About Snapstats.org</h1>
 
 <p>
-	Snapstats.org is a project by Daniel Llewellyn, aka diddledan, a prolific
+	Snapstats.org is a project by Dani Llewellyn, aka diddledani, a prolific
 	Snapcrafter (creator of snap packages). The site catalogues all the
 	publicly visible Snap package information and aggregates some
 	statistics about the available packages. The statistics and latest

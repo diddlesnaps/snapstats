@@ -129,7 +129,7 @@ label {
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary" />
-    <meta name="twitter:creator" content="@diddledan" />
+    <meta name="twitter:creator" content="@diddledani" />
     <meta name="twitter:title" content="Search the Snap Store" />
     <meta name="twitter:description" content="Search the Snap Store listings on SnapStats.org" />
     <meta name="twitter:image" content="/favicons/android-icon-512x512.png" />

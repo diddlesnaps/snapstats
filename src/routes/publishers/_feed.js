@@ -15,7 +15,7 @@ export default async function(publisherName) {
         language: "en",
         image: "https://snapstats.org/snapstats@2x.png",
         favicon: "https://snapstats.org/favicons/android-icon-512x512.png",
-        copyright: "© 2020 Daniel Llewellyn",
+        copyright: "© 2020 Dani Llewellyn",
         updated: new Date(now.getFullYear(), now.getMonth(), now.getDate()),
         generator: "Snapstats.org",
         feedLinks: {

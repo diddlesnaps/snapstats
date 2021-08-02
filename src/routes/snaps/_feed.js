@@ -15,7 +15,7 @@ export default async function() {
         language: "en",
         image: "https://snapstats.org/snapstats@2x.png",
         favicon: "https://snapstats.org/favicons/android-icon-512x512.png",
-        copyright: "© 2020 Daniel Llewellyn",
+        copyright: "© 2020 Dani Llewellyn",
         updated: new Date(now.getFullYear(), now.getMonth(), now.getDate()),
         generator: "Snapstats.org",
         feedLinks: {
@@ -24,9 +24,9 @@ export default async function() {
             rss: "https://snapstats.org/snaps/feed.rss"
         },
         author: {
-            name: "Daniel Llewellyn",
-            email: "diddledan@ubuntu.com",
-            link: "https://bowlhat.net/"
+            name: "Dani Llewellyn",
+            email: "diddledani@ubuntu.com",
+            link: "https://diddledani.com/"
         }
     });
     const snaps = await Promise.all(await Snaps.Query.snapsByDate(null, {query: {limit: 20}}));

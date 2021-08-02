@@ -62,7 +62,7 @@
 
 	<!-- Twitter -->
     <meta name="twitter:card" content="summary" />
-    <meta name="twitter:creator" content="@diddledan" />
+    <meta name="twitter:creator" content="@diddledani" />
     <meta name="twitter:title" content="Snap Store developers statistics | Snapstats.org" />
     <meta name="twitter:description" content="Statistics about Snap Package developers within the Snap Store for Linux" />
     <meta name="twitter:image" content="/favicons/android-icon-512x512.png" />
