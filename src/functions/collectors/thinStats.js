@@ -7,10 +7,12 @@ import {ChannelsModel} from '../../models/Channel';
 import {ConfinementsModel} from '../../models/Confinement';
 import {DeveloperCountsModel} from '../../models/DeveloperCount';
 import {LicensesModel} from '../../models/License';
+import {SectionsModel} from '../../models/Section';
 import {SnapCountsModel} from '../../models/SnapCount';
 
 import {promisify} from '../../promisify';
 import { connectMongoose } from '../../mongodb';
+import {Model} from 'mongoose';
 
 const denysave = process.env.denysave === 'true' ? true : false;
 
@@ -23,13 +25,16 @@ export default async (context) => {
             await connectMongoose();
 
             let promises = [];
-            for (const model of [
+            /** @type Model */
+            let model;
+            for (model of [
                 ArchitecturesModel,
                 BasesModel,
                 ChannelsModel,
                 ConfinementsModel,
                 DeveloperCountsModel,
                 LicensesModel,
+                SectionsModel,
                 SnapCountsModel,
             ]) {
                 promises.push(promisify(model.deleteMany({ isDaily: { $ne: true } })));
