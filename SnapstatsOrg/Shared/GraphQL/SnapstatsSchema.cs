@@ -27,6 +27,7 @@ namespace SnapstatsOrg.Shared.GraphQL
             #endregion
 
             RegisterTypeMapping(typeof(ICounts), typeof(CountsType));
+            RegisterTypeMapping(typeof(Timeline), typeof(TimelineType));
             RegisterTypeMapping(typeof(TimelineCounts), typeof(TimelineCountsType));
 
             RegisterTypeMapping(typeof(SnapCount), typeof(SnapCountType));

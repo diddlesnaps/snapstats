@@ -169,14 +169,9 @@ namespace SnapstatsOrg.Shared.GraphQL.Infrastructure
 
             queryTextStringBuilder.Append($" FROM {typeof(TSource).Name.ToLowerInvariant()} c");
 
-            queryTextStringBuilder.Append(" WHERE c.date > @date");
-            var date = context.GetArgument("from", new DateTime(DateTime.Today.Year - 1, DateTime.Today.Month, DateTime.Today.Day));
-            var parameters = new SqlParameterCollection()
-            {
-                new SqlParameter("@date", date)
-            };
+            queryTextStringBuilder.Append(" WHERE c.date > DateTimeAdd('yyyy', -1, GetCurrentDateTime())");
 
-            return new SqlQuerySpec(queryTextStringBuilder.ToString(), parameters);
+            return new SqlQuerySpec(queryTextStringBuilder.ToString());
         }
 
         public static SqlQuerySpec ToSqlLimitOneYearQuerySpec<TSource>(this IResolveFieldContext<TSource> context) where TSource : new()
@@ -205,7 +200,7 @@ namespace SnapstatsOrg.Shared.GraphQL.Infrastructure
         {
             var queryTextStringBuilder = new StringBuilder();
 
-            queryTextStringBuilder.Append("SELECT c.name, DateTimePart('m', c.date) as month, Max(c.total) as total, Max(c.filtered) as filtered");
+            queryTextStringBuilder.Append("SELECT c.name, c.date, c.total, c.filtered");
             queryTextStringBuilder.Append($" FROM {typeof(TSource).Name.ToLowerInvariant()} c");
 
             queryTextStringBuilder.Append(" WHERE c.date > @date");
@@ -220,23 +215,28 @@ namespace SnapstatsOrg.Shared.GraphQL.Infrastructure
             return new SqlQuerySpec(queryTextStringBuilder.ToString(), parameters);
         }
 
+        public static SqlQuerySpec ToTimelineOfCountsQuerySpec<TSource>(this IResolveFieldContext<TSource> context, string table)
+        {
+            var queryTextStringBuilder = new StringBuilder();
+
+            queryTextStringBuilder.Append("SELECT c.name, c.date, c.count");
+            queryTextStringBuilder.Append($" FROM {table} c");
+
+            queryTextStringBuilder.Append(" WHERE c.date > DateTimeAdd('yyyy', -1, GetCurrentDateTime())");
+
+            return new SqlQuerySpec(queryTextStringBuilder.ToString());
+        }
+
         public static SqlQuerySpec ToSnapCountTimelineQuerySpec<TSource>(this IResolveFieldContext<TSource> context)
         {
             var queryTextStringBuilder = new StringBuilder();
 
-            queryTextStringBuilder.Append("SELECT DateTimePart('m', c.date) as month, Max(c.total) as total, Max(c.filtered) as filtered");
+            queryTextStringBuilder.Append("SELECT c.date, c.total, c.filtered");
             queryTextStringBuilder.Append($" FROM {typeof(TSource).Name.ToLowerInvariant()} c");
 
-            queryTextStringBuilder.Append(" WHERE c.date > @date");
-            var date = context.GetArgument("from", new DateTime(DateTime.Today.Year - 1, DateTime.Today.Month, DateTime.Today.Day));
-            var parameters = new SqlParameterCollection()
-            {
-                new SqlParameter("@date", date)
-            };
+            queryTextStringBuilder.Append(" WHERE c.date > DateTimeAdd('yyyy', -1, GetCurrentDateTime())");
 
-            queryTextStringBuilder.Append(" GROUP BY month");
-
-            return new SqlQuerySpec(queryTextStringBuilder.ToString(), parameters);
+            return new SqlQuerySpec(queryTextStringBuilder.ToString());
         }
 
         public static async Task<string[]> GetVerifiedDeveloperNames(this IResolveFieldContext<object> context, IDocumentClient client, Uri collectionUri, FeedOptions feedOptions)
@@ -255,7 +255,7 @@ namespace SnapstatsOrg.Shared.GraphQL.Infrastructure
         {
             var queryTextStringBuilder = new StringBuilder();
 
-            queryTextStringBuilder.Append("SELECT DISTINCT(c.developer_name) AS developer_name");
+            queryTextStringBuilder.Append("SELECT DISTINCT c.developer_name");
             queryTextStringBuilder.Append($" FROM {typeof(Snap).Name.ToLowerInvariant()} c");
 
             queryTextStringBuilder.Append(" WHERE c.developer_validation = @developer_validation");
@@ -283,7 +283,7 @@ namespace SnapstatsOrg.Shared.GraphQL.Infrastructure
         {
             var queryTextStringBuilder = new StringBuilder();
 
-            queryTextStringBuilder.Append("SELECT DISTINCT(c.publisher_username)");
+            queryTextStringBuilder.Append("SELECT DISTINCT c.publisher_username");
             queryTextStringBuilder.Append($" FROM {typeof(TSource).Name.ToLowerInvariant()} c");
 
             var args = context.Arguments.Where(a => a.Value.Value is not null and not "");

@@ -16,7 +16,7 @@
 
 @* Twitter *@
 <Meta name="twitter:card" content="summary" />
-<Meta name="twitter:creator" content="@("diddledan")" />
+<Meta name="twitter:creator" content="@("@diddledani")" />
 <Meta name="twitter:image" content="/favicons/android-icon-512x512.png" />
 <Meta name="twitter:title" content="Snap Store architectures statistics | Snapstats.org" />
 <Meta name="twitter:description" content="Statistics about Snap Package sections within the Snap Store for Linux" />
@@ -25,7 +25,7 @@
 
 <DonateButton/>
 
-@*<Timeline title="Sections timeline" data={timeline} />*@
+<TimelineChart title="Sections timeline" data="@timeline" />
 
 <a href="/">Go back to the homepage...</a>
 
@@ -33,16 +33,14 @@
 	private const string Query = @"
 		query {
 			sectionTimeline{
-				_id
-				counts{
-					date
-					count
-				}
+				name
+				date
+				count
 			}
 		}
 	";
 
-	protected Timeline? timeline;
+	protected Timeline[]? timeline;
 
 	protected override async Task OnInitializedAsync()
     {
@@ -51,6 +49,6 @@
             Query = Query,
         };
         var response = await Client.SendQueryAsync<SectionsTimeline>(request).ConfigureAwait(false);
-        timeline = response.Data.sectionTimeline ?? new Timeline();
+        timeline = response.Data.sectionTimeline;
     }
 }

@@ -1,0 +1,113 @@
+﻿@using Blazorise.Charts
+
+@if (data is not null)
+{
+	<LineChart @ref="lineChart" TItem="TimelineChartData" OptionsObject="@options" />
+}
+
+@code {
+    LineChart<TimelineChartData>? lineChart;
+    List<LineChartDataset<TimelineChartData>> chartDatasets = new();
+    List<string> lineNames = new();
+    //List<DateTime> dates = new();
+
+    Timeline[]? _data;
+
+    [Parameter]
+    public Timeline[]? data {
+        get => _data;
+        set
+        {
+            _data = value ?? Array.Empty<Timeline>();
+            lineNames = _data.Select(d => d.name ?? "").Distinct().OrderBy(o => o).ToList();
+            //dates = _data.Select(d => ((DateTimeOffset)d.date).ToUnixTimeSeconds()).Distinct().OrderBy(o => o).ToList();
+            foreach (var name in lineNames)
+            {
+                var thisLine = _data.Where(w => w.name == name);
+                var thisData = thisLine.Select(s => new TimelineChartData() {
+                    X = s.date,
+                    Y = s.count,
+                });
+                var dataset = new LineChartDataset<TimelineChartData>()
+                {
+                    Data = thisData.ToList(),
+                    Label = name,
+                };
+                chartDatasets.Add(dataset);
+            }
+            HandleRedraw();
+        }
+    }
+
+    private string _title = "Timeline";
+
+    public object options { get; set; } = new
+    {
+        Scales = new
+        {
+            XAxes = new object[]
+            {
+                new
+                {
+                    Type = "time",
+                    Distribution = "linear",
+                    Time = new
+                    {
+                        Unit = "day",
+                    },
+                },
+            },
+            YAxes = new object[]
+            {
+                new
+                {
+                    ScaleLabel = new
+                    {
+                        Display = true,
+                        LabelString = "Number of snaps"
+                    },
+                    Ticks = new
+                    {
+                        BeginAtZero = true,
+                    },
+                },
+            },
+        },
+        Animation = new
+        {
+            Duration = 0,
+        },
+        ResponsiveAnimationDuration = 0,
+        Legend = new
+        {
+            Display = false,
+        },
+    };
+
+    [Parameter]
+    public string Title {
+        get => _title;
+        set
+        {
+            _title = value ?? "Timeline";
+        }
+    }
+
+    async Task HandleRedraw()
+    {
+        if (lineChart is not null)
+        {
+            await lineChart.Clear();
+
+            @*foreach (var label in dates)
+            {
+                await lineChart.AddLabels(label);
+            }*@
+            foreach (var dataset in chartDatasets)
+            {
+                await lineChart.AddDataSet(dataset);
+            }
+            await lineChart.Update();
+        }
+    }
+}

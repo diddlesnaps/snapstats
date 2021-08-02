@@ -1,3 +1,4 @@
+using Blazorise;
 using GraphQL.Client.Abstractions;
 using GraphQL.Client.Http;
 using GraphQL.Client.Serializer.SystemTextJson;
@@ -34,6 +35,12 @@ namespace SnapstatsOrg.Client
                 var graphQlClient = new GraphQLHttpClient(graphQlOptions, new SystemTextJsonSerializer());
                 return graphQlClient;
             });
+
+            builder.Services.AddBlazorise(options =>
+            {
+                options.ChangeTextOnKeyPress = true;
+            });
+            builder.Services.AddEmptyProviders();
 
             builder.Services.AddHeadElementHelper();
 

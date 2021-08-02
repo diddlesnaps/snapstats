@@ -16,8 +16,10 @@ namespace SnapstatsOrg.Shared.GraphQL.Types
     {
         public TimelineType()
         {
-            Field(t => t._id);
-            Field(t => t.counts);
+            Field(t => t.name);
+            //Field(t => t.counts);
+            Field(t => t.count);
+            Field(t => t.date);
         }
     }
 }

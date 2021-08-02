@@ -1,3 +1,4 @@
+using Blazorise;
 using GraphQL;
 using GraphQL.Client.Abstractions;
 using GraphQL.Client.Http;
@@ -101,6 +102,9 @@ namespace SnapstatsOrg.Server
             {
                 services.AddSingleton<IDocumentClient>(new DocumentClient(ServiceEndpoint, AuthKey));
             }
+
+            services.AddBlazorise();
+            services.AddEmptyProviders();
 
             services.AddHeadElementHelper();
 

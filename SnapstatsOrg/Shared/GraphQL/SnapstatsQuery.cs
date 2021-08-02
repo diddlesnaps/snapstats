@@ -9,6 +9,7 @@ using SnapstatsOrg.Shared.Models;
 using System.Linq;
 using Microsoft.Azure.Documents.Linq;
 using GraphQL.Execution;
+using SnapstatsOrg.Shared.Models.Derived;
 
 namespace SnapstatsOrg.Shared.GraphQL
 {
@@ -53,10 +54,10 @@ namespace SnapstatsOrg.Shared.GraphQL
                 resolve: context => documentClient.CreateDocumentQuery<Architecture>(_architecturesCollectionUri, context.ToSqlLimitOneYearQuerySpec(), _feedOptionsUnlimited)
             );
 
-            Field<TimelineType>(
+            Field<ListGraphType<TimelineType>>(
                 "architectureTimeline",
                 arguments: new QueryArguments(new QueryArgument<DateGraphType> { Name = "from" }),
-                resolve: context => documentClient.CreateDocumentQuery<Architecture>(_architecturesCollectionUri, context.ToTimelineQuerySpec(), _feedOptionsUnlimited)
+                resolve: context => documentClient.CreateDocumentQuery<Timeline>(_architecturesCollectionUri, context.ToTimelineOfCountsQuerySpec("architectures"), _feedOptionsUnlimited)
             );
             #endregion
 
@@ -82,10 +83,10 @@ namespace SnapstatsOrg.Shared.GraphQL
                 resolve: context => documentClient.CreateDocumentQuery<Base>(_basesCollectionUri, context.ToSqlLimitOneYearQuerySpec(), _feedOptionsUnlimited)
             );
 
-            Field<TimelineType>(
+            Field<ListGraphType<TimelineType>>(
                 "baseTimeline",
                 arguments: new QueryArguments(new QueryArgument<DateGraphType> { Name = "from" }),
-                resolve: context => documentClient.CreateDocumentQuery<Base>(_basesCollectionUri, context.ToTimelineQuerySpec(), _feedOptionsUnlimited)
+                resolve: context => documentClient.CreateDocumentQuery<Timeline>(_basesCollectionUri, context.ToTimelineOfCountsQuerySpec("bases"), _feedOptionsUnlimited)
             );
             #endregion
 
@@ -111,10 +112,10 @@ namespace SnapstatsOrg.Shared.GraphQL
                 resolve: context => documentClient.CreateDocumentQuery<Channel>(_channelsCollectionUri, context.ToSqlLimitOneYearQuerySpec(), _feedOptionsUnlimited)
             );
 
-            Field<TimelineType>(
+            Field<ListGraphType<TimelineType>>(
                 "channelTimeline",
                 arguments: new QueryArguments(new QueryArgument<DateGraphType> { Name = "from" }),
-                resolve: context => documentClient.CreateDocumentQuery<Channel>(_channelsCollectionUri, context.ToTimelineQuerySpec(), _feedOptionsUnlimited)
+                resolve: context => documentClient.CreateDocumentQuery<Timeline>(_channelsCollectionUri, context.ToTimelineOfCountsQuerySpec("channels"), _feedOptionsUnlimited)
             );
             #endregion
 
@@ -140,10 +141,10 @@ namespace SnapstatsOrg.Shared.GraphQL
                 resolve: context => documentClient.CreateDocumentQuery<Confinement>(_confinementsCollectionUri, context.ToSqlLimitOneYearQuerySpec(), _feedOptionsUnlimited)
             );
 
-            Field<TimelineType>(
+            Field<ListGraphType<TimelineType>>(
                 "confinementTimeline",
                 arguments: new QueryArguments(new QueryArgument<DateGraphType> { Name = "from" }),
-                resolve: context => documentClient.CreateDocumentQuery<Confinement>(_confinementsCollectionUri, context.ToTimelineQuerySpec(), _feedOptionsUnlimited)
+                resolve: context => documentClient.CreateDocumentQuery<Timeline>(_confinementsCollectionUri, context.ToTimelineOfCountsQuerySpec("confinements"), _feedOptionsUnlimited)
             );
             #endregion
 
@@ -211,10 +212,10 @@ namespace SnapstatsOrg.Shared.GraphQL
                 resolve: context => documentClient.CreateDocumentQuery<License>(_licensesCollectionUri, context.ToSqlLimitOneYearQuerySpec(), _feedOptionsUnlimited)
             );
 
-            Field<TimelineType>(
+            Field<ListGraphType<TimelineType>>(
                 "licenseTimeline",
                 arguments: new QueryArguments(new QueryArgument<DateGraphType> { Name = "from" }),
-                resolve: context => documentClient.CreateDocumentQuery<License>(_licensesCollectionUri, context.ToTimelineQuerySpec(), _feedOptionsUnlimited)
+                resolve: context => documentClient.CreateDocumentQuery<Timeline>(_licensesCollectionUri, context.ToTimelineOfCountsQuerySpec("licenses"), _feedOptionsUnlimited)
             );
             #endregion
 
@@ -240,10 +241,10 @@ namespace SnapstatsOrg.Shared.GraphQL
                 resolve: context => documentClient.CreateDocumentQuery<Section>(_sectionsCollectionUri, context.ToSqlLimitOneYearQuerySpec(), _feedOptionsUnlimited)
             );
 
-            Field<TimelineType>(
+            Field<ListGraphType<TimelineType>>(
                 "sectionTimeline",
                 arguments: new QueryArguments(new QueryArgument<DateGraphType> { Name = "from" }),
-                resolve: context => documentClient.CreateDocumentQuery<Section>(_sectionsCollectionUri, context.ToTimelineQuerySpec(), _feedOptionsUnlimited)
+                resolve: context => documentClient.CreateDocumentQuery<Timeline>(_sectionsCollectionUri, context.ToTimelineOfCountsQuerySpec("sections"), _feedOptionsUnlimited)
             );
             #endregion
 

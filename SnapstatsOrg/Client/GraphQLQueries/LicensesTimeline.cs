@@ -4,6 +4,6 @@ namespace SnapstatsOrg.Client.GraphQLQueries
 {
     public class LicensesTimeline
     {
-        public Timeline? licenseTimeline { get; set; }
+        public Timeline[]? licenseTimeline { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 ﻿@page "/snaps"
+@implements IDisposable
 @inject IGraphQLClient Client
 @inject NavigationManager NavManager
 @using System.Text.RegularExpressions
@@ -95,7 +96,7 @@
         return response?.Data?.findSnapsByName?.results ?? Array.Empty<Snap>();
     }
 
-    public void Dispose()
+    void IDisposable.Dispose()
     {
         NavManager.LocationChanged -= HandleLocationChanged;
     }

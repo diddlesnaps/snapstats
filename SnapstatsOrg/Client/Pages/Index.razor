@@ -16,7 +16,7 @@
 
 <!-- Twitter -->
 <Meta name="twitter:card" content="summary" />
-<Meta name="twitter:creator" content="@("diddledan")" />
+<Meta name="twitter:creator" content="@("@diddledani")" />
 <Meta name="twitter:title" content="Snapstats.org Snap Store statistics" />
 <Meta name="twitter:description" content="Statistics about Snap Packages within the Snap Store for Linux" />
 <Meta name="twitter:image" content="/favicons/android-icon-512x512.png" />
@@ -62,10 +62,10 @@ else
 
 <DonateButton/>
 
-@*<Timeline title="Developer counts timeline" data={[
+@*Timeline title="Developer counts timeline" data={[
 	{title: "Developer Count", items: result.data.developerCountTimeline},
 	{title: "Snap Count", items: result.data.snapCountTimeline},
-]} />*@
+]} /*@
 
 @code{
 	const string Query = @"
@@ -110,10 +110,10 @@ else
 			Query = Query,
 		};
 		var response = await Client.SendQueryAsync<IndexQuery>(request).ConfigureAwait(false);
-		snapCounts = response.Data.snapCountsByDate ?? Array.Empty<SnapCount>();
-		developerCounts = response.Data.developerCountsByDate ?? Array.Empty<DeveloperCount>();
-		snaps = response.Data.snapsByDate?.results ?? Array.Empty<Snap>();
-		verifiedSnapCount = response.Data.findSnapsCount ?? 0;
-		verifiedDeveloperCount = response.Data.verifiedDeveloperCount ?? 0;
+		snapCounts = response.Data?.snapCountsByDate ?? Array.Empty<SnapCount>();
+		developerCounts = response.Data?.developerCountsByDate ?? Array.Empty<DeveloperCount>();
+		snaps = response.Data?.snapsByDate?.results ?? Array.Empty<Snap>();
+		verifiedSnapCount = response.Data?.findSnapsCount ?? 0;
+		verifiedDeveloperCount = response.Data?.verifiedDeveloperCount ?? 0;
 	}
 }
