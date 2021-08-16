@@ -11,11 +11,10 @@ using GraphQL.SystemTextJson;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Azure.Documents;
-using Microsoft.Azure.Documents.Client;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using MongoDB.Driver;
 using SnapstatsOrg.Shared.GraphQL;
 using System;
 using System.Data.Common;
@@ -72,12 +71,12 @@ namespace SnapstatsOrg.Server
             });
 
             services.AddScoped<SnapstatsSchema>();
-            services.AddSingleton<IDataLoaderContextAccessor, DataLoaderContextAccessor>();
-            services.AddSingleton<IDocumentExecuter>(new DocumentExecuter());
-            services.AddSingleton<IDocumentWriter>(new DocumentWriter());
+            var mongoUrl = Configuration["MongoUrl"];
+            services.AddSingleton(new MongoClient(mongoUrl).GetDatabase("snapstats"));
+
             services.AddSingleton<IErrorInfoProvider>(services =>
                 {
-                    return new ErrorInfoProvider(new ErrorInfoProviderOptions { ExposeExceptionStackTrace = true });
+                    return new ErrorInfoProvider(new ErrorInfoProviderOptions { ExposeExceptionStackTrace = Environment.IsDevelopment() });
                 });
 
             services.AddGraphQL(options => {
@@ -88,28 +87,6 @@ namespace SnapstatsOrg.Server
                 .AddErrorInfoProvider(opt => opt.ExposeExceptionStackTrace = Environment.IsDevelopment())
                 .AddDataLoader()
                 .AddWebSockets();
-
-            var builder = new DbConnectionStringBuilder()
-            {
-                ConnectionString = Configuration["ConnectionStrings"]
-            };
-            string? AuthKey = null;
-            Uri? ServiceEndpoint = null;
-            if (builder.TryGetValue("AccountKey", out object? key))
-            {
-                AuthKey = key.ToString();
-            }
-            if (builder.TryGetValue("AccountEndpoint", out object? uri))
-            {
-                if (uri is not null)
-                {
-                    ServiceEndpoint = new Uri(uri.ToString() ?? "");
-                }
-            }
-            if (AuthKey is not null && ServiceEndpoint is not null)
-            {
-                services.AddSingleton<IDocumentClient>(new DocumentClient(ServiceEndpoint, AuthKey));
-            }
 
             services.AddBlazorise();
             services.AddEmptyProviders();

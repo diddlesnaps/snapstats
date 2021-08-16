@@ -19,19 +19,19 @@
         set
         {
             _data = value ?? Array.Empty<Timeline>();
-            lineNames = _data.Select(d => d.name ?? "").Distinct().OrderBy(o => o).ToList();
+            lineNames = _data.Select(d => d._id ?? "").ToList();
             //dates = _data.Select(d => ((DateTimeOffset)d.date).ToUnixTimeSeconds()).Distinct().OrderBy(o => o).ToList();
-            foreach (var name in lineNames)
+            foreach (var line in _data)
             {
-                var thisLine = _data.Where(w => w.name == name);
-                var thisData = thisLine.Select(s => new TimelineChartData() {
+                var thisData = line.counts.Select(s => new TimelineChartData()
+                {
                     X = s.date,
                     Y = s.count,
                 });
                 var dataset = new LineChartDataset<TimelineChartData>()
                 {
                     Data = thisData.ToList(),
-                    Label = name,
+                    Label = line._id,
                 };
                 chartDatasets.Add(dataset);
             }

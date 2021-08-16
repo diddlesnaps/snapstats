@@ -33,9 +33,11 @@
 	private const string Query = @"
 		query {
 			channelTimeline{
-				name
-				date
-				count
+				_id
+                counts{
+                    date
+                    count
+                }
 			}
 		}
 	";
@@ -48,7 +50,7 @@
         {
             Query = Query,
         };
-        var response = await Client.SendQueryAsync<ChannelsTimeline>(request).ConfigureAwait(false);
+        var response = await Client.SendQueryAsync<ChannelTimelineQuery>(request).ConfigureAwait(false);
         timeline = response.Data.channelTimeline;
     }
 }

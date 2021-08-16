@@ -1,4 +1,5 @@
-﻿using SnapstatsOrg.Shared.Models;
+﻿using MongoDB.Bson.Serialization.Attributes;
+using SnapstatsOrg.Shared.Models;
 using System;
 using System.Text.Json.Serialization;
 
@@ -17,6 +18,7 @@ namespace SnapstatsOrg.Shared.Models
         verified = 2,
     }
 
+    [BsonIgnoreExtraElements]
     public class SnapAlias
     {
         [JsonPropertyName("name")]
@@ -25,6 +27,7 @@ namespace SnapstatsOrg.Shared.Models
         public string? target { get; set; }
     }
 
+    [BsonIgnoreExtraElements]
     public class SnapMedia
     {
         [JsonPropertyName("type")]
@@ -37,6 +40,7 @@ namespace SnapstatsOrg.Shared.Models
         public uint? width { get; set; }
     }
 
+    [BsonIgnoreExtraElements]
     public class Plug
     {
         [JsonPropertyName("plug_name")]
@@ -49,6 +53,7 @@ namespace SnapstatsOrg.Shared.Models
         public string? default_provider { get; set; }
     }
 
+    [BsonIgnoreExtraElements]
     public class Slot
     {
         [JsonPropertyName("slot_name")]
@@ -57,6 +62,7 @@ namespace SnapstatsOrg.Shared.Models
         public string? _interface { get; set; }
     }
 
+    [BsonIgnoreExtraElements]
     public class Snap
     {
         [JsonPropertyName("aliases")]
@@ -88,7 +94,7 @@ namespace SnapstatsOrg.Shared.Models
         [JsonPropertyName("developer_name")]
         public string? developer_name { get; set; }
         [JsonPropertyName("developer_validation")]
-        public Validation developer_validation { get; set; }
+        public string developer_validation { get; set; } = "unproven";
         [JsonPropertyName("download_url")]
         public string? download_url { get; set; }
         [JsonPropertyName("icon_url")]

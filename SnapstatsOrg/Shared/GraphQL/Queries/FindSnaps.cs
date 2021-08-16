@@ -1,10 +1,10 @@
-﻿using SnapstatsOrg.Shared.Models;
-using SnapstatsOrg.Shared.Models.Derived;
+﻿using MongoDB.Driver;
+using SnapstatsOrg.Shared.Models;
 
 namespace SnapstatsOrg.Shared.GraphQL.Queries
 {
     public class FindSnaps
     {
-        public Pagination<Snap>? findSnaps { get; set; }
+        public Snap[]? findSnaps { get; set; }
     }
 }

@@ -1,25 +1,14 @@
 ﻿using GraphQL.Types;
-using SnapstatsOrg.Shared.Models.Derived;
+using SnapstatsOrg.Shared.Models;
 
 namespace SnapstatsOrg.Shared.GraphQL.Types
 {
-    public class TimelineCountsType : ObjectGraphType<TimelineCounts>
-    {
-        public TimelineCountsType()
-        {
-            Field(t => t.count);
-            Field(t => t.date);
-        }
-    }
-
     public class TimelineType : ObjectGraphType<Timeline>
     {
         public TimelineType()
         {
-            Field(t => t.name);
-            //Field(t => t.counts);
-            Field(t => t.count);
-            Field(t => t.date);
+            Field(f => f._id);
+            Field(f => f.counts);
         }
     }
 }

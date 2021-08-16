@@ -12,19 +12,21 @@
     <PackageReference Include="GraphQL.Server.Transports.AspNetCore.SystemTextJson" Version="5.0.2" />
     <PackageReference Include="GraphQL.Server.Transports.WebSockets" Version="4.4.1" />
     <PackageReference Include="GraphQL.Server.Ui.Playground" Version="5.0.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="5.0.8" />
-    <PackageReference Include="Microsoft.Azure.Cosmos" Version="3.20.1" />
-    <PackageReference Include="Microsoft.Azure.DocumentDB.Core" Version="2.15.0" />
-    <PackageReference Include="Toolbelt.Blazor.HeadElement.ServerPrerendering" Version="1.5.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="5.0.9" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.9">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="MongoDB.Driver" Version="2.13.1" />
+    <PackageReference Include="Toolbelt.Blazor.HeadElement.ServerPrerendering" Version="1.5.3" />
     <PackageReference Include="Markdig" Version="0.25.0" />
-    <PackageReference Include="HtmlSanitizer" Version="5.0.404" />
+    <PackageReference Include="HtmlSanitizer" Version="6.0.441" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Client\SnapstatsOrg.Client.csproj" />
     <ProjectReference Include="..\Shared\SnapstatsOrg.Shared.csproj" />
   </ItemGroup>
-
 
   <ItemGroup>
     <None Remove="Markdig" />

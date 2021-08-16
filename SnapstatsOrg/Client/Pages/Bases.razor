@@ -33,9 +33,11 @@
 	private const string Query = @"
 		query {
 			baseTimeline{
-				name
-				date
-				count
+				_id
+                counts{
+                    date
+                    count
+                }
 			}
 		}
 	";
@@ -48,7 +50,7 @@
         {
             Query = Query,
         };
-        var response = await Client.SendQueryAsync<BasesTimeline>(request).ConfigureAwait(false);
+        var response = await Client.SendQueryAsync<BaseTimelineQuery>(request).ConfigureAwait(false);
         timeline = response.Data.baseTimeline;
     }
 }

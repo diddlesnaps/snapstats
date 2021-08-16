@@ -9,18 +9,17 @@
     <ExternalConsole>true</ExternalConsole>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Blazorise.Charts" Version="0.9.4.1" />
+    <PackageReference Include="Blazorise.Charts" Version="0.9.4.3" />
     <PackageReference Include="GraphQL.Client" Version="3.2.4" />
     <PackageReference Include="GraphQL.Client.Serializer.SystemTextJson" Version="3.2.4" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="5.0.8" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="5.0.8" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="5.0.8" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="5.0.9" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="5.0.9" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="5.0.9" PrivateAssets="all" />
     <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="2.2.0" />
-    <PackageReference Include="Radzen.Blazor" Version="3.7.2" />
     <PackageReference Include="System.Net.Http.Json" Version="5.0.0" />
-    <PackageReference Include="Toolbelt.Blazor.HeadElement" Version="5.4.2" />
+    <PackageReference Include="Toolbelt.Blazor.HeadElement" Version="5.4.3" />
     <PackageReference Include="Markdig" Version="0.25.0" />
-    <PackageReference Include="HtmlSanitizer" Version="5.0.404" />
+    <PackageReference Include="HtmlSanitizer" Version="6.0.441" />
   </ItemGroup>
 
   <ItemGroup>

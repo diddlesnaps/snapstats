@@ -1,11 +1,7 @@
-﻿using System;
-using Microsoft.Azure.Documents;
-using Microsoft.Azure.Documents.Client;
-using GraphQL.Types;
+﻿using GraphQL.Types;
 using SnapstatsOrg.Shared.Models;
-using GraphQL;
-using Microsoft.Azure.Documents.Linq;
 using System.Linq;
+using MongoDB.Driver;
 
 namespace SnapstatsOrg.Shared.GraphQL.Types
 {
@@ -55,14 +51,11 @@ namespace SnapstatsOrg.Shared.GraphQL.Types
 
     public class SnapType : ObjectGraphType<Snap>
     {
-        private static readonly Uri _planetsCollectionUri = UriFactory.CreateDocumentCollectionUri(Constants.DATABASE_NAME, Constants.SNAPS_COLLECTION_NAME);
-        private static readonly FeedOptions _feedOptions = new FeedOptions { MaxItemCount = -1, EnableCrossPartitionQuery = true };
+        private readonly IMongoDatabase _db;
 
-        private readonly IDocumentClient _documentClient;
-
-        public SnapType(IDocumentClient documentClient) //, IDataLoaderContextAccessor dataLoaderContextAccessor)
+        public SnapType(IMongoDatabase db) //, IDataLoaderContextAccessor dataLoaderContextAccessor)
         {
-            _documentClient = documentClient;
+            _db = db;
 
             Field(t => t.aliases);
             Field(t => t.anon_download_url);
@@ -106,22 +99,12 @@ namespace SnapstatsOrg.Shared.GraphQL.Types
             Field(t => t.plugs);
             Field(t => t.slots);
 
-            FieldAsync<FloatGraphType>(
+            Field<FloatGraphType>(
                 "ratings_average",
-                resolve: async (context) => {
-                    var query = documentClient.CreateDocumentQuery<Rating>(
-                        SnapstatsQuery._ratingsCollectionUri,
-                        new SqlQuerySpec(
-                            "SELECT * FROM c WHERE c.app_id = @id",
-                            new SqlParameterCollection() {
-                                            new SqlParameter("@id", $"io.snapcraft.{context.Source.package_name}-{context.Source.snap_id}")
-                            }
-                        ),
-                        SnapstatsQuery._feedOptionsOne
-                    ).AsDocumentQuery();
-                    var rating = (Rating)((await query.ExecuteNextAsync()).FirstOrDefault() ?? new Rating());
+                resolve: context => {
+                    var rating = db.GetCollection<Rating>(Constants.RATINGS_COLLECTION_NAME).Find(Builders<Rating>.Filter.Eq(w => w.app_id, $"io.snapcraft.{context.Source.package_name}-{context.Source.snap_id}")).FirstOrDefault();
 
-                    if (rating.total == 0) return 0;
+                    if (rating is null || rating.total == 0) return 0;
 
                     return (
                         rating.star5 * 5
@@ -133,20 +116,13 @@ namespace SnapstatsOrg.Shared.GraphQL.Types
                 }
             );
 
-            FieldAsync<IntGraphType>(
+            Field<IntGraphType>(
                 "ratings_count",
-                resolve: async (context) => {
-                    var query = documentClient.CreateDocumentQuery<Rating>(
-                        SnapstatsQuery._ratingsCollectionUri,
-                        new SqlQuerySpec(
-                            "SELECT * FROM c WHERE c.app_id = @id",
-                            new SqlParameterCollection() {
-                                new SqlParameter("@id", $"io.snapcraft.{context.Source.package_name}-{context.Source.snap_id}")
-                            }
-                        ),
-                        SnapstatsQuery._feedOptionsOne
-                    ).AsDocumentQuery();
-                    var rating = (Rating)((await query.ExecuteNextAsync()).FirstOrDefault() ?? new Rating());
+                resolve: (context) => {
+                    var rating = db.GetCollection<Rating>(Constants.RATINGS_COLLECTION_NAME).Find(Builders<Rating>.Filter.Eq(w => w.app_id, $"io.snapcraft.{context.Source.package_name}-{context.Source.snap_id}")).FirstOrDefault();
+
+                    if (rating is null || rating.total == 0) return 0;
+
                     return rating.total;
                 }
             );

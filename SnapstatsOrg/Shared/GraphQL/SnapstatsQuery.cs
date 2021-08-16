@@ -1,250 +1,710 @@
-﻿using System;
-using Microsoft.Azure.Documents;
-using Microsoft.Azure.Documents.Client;
-using GraphQL;
+﻿using GraphQL;
 using GraphQL.Types;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
+using MongoDB.Driver;
+using SnapstatsOrg.Shared.GraphQL;
 using SnapstatsOrg.Shared.GraphQL.Infrastructure;
 using SnapstatsOrg.Shared.GraphQL.Types;
+using SnapstatsOrg.Shared.GraphQL.Types.Architectures;
+using SnapstatsOrg.Shared.GraphQL.Types.Bases;
+using SnapstatsOrg.Shared.GraphQL.Types.Channels;
+using SnapstatsOrg.Shared.GraphQL.Types.Confinements;
+using SnapstatsOrg.Shared.GraphQL.Types.DeveloperCounts;
+using SnapstatsOrg.Shared.GraphQL.Types.Licenses;
+using SnapstatsOrg.Shared.GraphQL.Types.Sections;
+using SnapstatsOrg.Shared.GraphQL.Types.SnapCounts;
 using SnapstatsOrg.Shared.Models;
+using SnapstatsOrg.Shared.Models.Architectures;
+using SnapstatsOrg.Shared.Models.Bases;
+using SnapstatsOrg.Shared.Models.Channels;
+using SnapstatsOrg.Shared.Models.Confinements;
+using SnapstatsOrg.Shared.Models.DeveloperCounts;
+using SnapstatsOrg.Shared.Models.Licenses;
+using SnapstatsOrg.Shared.Models.Sections;
+using SnapstatsOrg.Shared.Models.SnapCounts;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
-using Microsoft.Azure.Documents.Linq;
-using GraphQL.Execution;
-using SnapstatsOrg.Shared.Models.Derived;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace SnapstatsOrg.Shared.GraphQL
 {
     public class SnapstatsQuery : ObjectGraphType
     {
-        public static readonly Uri _architecturesCollectionUri = UriFactory.CreateDocumentCollectionUri(Constants.DATABASE_NAME, Constants.ARCHITECTURES_COLLECTION_NAME);
-        public static readonly Uri _basesCollectionUri = UriFactory.CreateDocumentCollectionUri(Constants.DATABASE_NAME, Constants.BASES_COLLECTION_NAME);
-        public static readonly Uri _channelsCollectionUri = UriFactory.CreateDocumentCollectionUri(Constants.DATABASE_NAME, Constants.CHANNELS_COLLECTION_NAME);
-        public static readonly Uri _confinementsCollectionUri = UriFactory.CreateDocumentCollectionUri(Constants.DATABASE_NAME, Constants.CONFINEMENTS_COLLECTION_NAME);
-        public static readonly Uri _developerCountsCollectionUri = UriFactory.CreateDocumentCollectionUri(Constants.DATABASE_NAME, Constants.DEVELOPER_COUNTS_COLLECTION_NAME);
-        public static readonly Uri _licensesCollectionUri = UriFactory.CreateDocumentCollectionUri(Constants.DATABASE_NAME, Constants.LICENSES_COLLECTION_NAME);
-        public static readonly Uri _ratingsCollectionUri = UriFactory.CreateDocumentCollectionUri(Constants.DATABASE_NAME, Constants.RATINGS_COLLECTION_NAME);
-        public static readonly Uri _sectionsCollectionUri = UriFactory.CreateDocumentCollectionUri(Constants.DATABASE_NAME, Constants.SECTIONS_COLLECTION_NAME);
-        public static readonly Uri _snapCountsCollectionUri = UriFactory.CreateDocumentCollectionUri(Constants.DATABASE_NAME, Constants.SNAP_COUNTS_COLLECTION_NAME);
-        public static readonly Uri _snapsCollectionUri = UriFactory.CreateDocumentCollectionUri(Constants.DATABASE_NAME, Constants.SNAPS_COLLECTION_NAME);
-
-        public static readonly FeedOptions _feedOptionsOne = new FeedOptions { MaxItemCount = 1, EnableCrossPartitionQuery = true };
-        public static readonly FeedOptions _feedOptionsTwenty = new FeedOptions { MaxItemCount = 20, EnableCrossPartitionQuery = true };
-        public static readonly FeedOptions _feedOptionsUnlimited = new FeedOptions { MaxItemCount = -1, EnableCrossPartitionQuery = true };
-
-        public SnapstatsQuery(IDocumentClient documentClient)
+        public SnapstatsQuery(IMongoDatabase db)
         {
             #region Architectures
-            Field<ListGraphType<CountsType>>(
+            Field<ListGraphType<CountType>>(
                 "architecture",
-                arguments: new QueryArguments(new QueryArgument<StringGraphType> { Name = "snap_id" }),
-                resolve: context => documentClient.CreateDocumentQuery<Architecture>(_architecturesCollectionUri, context.ToSqlQuerySpec(), _feedOptionsUnlimited)
+                arguments: new QueryArguments(new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "_id" }),
+                resolve: context => {
+                    var name = context.GetArgument<string>("_id");
+                    return db.GetCollection<Architecture>(Constants.ARCHITECTURES_COLLECTION_NAME).Find(new FilterDefinitionBuilder<Architecture>().Where(f => f.name == name));
+                }
             );
 
-            FieldAsync<IntGraphType>(
+            Field<IntGraphType>(
                 "architectureCount",
-                resolve: async context => await context.GetDocumentCount(documentClient, _architecturesCollectionUri, _feedOptionsUnlimited)
+                resolve: context => db.GetCollection<Architecture>(Constants.ARCHITECTURES_COLLECTION_NAME).CountDocuments(FilterDefinition<Architecture>.Empty)
             );
 
-            Field<ListGraphType<CountsType>>(
+            Field<ListGraphType<CountType>>(
                 "architectures",
-                resolve: context => documentClient.CreateDocumentQuery<Architecture>(_architecturesCollectionUri, context.ToSqlLimitOneYearQuerySpec(), _feedOptionsUnlimited)
+                arguments: new QueryArguments(new QueryArgument<DecimalGraphType> { Name = "offset" }, new QueryArgument<DecimalGraphType> { Name = "limit" }),
+                resolve: context => db.GetCollection<Architecture>(Constants.ARCHITECTURES_COLLECTION_NAME)
+                    .Find(FilterDefinition<Architecture>.Empty)
+                    .SortByDescending(s => s.date)
+                    .Skip(context.GetArgument<int?>("offset", 0))
+                    .Limit(context.GetArgument<int?>("limit", 20))
+                    .ToEnumerable()
             );
 
-            Field<ListGraphType<CountsType>>(
+            Field<ArchitecturesByDateType>(
                 "architecturesByDate",
-                resolve: context => documentClient.CreateDocumentQuery<Architecture>(_architecturesCollectionUri, context.ToSqlLimitOneYearQuerySpec(), _feedOptionsUnlimited)
+                resolve: context => {
+                    var updated = db.GetCollection<LastUpdated>(Constants.LAST_UPDATEDS_COLLECTION_NAME).Find(FilterDefinition<LastUpdated>.Empty).First();
+                    var date = updated.date;
+                    var architectures = db.GetCollection<Architecture>(Constants.ARCHITECTURES_COLLECTION_NAME).Find(f => f.date == date);
+                    return new ArchitectureByDate() { _id = date, architectures = architectures.ToEnumerable().ToArray() };
+                }
             );
 
             Field<ListGraphType<TimelineType>>(
                 "architectureTimeline",
-                arguments: new QueryArguments(new QueryArgument<DateGraphType> { Name = "from" }),
-                resolve: context => documentClient.CreateDocumentQuery<Timeline>(_architecturesCollectionUri, context.ToTimelineOfCountsQuerySpec("architectures"), _feedOptionsUnlimited)
+                arguments: new QueryArguments(new QueryArgument<DateTimeGraphType> { Name = "from" }),
+                resolve: context => {
+                    var now = DateTime.Now;
+                    var lastYear = now.AddYears(-1);
+                    var from = context.GetArgument<DateTime>("from");
+                    if (from < lastYear)
+                    {
+                        from = lastYear;
+                    }
+
+                    var cal = CultureInfo.InvariantCulture.Calendar;
+                    var startWeek = cal.GetWeekOfYear(from, CalendarWeekRule.FirstFullWeek, DayOfWeek.Monday);
+
+                    return db.GetCollection<Architecture>(Constants.ARCHITECTURES_COLLECTION_NAME).Aggregate()
+                        .Match(m => m.date >= from)
+                        .Group(
+                            g => new
+                            {
+                                year = g.date.Year,
+                                month = g.date.Month,
+                                day = g.date.Day,
+                                name = g.name,
+                            },
+                            g => new
+                            {
+                                _id = g.Key,
+                                count = g.Max(m => m.count),
+                            })
+                        .Project(
+                            p => new
+                            {
+                                _id = new DateTime(p._id.year, p._id.month, p._id.day),
+                                p.count,
+                                p._id.name,
+                            })
+                        .SortByDescending(p => p._id)
+                        .Group<Timeline>(new BsonDocument
+                        {
+                            { "_id", "$name" },
+                            {
+                                "counts", new BsonDocument
+                                {
+                                    {
+                                        "$push", new BsonDocument
+                                        {
+                                            { "count", "$count" },
+                                            { "date", "$_id" }
+                                        }
+                                    }
+                                }
+                            }
+                        })
+                        .ToEnumerable();
+                }
             );
             #endregion
 
             #region Bases
-            Field<ListGraphType<CountsType>>(
+            Field<ListGraphType<CountType>>(
                 "base",
-                arguments: new QueryArguments(new QueryArgument<StringGraphType> { Name = "_id" }),
-                resolve: context => documentClient.CreateDocumentQuery<Base>(_basesCollectionUri, context.ToSqlQuerySpec(), _feedOptionsUnlimited)
+                arguments: new QueryArguments(new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "_id" }),
+                resolve: context => {
+                    var name = context.GetArgument<string>("_id");
+                    return db.GetCollection<Base>(Constants.BASES_COLLECTION_NAME).Find(new FilterDefinitionBuilder<Base>().Where(f => f.name == name));
+                }
             );
 
-            FieldAsync<IntGraphType>(
+            Field<IntGraphType>(
                 "baseCount",
-                resolve: async context => await context.GetDocumentCount(documentClient, _basesCollectionUri, _feedOptionsUnlimited)
+                resolve: context => db.GetCollection<Base>(Constants.BASES_COLLECTION_NAME).CountDocuments(FilterDefinition<Base>.Empty)
             );
 
-            Field<ListGraphType<CountsType>>(
+            Field<ListGraphType<CountType>>(
                 "bases",
-                resolve: context => documentClient.CreateDocumentQuery<Base>(_basesCollectionUri, context.ToSqlLimitOneYearQuerySpec(), _feedOptionsUnlimited)
+                arguments: new QueryArguments(new QueryArgument<DecimalGraphType> { Name = "offset" }, new QueryArgument<DecimalGraphType> { Name = "limit" }),
+                resolve: context => db.GetCollection<Base>(Constants.BASES_COLLECTION_NAME)
+                    .Find(FilterDefinition<Base>.Empty)
+                    .SortByDescending(s => s.date)
+                    .Skip(context.GetArgument<int?>("offset", 0))
+                    .Limit(context.GetArgument<int?>("limit", 20))
+                    .ToEnumerable()
             );
 
-            Field<ListGraphType<CountsType>>(
+            Field<BasesByDateType>(
                 "basesByDate",
-                resolve: context => documentClient.CreateDocumentQuery<Base>(_basesCollectionUri, context.ToSqlLimitOneYearQuerySpec(), _feedOptionsUnlimited)
+                resolve: context => {
+                    var updated = db.GetCollection<LastUpdated>(Constants.LAST_UPDATEDS_COLLECTION_NAME).Find(FilterDefinition<LastUpdated>.Empty).First();
+                    var date = updated.date;
+                    var bases = db.GetCollection<Base>(Constants.BASES_COLLECTION_NAME).Find(f => f.date == date);
+                    return new BaseByDate() { _id = date, bases = bases.ToEnumerable().ToArray() };
+                }
             );
 
             Field<ListGraphType<TimelineType>>(
                 "baseTimeline",
-                arguments: new QueryArguments(new QueryArgument<DateGraphType> { Name = "from" }),
-                resolve: context => documentClient.CreateDocumentQuery<Timeline>(_basesCollectionUri, context.ToTimelineOfCountsQuerySpec("bases"), _feedOptionsUnlimited)
+                arguments: new QueryArguments(new QueryArgument<DateTimeGraphType> { Name = "from" }),
+                resolve: context => {
+                    var now = DateTime.Now;
+                    var lastYear = now.AddYears(-1);
+                    var from = context.GetArgument<DateTime>("from");
+                    if (from < lastYear)
+                    {
+                        from = lastYear;
+                    }
+
+                    var cal = CultureInfo.InvariantCulture.Calendar;
+                    var startWeek = cal.GetWeekOfYear(from, CalendarWeekRule.FirstFullWeek, DayOfWeek.Monday);
+
+                    return db.GetCollection<Base>(Constants.BASES_COLLECTION_NAME).Aggregate()
+                        .Match(m => m.date >= from)
+                        .Group(
+                            g => new
+                            {
+                                year = g.date.Year,
+                                month = g.date.Month,
+                                day = g.date.Day,
+                                name = g.name,
+                            },
+                            g => new
+                            {
+                                _id = g.Key,
+                                count = g.Max(m => m.count),
+                            })
+                        .Project(
+                            p => new
+                            {
+                                _id = new DateTime(p._id.year, p._id.month, p._id.day),
+                                p.count,
+                                p._id.name,
+                            })
+                        .SortByDescending(p => p._id)
+                        .Group<Timeline>(new BsonDocument
+                        {
+                            { "_id", "$name" },
+                            {
+                                "counts", new BsonDocument
+                                {
+                                    {
+                                        "$push", new BsonDocument
+                                        {
+                                            { "count", "$count" },
+                                            { "date", "$_id" }
+                                        }
+                                    }
+                                }
+                            }
+                        })
+                        .ToEnumerable();
+                }
             );
             #endregion
 
             #region Channels
-            Field<ListGraphType<CountsType>>(
+            Field<ListGraphType<CountType>>(
                 "channel",
-                arguments: new QueryArguments(new QueryArgument<StringGraphType> { Name = "_id" }),
-                resolve: context => documentClient.CreateDocumentQuery<Channel>(_channelsCollectionUri, context.ToSqlQuerySpec(), _feedOptionsUnlimited)
+                arguments: new QueryArguments(new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "_id" }),
+                resolve: context => {
+                    var name = context.GetArgument<string>("_id");
+                    return db.GetCollection<Channel>(Constants.CHANNELS_COLLECTION_NAME).Find(new FilterDefinitionBuilder<Channel>().Where(f => f.name == name));
+                }
             );
 
-            FieldAsync<IntGraphType>(
+            Field<IntGraphType>(
                 "channelCount",
-                resolve: async context => await context.GetDocumentCount(documentClient, _channelsCollectionUri, _feedOptionsUnlimited)
+                resolve: context => db.GetCollection<Channel>(Constants.CHANNELS_COLLECTION_NAME).CountDocuments(FilterDefinition<Channel>.Empty)
             );
 
-            Field<ListGraphType<CountsType>>(
+            Field<ListGraphType<CountType>>(
                 "channels",
-                resolve: context => documentClient.CreateDocumentQuery<Channel>(_channelsCollectionUri, context.ToSqlLimitOneYearQuerySpec(), _feedOptionsUnlimited)
+                arguments: new QueryArguments(new QueryArgument<DecimalGraphType> { Name = "offset" }, new QueryArgument<DecimalGraphType> { Name = "limit" }),
+                resolve: context => db.GetCollection<Channel>(Constants.CHANNELS_COLLECTION_NAME)
+                    .Find(FilterDefinition<Channel>.Empty)
+                    .SortByDescending(s => s.date)
+                    .Skip(context.GetArgument<int?>("offset", 0))
+                    .Limit(context.GetArgument<int?>("limit", 20))
+                    .ToEnumerable()
             );
 
-            Field<ListGraphType<CountsType>>(
+            Field<ChannelsByDateType>(
                 "channelsByDate",
-                resolve: context => documentClient.CreateDocumentQuery<Channel>(_channelsCollectionUri, context.ToSqlLimitOneYearQuerySpec(), _feedOptionsUnlimited)
+                resolve: context => {
+                    var updated = db.GetCollection<LastUpdated>(Constants.LAST_UPDATEDS_COLLECTION_NAME).Find(FilterDefinition<LastUpdated>.Empty).First();
+                    var date = updated.date;
+                    var channels = db.GetCollection<Channel>(Constants.CHANNELS_COLLECTION_NAME).Find(f => f.date == date);
+                    return new ChannelByDate() { _id = date, channels = channels.ToEnumerable().ToArray() };
+                }
             );
 
             Field<ListGraphType<TimelineType>>(
                 "channelTimeline",
-                arguments: new QueryArguments(new QueryArgument<DateGraphType> { Name = "from" }),
-                resolve: context => documentClient.CreateDocumentQuery<Timeline>(_channelsCollectionUri, context.ToTimelineOfCountsQuerySpec("channels"), _feedOptionsUnlimited)
+                arguments: new QueryArguments(new QueryArgument<DateTimeGraphType> { Name = "from" }),
+                resolve: context => {
+                    var now = DateTime.Now;
+                    var lastYear = now.AddYears(-1);
+                    var from = context.GetArgument<DateTime>("from");
+                    if (from < lastYear)
+                    {
+                        from = lastYear;
+                    }
+
+                    var cal = CultureInfo.InvariantCulture.Calendar;
+                    var startWeek = cal.GetWeekOfYear(from, CalendarWeekRule.FirstFullWeek, DayOfWeek.Monday);
+
+                    return db.GetCollection<Channel>(Constants.CHANNELS_COLLECTION_NAME).Aggregate()
+                        .Match(m => m.date >= from)
+                        .Group(
+                            g => new
+                            {
+                                year = g.date.Year,
+                                month = g.date.Month,
+                                day = g.date.Day,
+                                name = g.name,
+                            },
+                            g => new
+                            {
+                                _id = g.Key,
+                                count = g.Max(m => m.count),
+                            })
+                        .Project(
+                            p => new
+                            {
+                                _id = new DateTime(p._id.year, p._id.month, p._id.day),
+                                p.count,
+                                p._id.name,
+                            })
+                        .SortByDescending(p => p._id)
+                        .Group<Timeline>(new BsonDocument
+                        {
+                            { "_id", "$name" },
+                            {
+                                "counts", new BsonDocument
+                                {
+                                    {
+                                        "$push", new BsonDocument
+                                        {
+                                            { "count", "$count" },
+                                            { "date", "$_id" }
+                                        }
+                                    }
+                                }
+                            }
+                        })
+                        .ToEnumerable();
+                }
             );
             #endregion
 
             #region Confinements
-            Field<ListGraphType<CountsType>>(
+            Field<ListGraphType<CountType>>(
                 "confinement",
-                arguments: new QueryArguments(new QueryArgument<StringGraphType> { Name = "_id" }),
-                resolve: context => documentClient.CreateDocumentQuery<Confinement>(_confinementsCollectionUri, context.ToSqlQuerySpec(), _feedOptionsUnlimited)
+                arguments: new QueryArguments(new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "_id" }),
+                resolve: context => {
+                    var name = context.GetArgument<string>("_id");
+                    return db.GetCollection<Confinement>(Constants.CONFINEMENTS_COLLECTION_NAME).Find(new FilterDefinitionBuilder<Confinement>().Where(f => f.name == name));
+                }
             );
 
-            FieldAsync<IntGraphType>(
+            Field<IntGraphType>(
                 "confinementCount",
-                resolve: async context => await context.GetDocumentCount(documentClient, _confinementsCollectionUri, _feedOptionsUnlimited)
+                resolve: context => db.GetCollection<Confinement>(Constants.CONFINEMENTS_COLLECTION_NAME).CountDocuments(FilterDefinition<Confinement>.Empty)
             );
 
-            Field<ListGraphType<CountsType>>(
+            Field<ListGraphType<CountType>>(
                 "confinements",
-                resolve: context => documentClient.CreateDocumentQuery<Confinement>(_confinementsCollectionUri, context.ToSqlLimitOneYearQuerySpec(), _feedOptionsUnlimited)
+                arguments: new QueryArguments(new QueryArgument<DecimalGraphType> { Name = "offset" }, new QueryArgument<DecimalGraphType> { Name = "limit" }),
+                resolve: context => db.GetCollection<Confinement>(Constants.CONFINEMENTS_COLLECTION_NAME)
+                    .Find(FilterDefinition<Confinement>.Empty)
+                    .SortByDescending(s => s.date)
+                    .Skip(context.GetArgument<int?>("offset", 0))
+                    .Limit(context.GetArgument<int?>("limit", 20))
+                    .ToEnumerable()
             );
 
-            Field<ListGraphType<CountsType>>(
+            Field<ConfinementsByDateType>(
                 "confinementsByDate",
-                resolve: context => documentClient.CreateDocumentQuery<Confinement>(_confinementsCollectionUri, context.ToSqlLimitOneYearQuerySpec(), _feedOptionsUnlimited)
+                resolve: context => {
+                    var updated = db.GetCollection<LastUpdated>(Constants.LAST_UPDATEDS_COLLECTION_NAME).Find(FilterDefinition<LastUpdated>.Empty).First();
+                    var date = updated.date;
+                    var confinements = db.GetCollection<Confinement>(Constants.CONFINEMENTS_COLLECTION_NAME).Find(f => f.date == date);
+                    return new ConfinementByDate() { _id = date, confinements = confinements.ToEnumerable().ToArray() };
+                }
             );
 
             Field<ListGraphType<TimelineType>>(
                 "confinementTimeline",
-                arguments: new QueryArguments(new QueryArgument<DateGraphType> { Name = "from" }),
-                resolve: context => documentClient.CreateDocumentQuery<Timeline>(_confinementsCollectionUri, context.ToTimelineOfCountsQuerySpec("confinements"), _feedOptionsUnlimited)
+                arguments: new QueryArguments(new QueryArgument<DateTimeGraphType> { Name = "from" }),
+                resolve: context => {
+                    var now = DateTime.Now;
+                    var lastYear = now.AddYears(-1);
+                    var from = context.GetArgument<DateTime>("from");
+                    if (from < lastYear)
+                    {
+                        from = lastYear;
+                    }
+
+                    var cal = CultureInfo.InvariantCulture.Calendar;
+                    var startWeek = cal.GetWeekOfYear(from, CalendarWeekRule.FirstFullWeek, DayOfWeek.Monday);
+
+                    return db.GetCollection<Confinement>(Constants.CONFINEMENTS_COLLECTION_NAME).Aggregate()
+                        .Match(m => m.date >= from)
+                        .Group(
+                            g => new
+                            {
+                                year = g.date.Year,
+                                month = g.date.Month,
+                                day = g.date.Day,
+                                name = g.name,
+                            },
+                            g => new
+                            {
+                                _id = g.Key,
+                                count = g.Max(m => m.count),
+                            })
+                        .Project(
+                            p => new
+                            {
+                                _id = new DateTime(p._id.year, p._id.month, p._id.day),
+                                p.count,
+                                p._id.name,
+                            })
+                        .SortByDescending(p => p._id)
+                        .Group<Timeline>(new BsonDocument
+                        {
+                            { "_id", "$name" },
+                            {
+                                "counts", new BsonDocument
+                                {
+                                    {
+                                        "$push", new BsonDocument
+                                        {
+                                            { "count", "$count" },
+                                            { "date", "$_id" }
+                                        }
+                                    }
+                                }
+                            }
+                        })
+                        .ToEnumerable();
+                }
             );
             #endregion
 
-            #region DeveloperCounts
-            Field<ListGraphType<CountsType>>(
-                "developerCount",
-                arguments: new QueryArguments(new QueryArgument<StringGraphType> { Name = "_id" }),
-                resolve: context => documentClient.CreateDocumentQuery<DeveloperCount>(_developerCountsCollectionUri, context.ToSqlQuerySpec(), _feedOptionsUnlimited)
-            );
-
-            FieldAsync<IntGraphType>(
+            #region Developers
+            Field<IntGraphType>(
                 "developerCountCount",
-                resolve: async context => await context.GetDocumentCount(documentClient, _developerCountsCollectionUri, _feedOptionsUnlimited)
+                resolve: context => db.GetCollection<DeveloperCount>(Constants.DEVELOPER_COUNTS_COLLECTION_NAME).CountDocuments(FilterDefinition<DeveloperCount>.Empty)
             );
 
-            Field<ListGraphType<CountsType>>(
+            Field<ListGraphType<CountType>>(
                 "developerCounts",
-                resolve: context => documentClient.CreateDocumentQuery<DeveloperCount>(_developerCountsCollectionUri, context.ToSqlLimitOneYearQuerySpec(), _feedOptionsUnlimited)
+                arguments: new QueryArguments(new QueryArgument<DecimalGraphType> { Name = "offset" }, new QueryArgument<DecimalGraphType> { Name = "limit" }),
+                resolve: context => db.GetCollection<DeveloperCount>(Constants.DEVELOPER_COUNTS_COLLECTION_NAME)
+                    .Find(FilterDefinition<DeveloperCount>.Empty)
+                    .SortByDescending(s => s.date)
+                    .Skip(context.GetArgument<int?>("offset", 0))
+                    .Limit(context.GetArgument<int?>("limit", 20))
+                    .ToEnumerable()
             );
 
-            Field<ListGraphType<DeveloperCountType>>(
+            Field<DeveloperCountsByDateType>(
                 "developerCountsByDate",
-                resolve: context => documentClient.CreateDocumentQuery<DeveloperCount>(_developerCountsCollectionUri, context.ToSqlLimitOneYearQuerySpec(), _feedOptionsUnlimited)
+                resolve: context => {
+                    var updated = db.GetCollection<LastUpdated>(Constants.LAST_UPDATEDS_COLLECTION_NAME).Find(FilterDefinition<LastUpdated>.Empty).First();
+                    var date = updated.date;
+                    var developerCounts = db.GetCollection<DeveloperCount>(Constants.DEVELOPER_COUNTS_COLLECTION_NAME).Find(f => f.date == date);
+                    return new DeveloperCountByDate() { _id = date, developerCounts = developerCounts.ToEnumerable().ToArray() };
+                }
             );
 
-            Field<TimelineType>(
+            Field<ListGraphType<TimelineType>>(
                 "developerCountTimeline",
-                arguments: new QueryArguments(new QueryArgument<DateGraphType> { Name = "from" }),
-                resolve: context => documentClient.CreateDocumentQuery<DeveloperCount>(_developerCountsCollectionUri, context.ToTimelineQuerySpec(), _feedOptionsUnlimited)
+                arguments: new QueryArguments(new QueryArgument<DateTimeGraphType> { Name = "from" }),
+                resolve: context => {
+                    var now = DateTime.Now;
+                    var lastYear = now.AddYears(-1);
+                    var from = context.GetArgument<DateTime>("from");
+                    if (from < lastYear)
+                    {
+                        from = lastYear;
+                    }
+
+                    var cal = CultureInfo.InvariantCulture.Calendar;
+                    var startWeek = cal.GetWeekOfYear(from, CalendarWeekRule.FirstFullWeek, DayOfWeek.Monday);
+
+                    return db.GetCollection<DeveloperCount>(Constants.DEVELOPER_COUNTS_COLLECTION_NAME).Aggregate()
+                        .Match(m => m.date >= from)
+                        .SortBy(s => s.date)
+                        .Group(
+                            g => new
+                            {
+                                year = g.date.Year,
+                                month = g.date.Month,
+                                day = g.date.Day,
+                            },
+                            g => new
+                            {
+                                _id = g.Key,
+                                total = g.Max(m => m.total),
+                                mean = g.Average(m => m.mean),
+                            })
+                        .Project(
+                            p => new
+                            {
+                                _id = new DateTime(p._id.year, p._id.month, p._id.day),
+                                p.total,
+                                p.mean,
+                            })
+                        .ToEnumerable();
+                }
             );
 
-            FieldAsync<ListGraphType<StringGraphType>>(
+            Field<ListGraphType<StringGraphType>>(
                 "verifiedDevelopers",
-                resolve: async context => await context.GetVerifiedDeveloperNames(documentClient, _snapsCollectionUri, _feedOptionsUnlimited)
+                resolve: context => db.GetCollection<Snap>(Constants.SNAPS_COLLECTION_NAME).Aggregate()
+                    .Match(m => m.developer_validation == "verified")
+                    .Group(
+                        g => g.developer_name,
+                        g => new
+                        {
+                            _id = g.Key ?? "",
+                        }
+                    )
+                    .SortBy(s => s._id)
+                    .ToEnumerable()
+                    .Select(s => s._id)
             );
 
-            FieldAsync<IntGraphType>(
+            Field<IntGraphType>(
                 "verifiedDeveloperCount",
-                resolve: async context => {
-                    var response = await context.GetVerifiedDeveloperNames(documentClient, _snapsCollectionUri, _feedOptionsUnlimited);
-                    return response.Length;
+                resolve: context =>
+                {
+                    var r = db.GetCollection<Snap>(Constants.SNAPS_COLLECTION_NAME).Aggregate()
+                    .Match(m => m.developer_validation == "verified")
+                    .Group(
+                        g => g.developer_name,
+                        g => new
+                        {
+                            _id = g.Key
+                        }
+                    )
+                    .Count()
+                    .FirstOrDefault();
+                    return r?.Count ?? 0;
                 }
             );
             #endregion
 
             #region Licenses
-            Field<ListGraphType<CountsType>>(
+            Field<ListGraphType<CountType>>(
                 "license",
-                arguments: new QueryArguments(new QueryArgument<StringGraphType> { Name = "_id" }),
-                resolve: context => documentClient.CreateDocumentQuery<License>(_licensesCollectionUri, context.ToSqlQuerySpec(), _feedOptionsUnlimited)
+                arguments: new QueryArguments(new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "_id" }),
+                resolve: context => {
+                    var name = context.GetArgument<string>("_id");
+                    return db.GetCollection<License>(Constants.LICENSES_COLLECTION_NAME).Find(new FilterDefinitionBuilder<License>().Where(f => f.name == name));
+                }
             );
 
-            FieldAsync<IntGraphType>(
+            Field<IntGraphType>(
                 "licenseCount",
-                resolve: async context => await context.GetDocumentCount(documentClient, _licensesCollectionUri, _feedOptionsUnlimited)
+                resolve: context => db.GetCollection<License>(Constants.LICENSES_COLLECTION_NAME).CountDocuments(FilterDefinition<License>.Empty)
             );
 
-            Field<ListGraphType<CountsType>>(
+            Field<ListGraphType<CountType>>(
                 "licenses",
-                resolve: context => documentClient.CreateDocumentQuery<License>(_licensesCollectionUri, context.ToSqlLimitOneYearQuerySpec(), _feedOptionsUnlimited)
+                arguments: new QueryArguments(new QueryArgument<DecimalGraphType> { Name = "offset" }, new QueryArgument<DecimalGraphType> { Name = "limit" }),
+                resolve: context => db.GetCollection<License>(Constants.LICENSES_COLLECTION_NAME)
+                    .Find(FilterDefinition<License>.Empty)
+                    .SortByDescending(s => s.date)
+                    .Skip(context.GetArgument<int?>("offset", 0))
+                    .Limit(context.GetArgument<int?>("limit", 20))
+                    .ToEnumerable()
             );
 
-            Field<ListGraphType<CountsType>>(
+            Field<LicensesByDateType>(
                 "licensesByDate",
-                resolve: context => documentClient.CreateDocumentQuery<License>(_licensesCollectionUri, context.ToSqlLimitOneYearQuerySpec(), _feedOptionsUnlimited)
+                resolve: context => {
+                    var updated = db.GetCollection<LastUpdated>(Constants.LAST_UPDATEDS_COLLECTION_NAME).Find(FilterDefinition<LastUpdated>.Empty).First();
+                    var date = updated.date;
+                    var licenses = db.GetCollection<License>(Constants.LICENSES_COLLECTION_NAME).Find(f => f.date == date);
+                    return new LicenseByDate() { _id = date, licenses = licenses.ToEnumerable().ToArray() };
+                }
             );
 
             Field<ListGraphType<TimelineType>>(
                 "licenseTimeline",
-                arguments: new QueryArguments(new QueryArgument<DateGraphType> { Name = "from" }),
-                resolve: context => documentClient.CreateDocumentQuery<Timeline>(_licensesCollectionUri, context.ToTimelineOfCountsQuerySpec("licenses"), _feedOptionsUnlimited)
+                arguments: new QueryArguments(new QueryArgument<DateTimeGraphType> { Name = "from" }),
+                resolve: context => {
+                    var now = DateTime.Now;
+                    var lastYear = now.AddYears(-1);
+                    var from = context.GetArgument<DateTime>("from");
+                    if (from < lastYear)
+                    {
+                        from = lastYear;
+                    }
+
+                    return db.GetCollection<License>(Constants.LICENSES_COLLECTION_NAME).Aggregate()
+                        .Match(m => m.date >= from)
+                        .Group(
+                            g => new
+                            {
+                                year = g.date.Year,
+                                month = g.date.Month,
+                                day = g.date.Day,
+                                name = g.name,
+                            },
+                            g => new
+                            {
+                                _id = g.Key,
+                                count = g.Max(m => m.count),
+                            })
+                        .Project(
+                            p => new
+                            {
+                                _id = new DateTime(p._id.year, p._id.month, p._id.day),
+                                p.count,
+                                p._id.name,
+                            })
+                        .SortByDescending(p => p._id)
+                        .Group<Timeline>(new BsonDocument
+                        {
+                            { "_id", "$name" },
+                            {
+                                "counts", new BsonDocument
+                                {
+                                    {
+                                        "$push", new BsonDocument
+                                        {
+                                            { "count", "$count" },
+                                            { "date", "$_id" }
+                                        }
+                                    }
+                                }
+                            }
+                        })
+                        .ToEnumerable();
+                }
             );
             #endregion
 
             #region Sections
-            Field<ListGraphType<CountsType>>(
+            Field<ListGraphType<CountType>>(
                 "section",
-                arguments: new QueryArguments(new QueryArgument<StringGraphType> { Name = "_id" }),
-                resolve: context => documentClient.CreateDocumentQuery<Section>(_sectionsCollectionUri, context.ToSqlLimitOneYearQuerySpec(), _feedOptionsUnlimited)
+                arguments: new QueryArguments(new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "_id" }),
+                resolve: context => {
+                    var name = context.GetArgument<string>("_id");
+                    return db.GetCollection<Section>(Constants.SECTIONS_COLLECTION_NAME).Find(new FilterDefinitionBuilder<Section>().Where(f => f.name == name));
+                }
             );
 
-            FieldAsync<IntGraphType>(
+            Field<IntGraphType>(
                 "sectionCount",
-                resolve: async context => await context.GetDocumentCount(documentClient, _sectionsCollectionUri, _feedOptionsUnlimited)
+                resolve: context => db.GetCollection<Section>(Constants.SECTIONS_COLLECTION_NAME).CountDocuments(FilterDefinition<Section>.Empty)
             );
 
-            Field<ListGraphType<CountsType>>(
+            Field<ListGraphType<CountType>>(
                 "sections",
-                resolve: context => documentClient.CreateDocumentQuery<Section>(_sectionsCollectionUri, context.ToSqlLimitOneYearQuerySpec(), _feedOptionsUnlimited)
+                arguments: new QueryArguments(new QueryArgument<DecimalGraphType> { Name = "offset" }, new QueryArgument<DecimalGraphType> { Name = "limit" }),
+                resolve: context => db.GetCollection<Section>(Constants.SECTIONS_COLLECTION_NAME)
+                    .Find(FilterDefinition<Section>.Empty)
+                    .SortByDescending(s => s.date)
+                    .Skip(context.GetArgument<int?>("offset", 0))
+                    .Limit(context.GetArgument<int?>("limit", 20))
+                    .ToEnumerable()
             );
 
-            Field<ListGraphType<CountsType>>(
+            Field<SectionsByDateType>(
                 "sectionsByDate",
-                resolve: context => documentClient.CreateDocumentQuery<Section>(_sectionsCollectionUri, context.ToSqlLimitOneYearQuerySpec(), _feedOptionsUnlimited)
+                resolve: context => {
+                    var updated = db.GetCollection<LastUpdated>(Constants.LAST_UPDATEDS_COLLECTION_NAME).Find(FilterDefinition<LastUpdated>.Empty).First();
+                    var date = updated.date;
+                    var sections = db.GetCollection<Section>(Constants.SECTIONS_COLLECTION_NAME).Find(f => f.date == date);
+                    return new SectionByDate() { _id = date, sections = sections.ToEnumerable().ToArray() };
+                }
             );
 
             Field<ListGraphType<TimelineType>>(
                 "sectionTimeline",
-                arguments: new QueryArguments(new QueryArgument<DateGraphType> { Name = "from" }),
-                resolve: context => documentClient.CreateDocumentQuery<Timeline>(_sectionsCollectionUri, context.ToTimelineOfCountsQuerySpec("sections"), _feedOptionsUnlimited)
+                arguments: new QueryArguments(new QueryArgument<DateTimeGraphType> { Name = "from" }),
+                resolve: context => {
+                    var now = DateTime.Now;
+                    var lastYear = now.AddYears(-1);
+                    var from = context.GetArgument<DateTime>("from");
+                    if (from < lastYear)
+                    {
+                        from = lastYear;
+                    }
+
+                    var cal = CultureInfo.InvariantCulture.Calendar;
+                    var startWeek = cal.GetWeekOfYear(from, CalendarWeekRule.FirstFullWeek, DayOfWeek.Monday);
+
+                    return db.GetCollection<Section>(Constants.SECTIONS_COLLECTION_NAME).Aggregate()
+                        .Match(m => m.date >= from)
+                        .Group(
+                            g => new
+                            {
+                                year = g.date.Year,
+                                month = g.date.Month,
+                                day = g.date.Day,
+                                name = g.name,
+                            },
+                            g => new
+                            {
+                                _id = g.Key,
+                                count = g.Max(m => m.count),
+                            })
+                        .Project(
+                            p => new
+                            {
+                                _id = new DateTime(p._id.year, p._id.month, p._id.day),
+                                p.count,
+                                p._id.name,
+                            })
+                        .SortByDescending(p => p._id)
+                        .Group<Timeline>(new BsonDocument
+                        {
+                            { "_id", "$name" },
+                            {
+                                "counts", new BsonDocument
+                                {
+                                    {
+                                        "$push", new BsonDocument
+                                        {
+                                            { "count", "$count" },
+                                            { "date", "$_id" }
+                                        }
+                                    }
+                                }
+                            }
+                        })
+                        .ToEnumerable();
+                }
             );
             #endregion
 
@@ -258,196 +718,238 @@ namespace SnapstatsOrg.Shared.GraphQL
                 new QueryArgument<StringGraphType> { Name = "category", DefaultValue = "" },
                 new QueryArgument<StringGraphType> { Name = "license", DefaultValue = "" },
                 new QueryArgument<ValidationEnum> { Name = "developer_validation", DefaultValue = null },
-                new QueryArgument<StringGraphType> { Name = "continuationToken", DefaultValue = "" }
+                new QueryArgument<IntGraphType> { Name = "offset", DefaultValue = 0 },
+                new QueryArgument<IntGraphType> { Name = "limit", DefaultValue = 20 }
             );
 
-            FieldAsync<PaginationType<Snap>>(
-                "snap",
-                arguments: findSnapsArgs,
-                resolve: async context =>
-                {
-                    var query = documentClient.CreateDocumentQueryWithPagination<Snap>(
-                        _snapsCollectionUri,
-                        context.ToSqlOrderedQuerySpec<Snap>(o => o.name),
-                        _feedOptionsTwenty,
-                        context.GetArgument<string>("continuationToken")
-                    );
-                    return await context.AddPagination(query);
-                }
-            );
+            var noHelloWorldOrTestRE = new MongoDB.Bson.BsonRegularExpression("(^(test|hello)-|-(test|hello)$)", "i");
 
-            FieldAsync<PaginationType<Snap>>(
+            Field<IntGraphType>(
                 "findSnaps",
                 arguments: findSnapsArgs,
-                resolve: async context =>
-                {
-                    var query = documentClient.CreateDocumentQueryWithPagination<Snap>(
-                        _snapsCollectionUri,
-                        context.ToSqlOrderedQuerySpec<Snap>(o => o.name),
-                        _feedOptionsTwenty,
-                        context.GetArgument<string>("continuationToken")
-                    );
-                    return await context.AddPagination(query);
+                resolve: context => {
+                    var offset = context.GetArgument<int>("offset");
+                    if (offset < 0)
+                    {
+                        offset = 0;
+                    }
+
+                    var limit = context.GetArgument<int>("limit");
+                    if (limit > 20 || limit < 1)
+                    {
+                        limit = 20;
+                    }
+
+                    return context.FindSnaps(db)
+                        .SortByDescending(s => s.date_published)
+                        .Skip(offset)
+                        .Limit(limit)
+                        .ToEnumerable();
                 }
             );
 
-            FieldAsync<IntGraphType>(
-                "findSnapsCount",
-                arguments: findSnapsArgs,
-                resolve: async context => await context.GetDocumentCount(documentClient, _snapsCollectionUri, _feedOptionsUnlimited)
-            );
-
-            FieldAsync<PaginationType<Snap>>(
+            Field<ListGraphType<SnapType>>(
                 "findSnapsByName",
                 arguments: new QueryArguments(
-                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "name", DefaultValue = "" },
-                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "continuationToken", DefaultValue = "" }
+                    new QueryArgument<StringGraphType> { Name = "name", DefaultValue = "" },
+                    new QueryArgument<IntGraphType> { Name = "offset", DefaultValue = 0 },
+                    new QueryArgument<IntGraphType> { Name = "limit", DefaultValue = 20 }
                 ),
-                resolve: async context =>
-                {
-                    var query = documentClient.CreateDocumentQueryWithPagination<Snap>(
-                        _snapsCollectionUri,
-                        context.ToSqlOrderedQuerySpec<Snap>(o => o.name),
-                        _feedOptionsTwenty,
-                        context.GetArgument<string>("continuationToken")
-                    );
-                    return await context.AddPagination(query);
+                resolve: context => {
+                    var offset = context.GetArgument<int>("offset");
+                    if (offset < 0)
+                    {
+                        offset = 0;
+                    }
+
+                    var limit = context.GetArgument<int>("limit");
+                    if (limit > 20 || limit < 1)
+                    {
+                        limit = 20;
+                    }
+
+                    return context.FindSnaps(db)
+                        .SortByDescending(s => s.date_published)
+                        .Skip(offset)
+                        .Limit(limit)
+                        .ToEnumerable();
                 }
             );
 
-            FieldAsync<IntGraphType>(
-                "findSnapsByNameCount",
-                arguments: new QueryArguments(new QueryArgument<StringGraphType> { Name = "name", DefaultValue = "" }),
-                resolve: async context => await context.GetDocumentCount(documentClient, _snapsCollectionUri, _feedOptionsUnlimited)
-            );
-
-            FieldAsync<PaginationType<Snap>>(
+            Field<ListGraphType<SnapType>>(
                 "findSnapsByBase",
                 arguments: new QueryArguments(
-                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "base", DefaultValue = "" },
-                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "continuationToken", DefaultValue = "" }
+                    new QueryArgument<StringGraphType> { Name = "base", DefaultValue = "" },
+                    new QueryArgument<IntGraphType> { Name = "offset", DefaultValue = 0 },
+                    new QueryArgument<IntGraphType> { Name = "limit", DefaultValue = 20 }
                 ),
-                resolve: async context =>
-                {
-                    var query = documentClient.CreateDocumentQueryWithPagination<Snap>(
-                        _snapsCollectionUri,
-                        context.ToSqlOrderedQuerySpec<Snap>(o => o.name),
-                        _feedOptionsTwenty,
-                        context.GetArgument<string>("continuationToken")
-                    );
-                    return await context.AddPagination(query);
+                resolve: context => {
+                    var offset = context.GetArgument<int>("offset");
+                    if (offset < 0)
+                    {
+                        offset = 0;
+                    }
+
+                    var limit = context.GetArgument<int>("limit");
+                    if (limit > 20 || limit < 1)
+                    {
+                        limit = 20;
+                    }
+
+                    return context.FindSnaps(db)
+                        .SortByDescending(s => s.date_published)
+                        .Skip(offset)
+                        .Limit(limit)
+                        .ToEnumerable();
                 }
             );
 
-            FieldAsync<IntGraphType>(
+            Field<IntGraphType>(
+                "findSnapsCount",
+                arguments: findSnapsArgs,
+                resolve: context => context.FindSnaps(db).CountDocuments()
+            );
+
+            Field<IntGraphType>(
+                "findSnapsByNameCount",
+                arguments: new QueryArguments(new QueryArgument<StringGraphType> { Name = "name", DefaultValue = "" }),
+                resolve: context => context.FindSnaps(db).CountDocuments()
+            );
+
+            Field<IntGraphType>(
                 "findSnapsByBaseCount",
-                arguments: new QueryArguments(new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "base", DefaultValue = "" }),
-                resolve: async context => await context.GetDocumentCount(documentClient, _snapsCollectionUri, _feedOptionsUnlimited)
+                arguments: new QueryArguments(new QueryArgument<StringGraphType> { Name = "base", DefaultValue = "" }),
+                resolve: context => context.FindSnaps(db).CountDocuments()
             );
 
-            FieldAsync<SnapType>(
-                "snapByName",
-                arguments: new QueryArguments(new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "name" }),
-                resolve: async context =>
-                {
-                    var query = documentClient.CreateDocumentQuery<Snap>(_snapsCollectionUri, context.ToSqlQuerySpec(), _feedOptionsOne);
-                    var docQuery = query.AsDocumentQuery();
-                    var response = await docQuery.ExecuteNextAsync<Snap>();
-                    return response.FirstOrDefault();
-                }
-            );
-
-            FieldAsync<SnapType>(
+            Field<SnapType>(
                 "snapById",
-                arguments: new QueryArguments(new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "snap_id" }),
-                resolve: async context =>
-                {
-                    var query = documentClient.CreateDocumentQuery<Snap>(_snapsCollectionUri, context.ToSqlQuerySpec(), _feedOptionsOne);
-                    var docQuery = query.AsDocumentQuery();
-                    var response = await docQuery.ExecuteNextAsync<Snap>();
-                    return response.FirstOrDefault();
-                }
+                arguments: new QueryArguments(new QueryArgument<StringGraphType> { Name = "snap_id", DefaultValue = "" }),
+                resolve: context => db.GetCollection<Snap>(Constants.SNAPS_COLLECTION_NAME)
+                    .Find(Builders<Snap>.Filter.Eq(e => e.snap_id, context.GetArgument<string>("snap_id")))
+                    .Limit(1)
+                    .FirstOrDefault()
             );
 
-            FieldAsync<PaginationType<Snap>>(
+            Field<SnapType>(
+                "snapByName",
+                arguments: new QueryArguments(new QueryArgument<StringGraphType> { Name = "name", DefaultValue = "" }),
+                resolve: context => db.GetCollection<Snap>(Constants.SNAPS_COLLECTION_NAME)
+                    .Find(Builders<Snap>.Filter.Eq(e => e.package_name, context.GetArgument<string>("name")))
+                    .Limit(1)
+                    .FirstOrDefault()
+            );
+
+            Field<ListGraphType<SnapType>>(
                 "snapsByDate",
                 arguments: new QueryArguments(
-                    new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "limit", DefaultValue = 20 },
-                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "continuationToken", DefaultValue = "" }
+                    new QueryArgument<IntGraphType> { Name = "offset", DefaultValue = 0 },
+                    new QueryArgument<IntGraphType> { Name = "limit", DefaultValue = 20 }
                 ),
-                resolve: async context =>
-                {
-                    var limit = 20;
-                    context.Arguments.TryGetValue("limit", out var limitArg);
-                    if (limitArg.Value is not null)
-                    {
-                        limit = (int)limitArg.Value;
-                        if (limit > 20 || limit < 0) limit = 20;
-                    }
-                    context.Arguments.Remove("limit");
-
-                    var feedOptions = new FeedOptions() { MaxItemCount = limit };
-                    var query = documentClient.CreateDocumentQueryWithPagination<Snap>(
-                        _snapsCollectionUri,
-                        context.ToSqlOrderedQuerySpec<Snap>(o => o.date_published, "DESC"),
-                        feedOptions,
-                        context.GetArgument<string>("continuationToken")
-                    );
-                    return await context.AddPagination(query);
-                }
+                resolve: context => db.GetCollection<Snap>(Constants.SNAPS_COLLECTION_NAME)
+                    .Find(FilterDefinition<Snap>.Empty)
+                    .SortByDescending(s => s.date_published)
+                    .Skip(context.GetArgument("offset", 0))
+                    .Limit(context.GetArgument("limit", 20))
+                    .ToEnumerable()
             );
 
-            FieldAsync<IntGraphType>(
+            Field<IntGraphType>(
                 "snapsByDateCount",
-                resolve: async context => await context.GetDocumentCount(documentClient, _snapsCollectionUri, _feedOptionsUnlimited)
+                resolve: context => db.GetCollection<Snap>(Constants.SNAPS_COLLECTION_NAME)
+                    .Find(Builders<Snap>.Filter.Regex(r => r.name, noHelloWorldOrTestRE))
+                    .CountDocuments()
             );
 
-            FieldAsync<PaginationType<Snap>>(
+            Field<ListGraphType<SnapType>>(
                 "snapsByUpdatedDate",
-                resolve: async context =>
-                {
-                    var query = documentClient.CreateDocumentQueryWithPagination<Snap>(
-                        _snapsCollectionUri,
-                        context.ToSqlOrderedQuerySpec<Snap>(o => o.last_updated),
-                        _feedOptionsTwenty,
-                        context.GetArgument<string>("continuationToken")
-                    );
-                    return await context.AddPagination(query);
-                }
+                arguments: new QueryArguments(
+                    new QueryArgument<IntGraphType> { Name = "offset", DefaultValue = 0 },
+                    new QueryArgument<IntGraphType> { Name = "limit", DefaultValue = 20 }
+                ),
+                resolve: context => db.GetCollection<Snap>(Constants.SNAPS_COLLECTION_NAME)
+                    .Find(Builders<Snap>.Filter.Regex(r => r.name, noHelloWorldOrTestRE))
+                    .SortByDescending(s => s.last_updated)
+                    .Skip(context.GetArgument("offset", 0))
+                    .Limit(context.GetArgument("limit", 20))
+                    .ToEnumerable()
             );
 
-            FieldAsync<IntGraphType>(
+            Field<IntGraphType>(
                 "snapsByUpdatedDateCount",
-                resolve: async context => await context.GetDocumentCount(documentClient, _snapsCollectionUri, _feedOptionsUnlimited)
+                resolve: context => db.GetCollection<Snap>(Constants.SNAPS_COLLECTION_NAME)
+                    .Find(Builders<Snap>.Filter.Regex(r => r.name, noHelloWorldOrTestRE))
+                    .CountDocuments()
             );
             #endregion
 
             #region SnapCounts
-            Field<ListGraphType<CountsType>>(
-                "snapCount",
-                arguments: new QueryArguments(new QueryArgument<StringGraphType> { Name = "_id" }),
-                resolve: context => documentClient.CreateDocumentQuery<SnapCount>(_snapCountsCollectionUri, context.ToSqlQuerySpec(), _feedOptionsUnlimited)
-            );
-
-            FieldAsync<IntGraphType>(
+            Field<IntGraphType>(
                 "snapCountCount",
-                resolve: async context => await context.GetDocumentCount(documentClient, _snapCountsCollectionUri, _feedOptionsUnlimited)
+                resolve: context => db.GetCollection<SnapCount>(Constants.SNAP_COUNTS_COLLECTION_NAME).CountDocuments(FilterDefinition<SnapCount>.Empty)
             );
 
             Field<ListGraphType<SnapCountType>>(
                 "snapCounts",
-                resolve: context => documentClient.CreateDocumentQuery<SnapCount>(_snapCountsCollectionUri, context.ToSqlLimitOneYearQuerySpec(), _feedOptionsUnlimited)
+                arguments: new QueryArguments(new QueryArgument<DecimalGraphType> { Name = "offset" }, new QueryArgument<DecimalGraphType> { Name = "limit" }),
+                resolve: context => db.GetCollection<SnapCount>(Constants.SNAP_COUNTS_COLLECTION_NAME)
+                    .Find(FilterDefinition<SnapCount>.Empty)
+                    .SortByDescending(s => s.date)
+                    .Skip(context.GetArgument<int?>("offset", 0))
+                    .Limit(context.GetArgument<int?>("limit", 20))
+                    .ToEnumerable()
             );
 
-            Field<ListGraphType<SnapCountType>>(
+            Field<SnapCountsByDateType>(
                 "snapCountsByDate",
-                resolve: context => documentClient.CreateDocumentQuery<SnapCount>(_snapCountsCollectionUri, context.ToSqlLimitOneYearQuerySpec(), _feedOptionsUnlimited)
+                resolve: context => {
+                    var updated = db.GetCollection<LastUpdated>(Constants.LAST_UPDATEDS_COLLECTION_NAME).Find(FilterDefinition<LastUpdated>.Empty).First();
+                    var date = updated.date;
+                    var snapCounts = db.GetCollection<SnapCount>(Constants.SNAP_COUNTS_COLLECTION_NAME).Find(f => f.date == date);
+                    return new SnapCountByDate() { _id = date, snapCounts = snapCounts.ToEnumerable().ToArray() };
+                }
             );
 
-            Field<TimelineType>(
+            Field<ListGraphType<TimelineType>>(
                 "snapCountTimeline",
-                arguments: new QueryArguments(new QueryArgument<DateGraphType> { Name = "from" }),
-                resolve: context => documentClient.CreateDocumentQuery<SnapCount>(_snapCountsCollectionUri, context.ToSnapCountTimelineQuerySpec(), _feedOptionsUnlimited)
+                arguments: new QueryArguments(new QueryArgument<DateTimeGraphType> { Name = "from" }),
+                resolve: context => {
+                    var now = DateTime.Now;
+                    var lastYear = now.AddYears(-1);
+                    var from = context.GetArgument<DateTime>("from");
+                    if (from < lastYear)
+                    {
+                        from = lastYear;
+                    }
+
+                    var cal = CultureInfo.InvariantCulture.Calendar;
+                    var startWeek = cal.GetWeekOfYear(from, CalendarWeekRule.FirstFullWeek, DayOfWeek.Monday);
+
+                    return db.GetCollection<SnapCount>(Constants.SNAP_COUNTS_COLLECTION_NAME).Aggregate()
+                        .Match(m => m.date >= from)
+                        .SortBy(s => s.date)
+                        .Group(
+                            g => new
+                            {
+                                year = g.date.Year,
+                                month = g.date.Month,
+                                day = g.date.Day,
+                            },
+                            g => new
+                            {
+                                _id = g.Key,
+                                total = g.Max(m => m.total),
+                                filtered = g.Max(m => m.filtered),
+                            })
+                        .Project(
+                            p => new
+                            {
+                                _id = new DateTime(p._id.year, p._id.month, p._id.day),
+                                p.total,
+                                p.filtered,
+                            })
+                        .ToEnumerable();
+                }
             );
             #endregion
         }

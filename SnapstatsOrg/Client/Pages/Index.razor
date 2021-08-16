@@ -30,9 +30,9 @@
     title="Activity Streams JSON feed of new Snaps"/>
 
 <h1>Total Snaps count</h1>
-@if (snapCounts is not null && snapCounts.Length > 0)
+@if (snapCounts?.snapCounts is not null)
 {
-	<p>There are <strong>@snapCounts.First().total</strong> Snaps currently in the Store, of which <strong>@(snapCounts.First().total - @snapCounts.First().filtered)</strong> appear to be test or hello-world Snaps. Test and hello-world Snaps are identified by a name that begins with <code>hello-</code> or <code>test-</code>, or a name that ends with <code>-test</code>. All other statistics on this site exclude those test or hello-world Snaps.</p>
+	<p>There are <strong>@(snapCounts.snapCounts.FirstOrDefault()?.total ?? 0)</strong> Snaps currently in the Store, of which <strong>@((snapCounts.snapCounts.FirstOrDefault()?.total - snapCounts.snapCounts.FirstOrDefault()?.filtered) ?? 0)</strong> appear to be test or hello-world Snaps. Test and hello-world Snaps are identified by a name that begins with <code>hello-</code> or <code>test-</code>, or a name that ends with <code>-hello</code> or <code>-test</code>. All other statistics on this site exclude those test or hello-world Snaps.</p>
 	<p><span class="verified">Verified</span> developers, a total of <strong>@verifiedDeveloperCount</strong> developers, have published <strong>@verifiedSnapCount</strong> Snaps.</p>
 }
 else
@@ -45,14 +45,14 @@ else
 <SnapList snaps="snaps" />
 
 <h2>Developers</h2>
-@if (developerCounts is not null && developerCounts.Length > 0)
+@if (developerCounts.developerCounts is not null && developerCounts.developerCounts.Length > 0)
 {
-	<p>There are <strong>@developerCounts.First().total</strong> developers who have published at least one snap.</p>
+	<p>There are <strong>@developerCounts.developerCounts.First().total</strong> developers who have published at least one snap.</p>
 
 	<h3>Developer Averages</h3>
 	<p>
-		Developers with published Snaps have each published an average (<a href="https://en.wikipedia.org/wiki/Arithmetic_mean">mean</a>) of <strong>@developerCounts.First().mean</strong> Snaps.
-		The most common number of Snaps published per developer (<a href="https://en.wikipedia.org/wiki/Mode_(statistics)">mode</a>) is <strong>@developerCounts.First().mode</strong>.
+		Developers with published Snaps have each published an average (<a href="https://en.wikipedia.org/wiki/Arithmetic_mean">mean</a>) of <strong>@developerCounts.developerCounts.First().mean</strong> Snaps.
+		The most common number of Snaps published per developer (<a href="https://en.wikipedia.org/wiki/Mode_(statistics)">mode</a>) is <strong>@developerCounts.developerCounts.First().mode</strong>.
 	</p>
 }
 else
@@ -68,52 +68,57 @@ else
 ]} /*@
 
 @code{
-	const string Query = @"
+        const string Query = @"
 		query {
 			snapCountsByDate{
-				total
-				filtered
-				date
+				_id
+				snapCounts{
+				  date
+				  total
+				  filtered
+				}
 			}
 			developerCountsByDate{
-				total
-				mean
-				mode
-				median
-				date
+				_id
+				developerCounts{
+					date
+					total
+					mean
+					median
+					mode
+				}
 			}
 			snapsByDate(limit:6){
-				results{
-					snap_id
-					package_name
-					title
-					summary
-					icon_url
-					ratings_average
-				}
+				snap_id
+				package_name
+				title
+				summary
+				icon_url
+				ratings_average
 			}
 			findSnapsCount(developer_validation:VERIFIED)
 			verifiedDeveloperCount
 		}
 	";
 
-	protected SnapCount[] snapCounts = Array.Empty<SnapCount>();
-	protected DeveloperCount[] developerCounts = Array.Empty<DeveloperCount>();
-	protected Snap[] snaps = Array.Empty<Snap>();
-	protected uint verifiedSnapCount = 0;
-	protected uint verifiedDeveloperCount = 0;
 
-	protected override async Task OnInitializedAsync()
-	{
-		GraphQLRequest request = new GraphQLRequest
-		{
-			Query = Query,
-		};
-		var response = await Client.SendQueryAsync<IndexQuery>(request).ConfigureAwait(false);
-		snapCounts = response.Data?.snapCountsByDate ?? Array.Empty<SnapCount>();
-		developerCounts = response.Data?.developerCountsByDate ?? Array.Empty<DeveloperCount>();
-		snaps = response.Data?.snapsByDate?.results ?? Array.Empty<Snap>();
-		verifiedSnapCount = response.Data?.findSnapsCount ?? 0;
-		verifiedDeveloperCount = response.Data?.verifiedDeveloperCount ?? 0;
-	}
+    protected SnapCountByDate snapCounts = new SnapCountByDate();
+    protected DeveloperCountByDate developerCounts = new DeveloperCountByDate();
+    protected Snap[] snaps = Array.Empty<Snap>();
+    protected uint verifiedSnapCount = 0;
+    protected uint verifiedDeveloperCount = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        GraphQLRequest request = new GraphQLRequest
+        {
+            Query = Query,
+        };
+        var response = await Client.SendQueryAsync<IndexQuery>(request).ConfigureAwait(false);
+        snapCounts = response.Data?.snapCountsByDate ?? new SnapCountByDate();
+        developerCounts = response.Data?.developerCountsByDate ?? new DeveloperCountByDate();
+        snaps = response.Data?.snapsByDate ?? Array.Empty<Snap>();
+        verifiedSnapCount = response.Data?.findSnapsCount ?? 0;
+        verifiedDeveloperCount = response.Data?.verifiedDeveloperCount ?? 0;
+    }
 }

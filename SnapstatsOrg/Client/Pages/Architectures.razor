@@ -32,11 +32,13 @@
 @code {
 	private const string Query = @"
 		query {
-			architectureTimeline{
-				name
-				date
-				count
-			}
+            architectureTimeline{
+			    _id
+                counts{
+                    date
+                    count
+                }
+            }
 		}
 	";
 
@@ -48,7 +50,7 @@
         {
             Query = Query,
         };
-        var response = await Client.SendQueryAsync<ArchitecturesTimeline>(request).ConfigureAwait(false);
+        var response = await Client.SendQueryAsync<ArchitectureTimelineQuery>(request).ConfigureAwait(false);
         timeline = response.Data.architectureTimeline;
 	}
 }

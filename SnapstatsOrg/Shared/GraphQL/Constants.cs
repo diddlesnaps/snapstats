@@ -6,6 +6,8 @@
 
         public const string DATABASE_NAME = "snapstats";
 
+        public const string LAST_UPDATEDS_COLLECTION_NAME = "lastupdateds";
+
         public const string ARCHITECTURES_COLLECTION_NAME = "architectures";
         public const string BASES_COLLECTION_NAME = "bases";
         public const string CHANNELS_COLLECTION_NAME = "channels";

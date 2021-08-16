@@ -23,19 +23,20 @@
 
 <h1>Developers</h1>
 
-@if (developerCountsByDate is not null && developerCountsByDate.Length > 0)
+@if (developerCountsByDate is not null && developerCountsByDate.developerCounts.Length > 0)
 {
-	<p>There are <strong>@developerCountsByDate.First().total</strong> developers who have published at least one snap.</p>
+	<p>There are <strong>@developerCountsByDate.developerCounts.First().total</strong> developers who have published at least one snap.</p>
+
+	<p>
+		Developers with published Snaps have each published an average (<a href="https://en.wikipedia.org/wiki/Arithmetic_mean">mean</a>) of <strong>@(developerCountsByDate.developerCounts.First().mean)</strong> Snaps.
+		The most common number of Snaps published per developer (<a href="https://en.wikipedia.org/wiki/Mode_(statistics)">mode</a>) is <strong>@(developerCountsByDate.developerCounts.First().mode)</strong>.
+	</p>
 }
 else
 {
 	<p>There are an unknown number of developers who have published at least one snap.</p>
 }
 
-<p>
-	Developers with published Snaps have each published an average (<a href="https://en.wikipedia.org/wiki/Arithmetic_mean">mean</a>) of <strong>@(developerCountsByDate?.Length > 0 ? developerCountsByDate.First().mean : 0)</strong> Snaps.
-	The most common number of Snaps published per developer (<a href="https://en.wikipedia.org/wiki/Mode_(statistics)">mode</a>) is <strong>@(developerCountsByDate?.Length > 0 ? developerCountsByDate.First().mode : 0)</strong>.
-</p>
 
 <DonateButton/>
 
@@ -55,20 +56,23 @@ else
 	private const string Query = @"
 		query {
 			developerCountsByDate{
-				date
-				total
-				mean
-				mode
-				median
+				_id
+				developerCounts{
+					date
+					total
+					mean
+					mode
+					median
+				}
 			}
 			findSnapsCount(developer_validation:VERIFIED)
 			verifiedDevelopers
 		}
 	";
 
-	protected DeveloperCount[] developerCountsByDate = Array.Empty<DeveloperCount>();
+	protected DeveloperCountByDate developerCountsByDate = new DeveloperCountByDate();
 	protected string[] verifiedDevelopers = Array.Empty<string>();
-	protected uint verifiedSnapsCount = 0;
+	protected int verifiedSnapsCount = 0;
 
 	protected override async Task OnInitializedAsync()
     {
@@ -77,8 +81,8 @@ else
             Query = Query,
         };
         var response = await Client.SendQueryAsync<DevelopersQuery>(request).ConfigureAwait(false);
-		developerCountsByDate = response.Data.developerCountsByDate ?? Array.Empty<DeveloperCount>();
-		verifiedDevelopers = response.Data.verifiedDevelopers ?? Array.Empty<string>();
-		verifiedSnapsCount = response.Data.findSnapsCount ?? 0;
+		developerCountsByDate = response.Data?.developerCountsByDate ?? new DeveloperCountByDate();
+		verifiedDevelopers = response.Data?.verifiedDevelopers ?? Array.Empty<string>();
+		verifiedSnapsCount = response.Data?.findSnapsCount ?? 0;
     }
 }
