@@ -132,6 +132,9 @@
       title="Atom feed of new Snaps"/>
     <link rel="alternate home" type="application/activitystream+json" href="/snaps/feed.json"
       title="Activity Streams JSON feed of new Snaps"/>
+
+	<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8255474170399666"
+	  crossorigin="anonymous"></script>
 </svelte:head>
 
 <div>

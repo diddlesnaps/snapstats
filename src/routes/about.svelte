@@ -24,6 +24,9 @@
     <meta name="twitter:title" content="About Snapstats.org" />
     <meta name="twitter:description" content="Find out about the Snapstats.org website" />
     <meta name="twitter:image" content="/favicons/android-icon-512x512.png" />
+
+	<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8255474170399666"
+      crossorigin="anonymous"></script>
 </svelte:head>
 
 <h1>About Snapstats.org</h1>
