@@ -4,11 +4,11 @@ import { Feed } from "feed";
 import {connectMongoose} from '../../mongodb';
 import Snaps from '../../graphql/resolvers/Snaps';
 
-export default async function(publisherName) {
+export default async function(base: string) {
     connectMongoose();
     const now = new Date();
     const feed = new Feed({
-        title: `Latest Snap Packages by ${publisherName}`,
+        title: `Latest Snap Packages with ${base} Base Snap`,
         description: `The latest 20 Snap Packages to be added to the public Snap Store by ${publisherName}`,
         id: "https://snapstats.org/",
         link: "https://snapstats.org/",
@@ -23,11 +23,8 @@ export default async function(publisherName) {
             atom: "https://snapstats.org/snaps/feed.atom",
             rss: "https://snapstats.org/snaps/feed.rss",
         },
-        author: {
-            name: publisherName,
-        },
     });
-    const snaps = await Promise.all(await Snaps.Query.findSnaps(null, {publisherOrDeveloper: publisherName, query: {limit: 20, sort:{order: -1, field: 'date_published'}}}));
+    const snaps = await Promise.all(await Snaps.Query.findSnaps(null, {base, query: {limit: 20, sort:{order: -1, field: 'date_published'}}}));
     snaps.forEach(snap => {
         const url = `https://snapstats.org/snaps/${snap.package_name}`;
         feed.addItem({
