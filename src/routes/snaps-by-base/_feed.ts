@@ -8,8 +8,8 @@ export default async function(base: string) {
     connectMongoose();
     const now = new Date();
     const feed = new Feed({
-        title: `Latest Snap Packages with ${base} Base Snap`,
-        description: `The latest 20 Snap Packages to be added to the public Snap Store by ${publisherName}`,
+        title: `Latest Snap Packages with the ${base} Base Snap`,
+        description: `The latest 20 Snap Packages to be added to the public Snap Store with the ${base} Base Snap`,
         id: "https://snapstats.org/",
         link: "https://snapstats.org/",
         language: "en",
