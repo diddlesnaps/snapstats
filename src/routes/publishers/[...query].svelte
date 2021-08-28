@@ -40,7 +40,7 @@
             publisherName,
             field,
             order,
-            offset,
+            page: parseInt(page),
             cache: (await data).data,
         };
     }
@@ -60,19 +60,21 @@
     export let order;
     /** @type {number} */
     export let page;
+    /** @type {number} */
+    export let limit;
     export let cache;
 
 	setClient(client);
 	restore(searchQuery, cache);
-        
-    let data = query(searchQuery, {
+
+    let result = query(searchQuery, {
         variables: {publisherName, field, order, offset: page*limit, limit}
     });
 
     $: {
         if (process.browser) {
-            data.refetch({ publisherName, field, order, offset: page*limit, limit })
             goto(`/publishers/${publisherName}/${page}?field=${field}&order=${order}`);
+            result.refetch({ publisherName, field, order, offset: page*limit, limit })
             globalThis.firebase?.analytics().logEvent('showPublisherPage', {
                 publisherName,
                 page,
@@ -149,12 +151,14 @@ label {
     </form>
 </div>
 
-{#await $data}
-    <p>Loading...</p>
-{:then result}
+{#if $result.loading}
+	<p>Loading...</p>
+{:else if $result.error}
+	<p>Error...</p>
+{:else}
         <h2>Snaps by {publisherName}:</h2>
-        <SnapList snaps={result.data.findSnaps} />
-        <Pagination count={result.data.findSnapsCount.count} {limit} offset={page*limit} {getPageUrl} />
-{/await}
+        <SnapList snaps={$result.data?.findSnaps} />
+        <Pagination count={$result.data?.findSnapsCount.count} {limit} offset={page*limit} {getPageUrl} />
+{/if}
 
 <a href="/">Go back to the homepage</a>

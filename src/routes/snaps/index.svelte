@@ -60,7 +60,6 @@
     // @ts-check
 
     import { goto } from '@sapper/app';
-    import { onMount } from 'svelte';
     import { setClient, restore, query } from 'svelte-apollo';
 
     export let q;

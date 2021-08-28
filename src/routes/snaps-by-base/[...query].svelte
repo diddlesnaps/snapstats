@@ -50,7 +50,7 @@
     // @ts-check
 
     import { goto } from '@sapper/app';
-	import { setClient, restore, query } from 'svelte-apollo';
+    import { setClient, restore, query } from 'svelte-apollo';
 
     /** @type {string} */
     export let base;
@@ -60,19 +60,21 @@
     export let order;
     /** @type {number} */
     export let page;
+    /** @type {number} */
+    export let limit;
     export let cache;
 
 	setClient(client);
 	restore(searchQuery, cache);
 
-    let data = query(searchQuery, {
+    let result = query(searchQuery, {
         variables: {base, field, order, offset: page*limit, limit}
     });
 
     $: {
         if (process.browser) {
-            data.refetch({ base, field, order, offset: page*limit, limit })
             goto(`/snaps-by-base/${base}/${page}?field=${field}&order=${order}`);
+            result.refetch({ base, field, order, offset: page*limit, limit })
             globalThis.firebase?.analytics().logEvent('showPublisherPage', {
                 base,
                 page,
@@ -108,13 +110,15 @@
     <meta name="twitter:image" content="/favicons/android-icon-512x512.png" />
 </svelte:head>
 
-{#await $data}
-    <p>Loading...</p>
-{:then result}
+{#if $result.loading}
+	<p>Loading...</p>
+{:else if $result.error}
+	<p>Error...</p>
+{:else}
     <h1>Snaps using base snap '{base}':</h1>
-    <SnapList snaps={result.data.findSnapsByBase} />
-    <Pagination count={result.data.findSnapsByBaseCount.count} {limit} offset={page*limit} {getPageUrl} />
-{/await}
+    <SnapList snaps={$result.data?.findSnapsByBase} />
+    <Pagination count={$result.data?.findSnapsByBaseCount.count} {limit} offset={page*limit} {getPageUrl} />
+{/if}
 
 <a href="/bases">Go back to the bases list</a>, or {' '}
 <a href="/">go back to the homepage</a>.
