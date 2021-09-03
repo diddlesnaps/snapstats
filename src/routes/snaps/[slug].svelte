@@ -405,6 +405,7 @@
             $result.data?.snapByName.contact ||
             $result.data?.snapByName.publisher ||
             $result.data?.snapByName.developer_name ||
+            $result.data?.snapByName.developer_username ||
             $result.data?.snapByName.developer_validation ||
             $result.data?.snapByName.date_published ||
             $result.data?.snapByName.last_updated
@@ -440,8 +441,8 @@
                     {#if $result.data?.snapByName.developer_name || $result.data?.snapByName.publisher}
                         <dt>Published to the Snap Store by:</dt>
                         <dd>
-                            <a href="/publishers/{$result.data?.snapByName.developer_name || $result.data?.snapByName.publisher}">
-                                {$result.data?.snapByName.developer_name || $result.data?.snapByName.publisher}
+                            <a href="/publishers/{$result.data?.snapByName.developer_username}">
+                                {$result.data?.snapByName.developer_name || $result.data?.snapByName.publisher || $result.data?.snapByName.developer_username}
                             </a>
                             {#if $result.data?.snapByName.developer_validation === 'verified'}
                                 <span class="verified">(Author is verified)</span>
