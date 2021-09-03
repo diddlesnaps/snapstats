@@ -57,35 +57,35 @@
 
     import { onMount } from 'svelte';
     import { stores } from '@sapper/app';
-    import marked from 'marked'
-    import createDOMPurify from 'dompurify'
+    // import marked from 'marked'
+    // import createDOMPurify from 'dompurify'
 
 	const { page } = stores();
     let slug = $page.params.slug;
     console.dir(slug);
 
-    const DOMPurify = createDOMPurify(window)
-    const DOMPurifyOpts = {
-        ALLOWED_TAGS: [
-            'a',
-            'p', '#text', 'br', 'code', 'pre',
-            'em', 'strong', 'b', 'i',
-            'li', 'ul', 'ol',
-            'table', 'tr', 'td', 'tbody', 'thead',
-            'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-        ],
-        KEEP_CONTENT: true,
-    };
+    // const DOMPurify = createDOMPurify(window)
+    // const DOMPurifyOpts = {
+    //     ALLOWED_TAGS: [
+    //         'a',
+    //         'p', '#text', 'br', 'code', 'pre',
+    //         'em', 'strong', 'b', 'i',
+    //         'li', 'ul', 'ol',
+    //         'table', 'tr', 'td', 'tbody', 'thead',
+    //         'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+    //     ],
+    //     KEEP_CONTENT: true,
+    // };
 
-    DOMPurify.addHook('afterSanitizeAttributes', function(node) {
-        if (node.hasAttribute('href')) {
-            const href = node.getAttribute('href')
-            if (href.startsWith('.') || href.startsWith('#')) {
-                node.removeAttribute('href')
-            }
-            node.setAttribute('rel', 'nofollow ugc')
-        }
-    })
+    // DOMPurify.addHook('afterSanitizeAttributes', function(node) {
+    //     if (node.hasAttribute('href')) {
+    //         const href = node.getAttribute('href')
+    //         if (href.startsWith('.') || href.startsWith('#')) {
+    //             node.removeAttribute('href')
+    //         }
+    //         node.setAttribute('rel', 'nofollow ugc')
+    //     }
+    // })
 
 	import { setClient, restore, query } from 'svelte-apollo'
 
@@ -472,7 +472,7 @@
         <DonateBtn />
 
         <h2>Description</h2>
-        {@html DOMPurify.sanitize(marked($result.data?.snapByName.description), DOMPurifyOpts)}
+        <!-- { @ html DOMPurify.sanitize(marked($result.data?.snapByName.description), DOMPurifyOpts)} -->
 
         {#if $result.data?.snapByName.media.filter(
             item => item.type === 'screenshot'

@@ -5,7 +5,6 @@ import svelte from 'rollup-plugin-svelte';
 import babel from '@rollup/plugin-babel';
 import { terser } from 'rollup-plugin-terser';
 import typescript from '@rollup/plugin-typescript';
-import json from '@rollup/plugin-json';
 import autoPreprocess from 'svelte-preprocess';
 import config from 'sapper/config/rollup.js';
 import pkg from './package.json';
@@ -43,7 +42,6 @@ export default {
 				dedupe: ['svelte'],
 			}),
 			commonjs(),
-			typescript({ sourceMap: dev }),
 
 			legacy && babel({
 				extensions: ['.js', '.mjs', '.html', '.svelte'],
@@ -65,17 +63,6 @@ export default {
 			}),
 
 			!dev && terser({
-				compress: {
-					drop_console: true,
-					keep_fargs: false,
-					passes: 2,
-					unsafe: true,
-					unsafe_Function: true,
-					unsafe_math: true,
-					unsafe_proto: true,
-					unsafe_regexp: true,
-				},
-				ecma: 6,
 				module: true,
 			})
 		],
@@ -114,7 +101,6 @@ export default {
 				dedupe: ['svelte'],
 			}),
 			commonjs(),
-			typescript({ sourceMap: dev }),
 			babel({
 				extensions: ['.js', '.mjs', '.html', '.svelte'],
 				babelHelpers: 'runtime',
@@ -131,7 +117,6 @@ export default {
 					'@babel/plugin-transform-runtime',
 				],
 			}),
-			json(),
 		],
 		external: Object.keys(pkg.dependencies).concat(require('module').builtinModules),
 
