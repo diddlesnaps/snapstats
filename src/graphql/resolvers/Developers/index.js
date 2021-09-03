@@ -58,14 +58,17 @@ export default {
                     developer_validation: 'verified',
                 } },
                 { $group: {
-                    _id: '$developer_name',
+                    _id: {
+                        developer_name: '$developer_name',
+                        publisher_username: '$publisher_username',
+                    }
                 } },
                 { $project: {
-                    _id: 1,
-                    sort_field: { $toLower: '$_id' }
+                    _id: '$_id.developer_name',
+                    publisher_username: '$_id.publiser_username',
                 } },
                 { $sort: {
-                    sort_field: 1,
+                    _id: 1,
                 } },
             ]))
         },

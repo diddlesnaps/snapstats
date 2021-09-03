@@ -23,6 +23,7 @@ export const schema = `
 
     type DeveloperNames {
         _id: String!
+        publisher_username: String
     }
 
     type Query {
