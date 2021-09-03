@@ -15,7 +15,6 @@
                 date_published
                 description
                 developer_name
-                developer_username
                 developer_validation
                 icon_url
                 last_updated
@@ -29,6 +28,7 @@
                 name
                 package_name
                 publisher
+                publisher_username
                 ratings_average
                 ratings_count
                 screenshot_urls
@@ -404,8 +404,8 @@
             $result.data?.snapByName.website ||
             $result.data?.snapByName.contact ||
             $result.data?.snapByName.publisher ||
+            $result.data?.snapByName.publisher_username ||
             $result.data?.snapByName.developer_name ||
-            $result.data?.snapByName.developer_username ||
             $result.data?.snapByName.developer_validation ||
             $result.data?.snapByName.date_published ||
             $result.data?.snapByName.last_updated
@@ -441,8 +441,8 @@
                     {#if $result.data?.snapByName.developer_name || $result.data?.snapByName.publisher}
                         <dt>Published to the Snap Store by:</dt>
                         <dd>
-                            <a href="/publishers/{$result.data?.snapByName.developer_username}">
-                                {$result.data?.snapByName.developer_name || $result.data?.snapByName.publisher || $result.data?.snapByName.developer_username}
+                            <a href="/publishers/{$result.data?.snapByName.publisher_username}">
+                                {$result.data?.snapByName.developer_name || $result.data?.snapByName.publisher || $result.data?.snapByName.publisher_username}
                             </a>
                             {#if $result.data?.snapByName.developer_validation === 'verified'}
                                 <span class="verified">(Author is verified)</span>
