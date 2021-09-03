@@ -48,7 +48,14 @@ else {
 
     const GraphQL = (await import('apollo-server-cloud-functions')).ApolloServer;
     const graphql = new GraphQL(graphQLConfig);
-    return graphql.createHandler()(req, res);
+    return graphql.createHandler({
+      cors: {
+        origin: [
+          'https://snapstats.org',
+          'http://localhost:5000',
+        ],
+      }
+    })(req, res);
   });
 }
 

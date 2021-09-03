@@ -10,8 +10,8 @@
     const limit = 20
 
     const searchQuery = gql`
-        query($base: String!, $offset: Int!, $limit: Int!){
-            findSnapsByBase(base:$base, query:{offset:$offset, limit:$limit}){
+        query($base: String!, $offset: Int!, $limit: Int!, $field: String!, $order: Int!){
+            findSnapsByBase(base:$base, query:{offset:$offset, limit:$limit, sort:{field:$field,order:$order}}){
                 snap_id
                 package_name
                 title
@@ -73,7 +73,7 @@
         if (process.browser) {
             goto(`/snaps-by-base/${base}/${page}?field=${field}&order=${order}`);
             result.refetch({ base, field, order, offset: page*limit, limit })
-            globalThis.firebase?.analytics().logEvent('showPublisherPage', {
+            globalThis.firebase?.analytics().logEvent('showSnapsByBasePage', {
                 base,
                 page,
             });
@@ -85,7 +85,7 @@
 
 <svelte:head>
 	<title>Search the Snap Store</title>
-    <meta name="description" content="Search the Snap Store listings on SnapStats.org" />
+    <meta name="description" content="Snaps in the Snap Store using base snap '{base}' found by SnapStats.org" />
 
     <!-- Facebook -->
     <meta property="og:site_name" content="Snapstats.org" />
@@ -108,12 +108,28 @@
     <meta name="twitter:image" content="/favicons/android-icon-512x512.png" />
 </svelte:head>
 
+<h1>Snaps using base snap '{base}':</h1>
+<div class='search'>
+    <form method="get">
+        <input name="offset" type="hidden" value='0' />
+        <input name="limit" type="hidden" value={limit} />
+        <label>Sort by <select name="field" bind:value={field}>
+            <option value="date_published">First publish date</option>
+            <option value="package_name">Name</option>
+            <option value="title">Title</option>
+        </select></label>
+        <label>Order <select name="order" bind:value={order}>
+            <option value={1}>Ascending</option>
+            <option value={-1}>Descending</option>
+        </select></label>
+    </form>
+</div>
+
 {#if $result.loading}
 	<p>Loading...</p>
 {:else if $result.error}
 	<p>Error...</p>
 {:else}
-    <h1>Snaps using base snap '{base}':</h1>
     <SnapList snaps={$result.data?.findSnapsByBase} />
     <Pagination count={$result.data?.findSnapsByBaseCount.count} {limit} offset={page*limit} {getPageUrl} />
 {/if}

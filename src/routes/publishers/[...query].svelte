@@ -155,9 +155,8 @@ label {
 {:else if $result.error}
 	<p>Error...</p>
 {:else}
-        <h2>Snaps by {publisherName}:</h2>
-        <SnapList snaps={$result.data?.findSnaps} />
-        <Pagination count={$result.data?.findSnapsCount.count} {limit} offset={page*limit} {getPageUrl} />
+    <SnapList snaps={$result.data?.findSnaps} />
+    <Pagination count={$result.data?.findSnapsCount.count} {limit} offset={page*limit} {getPageUrl} />
 {/if}
 
 <a href="/">Go back to the homepage</a>
