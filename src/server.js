@@ -34,7 +34,7 @@ else {
   }).https.onRequest(async (req, res) => {
     const {JSDOM} = require('jsdom');
     global.window = (new JSDOM('')).window;
-    const sapper = require('@sapper/server');
+    const sapper = await import('@sapper/server');
     req.baseUrl = '';
     return sapper.middleware()(req, res);
   });
