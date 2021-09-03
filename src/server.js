@@ -8,6 +8,7 @@ if (process.env.NODE_ENV === 'development') {
   (function() {
     const graphQLConfig = require('./graphql-config').getGQLConfig();
 
+    const {JSDOM} = require('jsdom');
     global.window = (new JSDOM('')).window;
 
     const sirv = require('sirv');

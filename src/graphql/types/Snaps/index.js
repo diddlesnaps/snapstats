@@ -29,7 +29,6 @@ export const schema = `
         description: String
         developer_id: String
         developer_name: String
-        developer_username: String
         developer_validation: String
         icon_url: String
         last_updated: Date
@@ -39,6 +38,7 @@ export const schema = `
         package_name: String
         prices: [Price]
         publisher: String
+        publisher_username: String
         ratings_average: Float
         ratings_count: Int
         screenshot_urls: [String]
