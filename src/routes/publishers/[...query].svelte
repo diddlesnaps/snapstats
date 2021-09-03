@@ -61,8 +61,6 @@
     export let order;
     /** @type {number} */
     export let page;
-    /** @type {number} */
-    export let limit;
     export let cache;
 
 	setClient(client);
