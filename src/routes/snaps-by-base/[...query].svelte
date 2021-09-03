@@ -7,7 +7,7 @@
     import { gql } from '@apollo/client/core';
 	import {client} from '../../apollo';
 
-    const limit = 20
+    const limit = 20;
 
     const searchQuery = gql`
         query($base: String!, $offset: Int!, $limit: Int!, $field: String!, $order: Int!){
@@ -26,8 +26,9 @@
     `;
 
     export async function preload({params: {query: [base, page]}, query: {field, order}}, session) {
-        let offset = parseInt(page) * limit;
+        page ??= 0;
         base ??= '';
+        let offset = parseInt(page) * limit;
         field ??= 'title';
         order = order ? parseInt(order) || 1 : 1;
 
@@ -83,6 +84,25 @@
     let getPageUrl = (page) => `/snaps-by-base/${base}/${page}?field=${field}&order=${order}`;
 </script>
 
+<style>
+label {
+    display: block;
+}
+.search input {
+    border-radius: 2rem;
+    box-sizing: border-box;
+    display: block;
+    font-size: 1.5rem;
+    margin: 0.4rem 0 2rem;
+    padding: 1rem 2rem;
+    width: 100%;
+}
+/* .rssicon {
+    background-color: orange;
+    border-radius: 0.4rem;
+} */
+</style>
+
 <svelte:head>
 	<title>Search the Snap Store</title>
     <meta name="description" content="Snaps in the Snap Store using base snap '{base}' found by SnapStats.org" />
@@ -106,6 +126,14 @@
     <meta name="twitter:title" content="Snaps using base snap '{base}'" />
     <meta name="twitter:description" content="Snaps in the Snap Store using base snap '{base}' found by SnapStats.org" />
     <meta name="twitter:image" content="/favicons/android-icon-512x512.png" />
+
+    <!-- Feed -->
+    <link rel="alternate home" type="application/rss+xml" href="/snaps-by-base/{base}.rss"
+      title="RSS feed of new Snaps by {base}"/>
+    <link rel="alternate home" type="application/atom+xml" href="/snaps-by-base/{base}.atom"
+      title="Atom feed of new Snaps by {base}"/>
+    <link rel="alternate home" type="application/activitystream+json" href="/snaps-by-base/{base}.json"
+      title="Activity Streams JSON feed of new Snaps by {base}"/>
 </svelte:head>
 
 <h1>Snaps using base snap '{base}':</h1>
@@ -134,5 +162,5 @@
     <Pagination count={$result.data?.findSnapsByBaseCount.count} {limit} offset={page*limit} {getPageUrl} />
 {/if}
 
-<a href="/bases">Go back to the bases list</a>, or {' '}
+<!-- <a href="/bases">Go back to the bases list</a>, or {' '} -->
 <a href="/">go back to the homepage</a>.

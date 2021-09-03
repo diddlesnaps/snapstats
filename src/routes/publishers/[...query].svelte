@@ -108,6 +108,8 @@ label {
     <meta name="description" content="Snap packages by {publisherName} on SnapStats.org" />
 
     <!-- Facebook -->
+    <meta property="og:site_name" content="Snapstats.org" />
+    <meta property="fb:app_id" content="2603641926537298" />
 	<meta property="og:type" content="website" />
     <meta property="og:title" content="Snap Packages by {publisherName}" />
     <meta property="og:description" content="Snap Packages by {publisherName} on SnapStats.org" />
@@ -119,6 +121,7 @@ label {
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@snapstats_org" />
     <meta name="twitter:creator" content="@diddledani" />
     <meta name="twitter:title" content="Snap packages by {publisherName}" />
     <meta name="twitter:description" content="Snap packages by {publisherName} on SnapStats.org" />
