@@ -25,9 +25,10 @@
         }
     `;
 
-    export async function preload({params: [publisherName, page], query: {field, order}}, session) {
-        let offset = parseInt(page) * limit;
+    export async function preload({params: {query: [publisherName, page]}, query: {field, order}}, session) {
+        page ??= 0;
         publisherName ??= '';
+        let offset = parseInt(page) * limit;
         field ??= 'title';
         order = order ? parseInt(order) || 1 : 1;
 

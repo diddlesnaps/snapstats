@@ -25,7 +25,7 @@
         }
     `;
 
-    export async function preload({params: [base, page], query: {field, order}}, session) {
+    export async function preload({params: {query: [base, page]}, query: {field, order}}, session) {
         let offset = parseInt(page) * limit;
         base ??= '';
         field ??= 'title';
