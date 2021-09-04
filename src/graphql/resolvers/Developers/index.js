@@ -65,7 +65,7 @@ export default {
                 } },
                 { $project: {
                     _id: '$_id.developer_name',
-                    publisher_username: '$_id.publiser_username',
+                    publisher_username: '$_id.publisher_username',
                 } },
                 { $sort: {
                     _id: 1,

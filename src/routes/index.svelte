@@ -88,8 +88,8 @@
 	}
 
 	.verified:after {
-		content: '✔️';
-		color: #2a2;
+		content: '✓';
+		color: #0a0;
 	}
 
 	.rssicon {
