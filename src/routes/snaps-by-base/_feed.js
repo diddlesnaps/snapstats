@@ -1,15 +1,13 @@
 // @ts-check
-
 import { Feed } from "feed";
-import {connectMongoose} from '../../mongodb';
+import { connectMongoose } from '../../mongodb';
 import Snaps from '../../graphql/resolvers/Snaps';
-
-export default async function() {
+export default async function (base) {
     connectMongoose();
     const now = new Date();
     const feed = new Feed({
-        title: "Latest Snap Packages",
-        description: "The latest 20 Snap Packages to be added to the public Snap Store",
+        title: `Latest Snap Packages with the ${base} Base Snap`,
+        description: `The latest 20 Snap Packages to be added to the public Snap Store with the ${base} Base Snap`,
         id: "https://snapstats.org/",
         link: "https://snapstats.org/",
         language: "en",
@@ -21,15 +19,10 @@ export default async function() {
         feedLinks: {
             json: "https://snapstats.org/snaps/feed.json",
             atom: "https://snapstats.org/snaps/feed.atom",
-            rss: "https://snapstats.org/snaps/feed.rss"
+            rss: "https://snapstats.org/snaps/feed.rss",
         },
-        author: {
-            name: "Dani Llewellyn",
-            email: "diddledani@ubuntu.com",
-            link: "https://diddledani.com/"
-        }
     });
-    const snaps = await Promise.all(await Snaps.Query.snapsByDate(null, {query: {limit: 20}}));
+    const snaps = await Promise.all(await Snaps.Query.findSnaps(null, { base, query: { limit: 20, sort: { order: -1, field: 'date_published' } } }));
     snaps.forEach(snap => {
         const url = `https://snapstats.org/snaps/${snap.package_name}`;
         feed.addItem({
@@ -45,8 +38,9 @@ export default async function() {
                 }
             ],
             date: snap.date_published,
-            image: snap.icon_url
+            image: snap.icon_url,
         });
     });
     return feed;
 }
+//# sourceMappingURL=_feed.js.map
