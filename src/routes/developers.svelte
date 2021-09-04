@@ -109,7 +109,7 @@
 		<ul>
 			{#each $result.data.verifiedDevelopers as developer}
 			{@debug developer}
-				<li><a href="{developer.publisher_username}">{developer._id}</a></li>
+				<li><a href="/publishers/{developer.publisher_username}">{developer._id}</a></li>
 			{/each}
 		</ul>
 	{/if}
