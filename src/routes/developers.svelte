@@ -108,7 +108,6 @@
 		<p>Below is a list of the <strong>{$result.data.verifiedDeveloperCount.count}</strong> known <span class='verified'>Verified</span> developers. Between them they have published <strong>{$result.data.findSnapsCount.count}</strong> Snaps:</p>
 		<ul>
 			{#each $result.data.verifiedDevelopers as developer}
-			{@debug developer}
 				<li><a href="/publishers/{developer.publisher_username}">{developer._id}</a></li>
 			{/each}
 		</ul>
