@@ -111,5 +111,5 @@
 <footer>
 	<a href='privacy'>Privacy policy</a>
 </footer>
-<GdprBanner cookieName="gdprOptIn" choices={{tracking: false, marketing: false}} on:analytics={enableAnalytics}
+<GdprBanner cookieName="gdprOptIn" cookieConfig={{sameSite: 'strict'}} choices={{tracking: false, marketing: false}} on:analytics={enableAnalytics}
 	description="We use cookies to analyze site traffic. Please review our <a href='/privacy'>privacy policy page</a>. By clicking accept, you consent to our privacy policy &amp; use of cookies" />
