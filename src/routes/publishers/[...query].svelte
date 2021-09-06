@@ -51,7 +51,7 @@
     // @ts-check
 
     import { goto } from '@sapper/app';
-    import { setClient, restore, query } from 'svelte-apollo';
+    import { setClient, query } from 'svelte-apollo';
 
     /** @type {string} */
     export let publisherName;
@@ -64,7 +64,7 @@
     export let cache;
 
 	setClient(client);
-	restore(searchQuery, cache);
+    client.writeQuery({query: q, data: cache})
 
     let result = query(searchQuery, {
         variables: {publisherName, field, order, offset: page*limit, limit}

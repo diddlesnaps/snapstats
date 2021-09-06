@@ -34,12 +34,12 @@
 <script>
 	// @ts-check
 
-	import { setClient, restore, query } from 'svelte-apollo';
+	import { setClient, query } from 'svelte-apollo';
 
 	export let cache;
 
 	setClient(client);
-	restore(q, cache);
+	client.writeQuery({query: q, data: cache})
 	let result = query(q);
 
 	const getLegendItem = (title) => `<a href="/snaps-by-base/${title}">${title}</a>`

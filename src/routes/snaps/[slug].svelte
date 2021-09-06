@@ -87,12 +87,12 @@
     //     }
     // })
 
-	import { setClient, restore, query } from 'svelte-apollo'
+	import { setClient, query } from 'svelte-apollo'
 
     export let cache
 
 	setClient(client)
-	restore(q, cache)
+	client.writeQuery({query: q, data: cache})
     let result = query(q, {variables: {slug}})
 
     let video

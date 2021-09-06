@@ -9,7 +9,7 @@
 
     const limit = 20;
 
-    const searchQuery = gql`
+    const q = gql`
         query($base: String!, $offset: Int!, $limit: Int!, $field: String!, $order: Int!){
             findSnapsByBase(base:$base, query:{offset:$offset, limit:$limit, sort:{field:$field,order:$order}}){
                 snap_id
@@ -33,7 +33,7 @@
         order = order ? parseInt(order) || 1 : 1;
 
         let data = client.query({
-            query: searchQuery,
+            query: q,
             variables: {base, field, order, offset, limit},
         });
 
@@ -51,7 +51,7 @@
     // @ts-check
 
     import { goto } from '@sapper/app';
-    import { setClient, restore, query } from 'svelte-apollo';
+    import { setClient, query } from 'svelte-apollo';
 
     /** @type {string} */
     export let base;
@@ -64,9 +64,9 @@
     export let cache;
 
 	setClient(client);
-	restore(searchQuery, cache);
+    client.writeQuery({query: q, data: cache})
 
-    let result = query(searchQuery, {
+    let result = query(q, {
         variables: {base, field, order, offset: page*limit, limit}
     });
 
