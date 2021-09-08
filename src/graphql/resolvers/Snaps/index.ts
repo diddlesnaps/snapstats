@@ -62,7 +62,6 @@ const searchSnapsFn: SearchFn = (args) => {
 
         query = {
             ...query,
-            name: { $not: /(^(test|hello)-|-(test|hello)$)/i },
             $search: {
                 index: 'default',
                 text: {
@@ -71,7 +70,8 @@ const searchSnapsFn: SearchFn = (args) => {
                         wildcard: '*'
                     }
                 }
-            }
+            },
+            name: { $not: /(^(test|hello)-|-(test|hello)$)/i },
         }
     }
 
