@@ -62,12 +62,16 @@ const searchSnapsFn: SearchFn = (args) => {
 
         query = {
             ...query,
-            name: { $not: /(^(test|hello)-|-test$)/i },
-            $or: [
-                { name: { $regex: name, $options: 'i' } },
-                { title: { $regex: name, $options: 'i' } },
-                { package_name: { $regex: name, $options: 'i' } },
-            ],
+            name: { $not: /(^(test|hello)-|-(test|hello)$)/i },
+            $search: {
+                index: 'default',
+                text: {
+                    query: name,
+                    path: {
+                        wildcard: '*'
+                    }
+                }
+            }
         }
     }
 
