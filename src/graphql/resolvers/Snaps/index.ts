@@ -1,8 +1,9 @@
 import { SnapsModel, ISnapDocument, DeveloperValidation, Architecture } from "../../../models/Snaps"
 import { RatingsModel } from "../../../models/Rating"
 import escapeRegExp from 'lodash.escaperegexp'
-import type {Query, FilterQuery} from 'mongoose';
+import type {FilterQuery, Aggregate} from 'mongoose';
 import type {MongooseDataloaderFactory} from 'graphql-dataloader-mongoose';
+import { promisify } from "../../../promisify";
 
 type args = {
     query: {
@@ -23,7 +24,7 @@ type args = {
     developerValidated?: boolean
 }
 
-type SearchFn = (args?: args) => Query<ISnapDocument[], ISnapDocument>;
+type SearchFn = (args?: args) => any[]
 
 const getRatingAverage: (snap: ISnapDocument) => Promise<number> = async (snap) => {
     const rating = await RatingsModel.findOne({
@@ -52,16 +53,16 @@ const getRatingCount: (snap: ISnapDocument) => Promise<number> = async (snap) =>
     return rating.total;
 }
 
-const snapsByDateFn: SearchFn = () => SnapsModel.find({ name: { $not: /(^(test|hello)-|-test$)/i } })
+const snapsByDateFn = () => SnapsModel.aggregate<ISnapDocument>([{ name: { $not: /(^(test|hello)-|-(test|hello)$)/i } }])
 
-const searchSnapsFn: SearchFn = (args) => {
-    let query: FilterQuery<ISnapDocument> = {}
+const searchSnapsFn = (args: args) => {
+    let query: any[] = []
+    let match: any = { name: { $not: /(^(test|hello)-|-(test|hello)$)/i } }
 
     if (args.name) {
         const name = escapeRegExp(args.name)
 
-        query = {
-            ...query,
+        query.push({
             $search: {
                 index: 'default',
                 text: {
@@ -71,8 +72,7 @@ const searchSnapsFn: SearchFn = (args) => {
                     }
                 }
             },
-            name: { $not: /(^(test|hello)-|-(test|hello)$)/i },
-        }
+        })
     }
 
     if (args.publisherOrDeveloper) {
@@ -83,50 +83,51 @@ const searchSnapsFn: SearchFn = (args) => {
         publisherOrDeveloperQuery.push({publisher_username: {$regex: publisherOrDeveloper, $options: 'i'}})
         publisherOrDeveloperQuery.push({developer_name: {$regex: publisherOrDeveloper, $options: 'i'}})
 
-        query = { ...query, $or: publisherOrDeveloperQuery }
+        match = { ...match, $or: publisherOrDeveloperQuery }
     }
 
     if (args.base) {
-        query = { ...query, base_snap: args.base }
+        match = { ...match, base_snap: args.base }
     }
     if (args.architecture) {
-        query = { ...query, architecture: Architecture[args.architecture] }
+        match = { ...match, architecture: Architecture[args.architecture] }
     }
     if (args.categories) {
-        query = { ...query, categories: { $in: args.categories } }
+        match = { ...match, categories: { $in: args.categories } }
     }
     if (args.license) {
-        query = { ...query, license: args.license }
+        match = { ...match, license: args.license }
     }
 
     if (typeof args.developerValidated !== 'undefined') {
         if (args.developerValidated === true) {
-            query = { ...query, developer_validation: DeveloperValidation.verified }
+            match = { ...match, developer_validation: DeveloperValidation.verified }
         } else {
-            query = { ...query, developer_validation: DeveloperValidation.unproven }
+            match = { ...match, developer_validation: DeveloperValidation.unproven }
         }
     }
 
+    query.push({ $match: match });
+
+    let agg = SnapsModel.aggregate<ISnapDocument>(query)
+
     if (args.query?.sort?.field && args.query?.sort?.order) {
-        let sort = { [args.query.sort.field]: args.query.sort.order }
-        return SnapsModel.find(query).sort(sort)
+        agg = agg.sort({ [args.query.sort.field]: args.query.sort.order })
     }
-    
-    return SnapsModel.find(query)
+
+    return agg
 }
 
-const findSnapsQueryFn = (searchHandlerFn: SearchFn) => async (_: any, args: args) => await searchHandlerFn(args)
-    .skip(args.query.offset || 0)
-    .limit(args.query.limit || 6)
-
-const findSnapsCountFn = (searchSnapsFn: SearchFn) => async (_: any, args: args) => {
-    const count = (await searchSnapsFn(args).countDocuments()) || 0;
-    return { count };
+const findSnapsQueryFn = (searchHandlerFn: { (args: args): Aggregate<ISnapDocument[]> }) => (_: any, args: args) => {
+    const agg = searchHandlerFn(args)
+        .skip(args.query.offset ?? 0)
+        .limit(args.query.limit ?? 6)
+    return promisify(agg)
 }
 
-const snapsByDateCount = async () => ({
-    count: (await snapsByDateFn().countDocuments()) || 0,
-});
+const findSnapsCountFn = (searchSnapsFn: { (args: args): Aggregate<ISnapDocument[]> }) => async (_: any, args: args) => (await promisify<{count: number}>(searchSnapsFn(args).count('count')))
+
+const snapsByDateCount = async () => (await promisify<{count: number}[]>(snapsByDateFn().count('count'))).shift()
 
 const loadSnap = (key: string, argKey: string) => async (_parent: any, args: args, context: { dataloaderFactory: MongooseDataloaderFactory; }): Promise<ISnapDocument> => {
     const dataloaderFactory: MongooseDataloaderFactory = context.dataloaderFactory;
@@ -159,3 +160,4 @@ export default {
         ratings_count: getRatingCount,
     }
 };
+

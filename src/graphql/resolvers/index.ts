@@ -1,4 +1,5 @@
 import { mergeResolvers } from '@graphql-tools/merge';
+import type { GraphQLResolveInfo } from 'graphql';
 
 import Architecture from "./Architecture";
 import Base from "./Base";
@@ -22,4 +23,4 @@ const resolvers = [
     Snaps,
 ];
 
-export default mergeResolvers(resolvers);
+export default mergeResolvers<any, GraphQLResolveInfo>(resolvers);
