@@ -53,7 +53,7 @@ const getRatingCount: (snap: ISnapDocument) => Promise<number> = async (snap) =>
     return rating.total;
 }
 
-const snapsByDateFn = () => SnapsModel.aggregate<ISnapDocument>([{ name: { $not: /(^(test|hello)-|-(test|hello)$)/i } }])
+const snapsByDateFn = () => SnapsModel.aggregate<ISnapDocument>([{ $match: { name: { $not: /(^(test|hello)-|-(test|hello)$)/i } } }])
 
 const searchSnapsFn = (args: args) => {
     let query: any[] = []
