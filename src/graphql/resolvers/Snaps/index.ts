@@ -125,7 +125,7 @@ const findSnapsQueryFn = (searchHandlerFn: { (args: args): Aggregate<ISnapDocume
     return promisify(agg)
 }
 
-const findSnapsCountFn = (searchSnapsFn: { (args: args): Aggregate<ISnapDocument[]> }) => async (_: any, args: args) => (await promisify<{count: number}>(searchSnapsFn(args).count('count')))
+const findSnapsCountFn = (searchSnapsFn: { (args: args): Aggregate<ISnapDocument[]> }) => async (_: any, args: args) => (await promisify<{count: number}[]>(searchSnapsFn(args).count('count'))).shift()
 
 const snapsByDateCount = async () => (await promisify<{count: number}[]>(snapsByDateFn().count('count'))).shift()
 
