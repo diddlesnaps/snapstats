@@ -111,7 +111,7 @@ const searchSnapsFn = (args: args) => {
 
     let agg = SnapsModel.aggregate<ISnapDocument>(query)
 
-    if (args.query?.sort?.field && args.query?.sort?.order) {
+    if (args.query?.sort?.field && args.query?.sort?.field != "" && args.query?.sort?.order) {
         agg = agg.sort({ [args.query.sort.field]: args.query.sort.order })
     }
 

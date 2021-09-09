@@ -148,6 +148,7 @@ label {
         <input name="offset" type="hidden" value='0' />
         <input name="limit" type="hidden" value={limit} />
         <label>Sort by <select name="field" bind:value={field}>
+            <option value="">Relevance</option>
             <option value="date_published">First publish date</option>
             <option value="package_name">Name</option>
             <option value="title">Title</option>
@@ -158,7 +159,11 @@ label {
         </select></label>
         <label>Enter a term to search
             <input name="q" type="text" value={q} placeholder="spotify"
-                on:blur={(e) => q = e.currentTarget.value} />
+                on:blur={(e) => {
+                    q = e.currentTarget.value;
+                    field = "";
+                    order = -1;
+                }} />
         </label>
     </form>
 </div>
