@@ -62,6 +62,7 @@
 	// @ts-check
 
 	import { setClient, query } from 'svelte-apollo';
+	import {advertisingEnabled} from '../stores.js'
 
 	export let cache;
 
@@ -133,8 +134,10 @@
     <link rel="alternate home" type="application/activitystream+json" href="/snaps/feed.json"
       title="Activity Streams JSON feed of new Snaps"/>
 
-	<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8255474170399666"
-	  crossorigin="anonymous"></script>
+	{#if $advertisingEnabled}
+		<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8255474170399666"
+			crossorigin="anonymous"></script>
+	{/if}
 </svelte:head>
 
 <div>

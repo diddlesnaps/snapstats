@@ -7,11 +7,11 @@
 	import GdprBanner from '@beyonk/gdpr-cookie-consent-banner/src/components/Banner.svelte'
 	import Nav from '../components/Nav.svelte';
 	import PacmanLoader from '../components/PacmanLoader.svelte';
+	import {analyticsEnabled} from '../stores.js'
 
 	export let segment;
 
 	let analytics, performance;
-	let analyticsEnabled = false;
 
 	const firebaseConfig = {
 		"apiKey": "AIzaSyDw0caGVGccf5pv5FC-0kXFpR6eFxfiVq8",
@@ -33,14 +33,14 @@
 			initializeApp(firebaseConfig);
 			
 			analytics = getAnalytics();
-			if (analyticsEnabled) {
+			if ($analyticsEnabled) {
 				analytics.app.automaticDataCollectionEnabled = true;
 			} else {
 				analytics.app.automaticDataCollectionEnabled = false;
 			}
 
 			performance = getPerformance();
-			if (analyticsEnabled) {
+			if ($analyticsEnabled) {
 				performance.dataCollectionEnabled = true;
 				performance.instrumentationEnabled = true;
 			} else {
@@ -63,7 +63,7 @@
 
 	function enableAnalytics() {
 		if (process.env.NODE_ENV === 'production') {
-			analyticsEnabled = true;
+			analyticsEnabled.enable();
 			if (analytics) {
 				analytics.app.automaticDataCollectionEnabled = true;
 			}
@@ -76,7 +76,7 @@
 
 	function enableAdvertising() {
 		if (process.env.NODE_ENV === 'production') {
-
+			advertisingEnabled.enable();
 		}
 	}
 </script>

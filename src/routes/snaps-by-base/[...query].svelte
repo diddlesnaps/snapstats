@@ -52,6 +52,7 @@
 
     import { goto } from '@sapper/app';
     import { setClient, query } from 'svelte-apollo';
+	import {advertisingEnabled} from '../../stores.js'
 
     /** @type {string} */
     export let base;
@@ -134,6 +135,11 @@ label {
       title="Atom feed of new Snaps by {base}"/>
     <link rel="alternate home" type="application/activitystream+json" href="/snaps-by-base/{base}.json"
       title="Activity Streams JSON feed of new Snaps by {base}"/>
+
+    {#if $advertisingEnabled}
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8255474170399666"
+            crossorigin="anonymous"></script>
+    {/if}
 </svelte:head>
 
 <h1>Snaps using base snap '{base}':</h1>

@@ -59,6 +59,7 @@
     import { stores } from '@sapper/app';
     import marked from 'marked'
     import createDOMPurify from 'dompurify'
+	import {advertisingEnabled} from '../../stores.js'
 
 	const { page } = stores();
     let slug = $page.params.slug;
@@ -333,8 +334,10 @@
         </${'script'}>`}
     {/if}
 
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8255474170399666"
-      crossorigin="anonymous"></script>
+	{#if $advertisingEnabled}
+		<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8255474170399666"
+			crossorigin="anonymous"></script>
+	{/if}
 </svelte:head>
 
 {#if $result.loading}
