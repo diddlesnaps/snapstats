@@ -8,9 +8,10 @@
 	import Nav from '../components/Nav.svelte';
 	import PacmanLoader from '../components/PacmanLoader.svelte';
 
-	import { initializeApp } from 'firebase/app';
-	import { getAnalytics } from "firebase/analytics";
-	import { getPerformance } from "firebase/performance";
+	export let segment;
+
+	let analytics, performance;
+	let analyticsEnabled = false;
 
 	const firebaseConfig = {
 		"apiKey": "AIzaSyDw0caGVGccf5pv5FC-0kXFpR6eFxfiVq8",
@@ -23,14 +24,31 @@
 		"storageBucket": "snapstatsorg.appspot.com"
 	}
 
-	const app = initializeApp(firebaseConfig);
-	const analytics = getAnalytics();
-	analytics.app.automaticDataCollectionEnabled = false;
-	const performance = getPerformance();
-	performance.dataCollectionEnabled = false;
-	performance.instrumentationEnabled = false;
+	if (process.browser) {
+		(async function() {
+			const { initializeApp } = await import('firebase/app');
+			const { getAnalytics } = await import("firebase/analytics");
+			const { getPerformance } = await import("firebase/performance");
+			
+			initializeApp(firebaseConfig);
+			
+			analytics = getAnalytics();
+			if (analyticsEnabled) {
+				analytics.app.automaticDataCollectionEnabled = true;
+			} else {
+				analytics.app.automaticDataCollectionEnabled = false;
+			}
 
-	export let segment;
+			performance = getPerformance();
+			if (analyticsEnabled) {
+				performance.dataCollectionEnabled = true;
+				performance.instrumentationEnabled = true;
+			} else {
+				performance.dataCollectionEnabled = false;
+				performance.instrumentationEnabled = false;
+			}
+		}())
+	}
 
 	const { preloading, page } = stores();
 	const delayedPreloading = derived(preloading,
@@ -45,15 +63,20 @@
 
 	function enableAnalytics() {
 		if (process.env.NODE_ENV === 'production') {
-			analytics.app.automaticDataCollectionEnabled = true;
-			performance.dataCollectionEnabled = true;
-			performance.instrumentationEnabled = true;
+			analyticsEnabled = true;
+			if (analytics) {
+				analytics.app.automaticDataCollectionEnabled = true;
+			}
+			if (performance) {
+				performance.dataCollectionEnabled = true;
+				performance.instrumentationEnabled = true;
+			}
 		}
 	}
 
 	function enableAdvertising() {
 		if (process.env.NODE_ENV === 'production') {
-			
+
 		}
 	}
 </script>
