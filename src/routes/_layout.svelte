@@ -7,7 +7,7 @@
 	import GdprBanner from '@beyonk/gdpr-cookie-consent-banner/src/components/Banner.svelte'
 	import Nav from '../components/Nav.svelte';
 	import PacmanLoader from '../components/PacmanLoader.svelte';
-	import {analyticsEnabled} from '../stores.js'
+	import {analyticsEnabled, advertisingEnabled} from '../stores.js'
 
 	export let segment;
 
