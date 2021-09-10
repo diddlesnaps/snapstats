@@ -3,7 +3,7 @@ import { InMemoryCache } from '@apollo/client/cache';
 
 const uri = (process.env.NODE_ENV === 'production') ?
     'https://snapstats.org/graphql' :
-    'http://localhost:3000/graphql';
+    'http://localhost:5000/graphql';
 
 class Client {
     constructor() {

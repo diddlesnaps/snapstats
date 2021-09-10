@@ -8,10 +8,31 @@
 	import Nav from '../components/Nav.svelte';
 	import PacmanLoader from '../components/PacmanLoader.svelte';
 
+	import { initializeApp } from 'firebase/app';
+	import { getAnalytics } from "firebase/analytics";
+	import { getPerformance } from "firebase/performance";
+
+	const firebaseConfig = {
+		"apiKey": "AIzaSyDw0caGVGccf5pv5FC-0kXFpR6eFxfiVq8",
+		"appId": "1:765277289423:web:1d8708e7c9a9590abb30ba",
+		"authDomain": "snapstatsorg.firebaseapp.com",
+		"databaseURL": "https://snapstatsorg.firebaseio.com",
+		"measurementId": "G-47YKSBS1V0",
+		"messagingSenderId": "765277289423",
+		"projectId": "snapstatsorg",
+		"storageBucket": "snapstatsorg.appspot.com"
+	}
+
+	const app = initializeApp(firebaseConfig);
+	const analytics = getAnalytics();
+	analytics.app.automaticDataCollectionEnabled = false;
+	const performance = getPerformance();
+	performance.dataCollectionEnabled = false;
+	performance.instrumentationEnabled = false;
+
 	export let segment;
 
 	const { preloading, page } = stores();
-	/** @type require('svelte/store').Readable<boolean> */
 	const delayedPreloading = derived(preloading,
 		/**
 		 * @param {boolean} currentPreloading
@@ -24,12 +45,16 @@
 
 	function enableAnalytics() {
 		if (process.env.NODE_ENV === 'production') {
-			globalThis.firebase?.analytics();
-			globalThis.firebase?.performance();
+			analytics.app.automaticDataCollectionEnabled = true;
+			performance.dataCollectionEnabled = true;
+			performance.instrumentationEnabled = true;
 		}
 	}
-	let GDPRCategories = {
-		analytics: () => true
+
+	function enableAdvertising() {
+		if (process.env.NODE_ENV === 'production') {
+			
+		}
 	}
 </script>
 
@@ -114,5 +139,5 @@
 	<p>Cloud Hosting by <a href="https://gcpsignup.page.link/Y1i1">Google Cloud - sign up with this link to get $350 credit</a></p>
 	<p><a href='privacy'>Privacy policy</a></p>
 </footer>
-<GdprBanner cookieName="gdprOptIn" cookieConfig={{sameSite: 'strict'}} choices={{tracking: false, marketing: false}} on:analytics={enableAnalytics}
+<GdprBanner cookieName="gdprOptIn" cookieConfig={{sameSite: 'strict'}} choices={{analytics: false, tracking: false}} on:analytics={enableAnalytics} on:tracking={enableAdvertising}
 	description="We use cookies to analyze site traffic. Please review our <a href='/privacy'>privacy policy page</a>. By clicking accept, you consent to our privacy policy &amp; use of cookies" />
