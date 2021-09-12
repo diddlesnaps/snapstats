@@ -76,12 +76,12 @@ const searchSnapsFn = (args: args) => {
     }
 
     if (args.publisherOrDeveloper) {
-        const publisherOrDeveloper: string = `^${escapeRegExp(args.publisherOrDeveloper)}$`
+        const publisherOrDeveloper: RegExp = new RegExp(`^${escapeRegExp(args.publisherOrDeveloper)}$`, 'i')
 
         let publisherOrDeveloperQuery: FilterQuery<ISnapDocument>[] = []
-        publisherOrDeveloperQuery.push({publisher: {$regex: publisherOrDeveloper, $options: 'i'}})
-        publisherOrDeveloperQuery.push({publisher_username: {$regex: publisherOrDeveloper, $options: 'i'}})
-        publisherOrDeveloperQuery.push({developer_name: {$regex: publisherOrDeveloper, $options: 'i'}})
+        publisherOrDeveloperQuery.push({publisher: publisherOrDeveloper})
+        publisherOrDeveloperQuery.push({publisher_username: publisherOrDeveloper})
+        publisherOrDeveloperQuery.push({developer_name: publisherOrDeveloper})
 
         match = { ...match, $or: publisherOrDeveloperQuery }
     }
@@ -107,7 +107,9 @@ const searchSnapsFn = (args: args) => {
         }
     }
 
-    query.push({ $match: match });
+    if (Object.entries(match).length != 0) {
+        query.push({ $match: match });
+    }
 
     let agg = SnapsModel.aggregate<ISnapDocument>(query)
 
