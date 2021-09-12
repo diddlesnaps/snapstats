@@ -57,7 +57,7 @@ const snapsByDateFn = () => SnapsModel.aggregate<ISnapDocument>([{ $match: { nam
 
 const searchSnapsFn = (args: args) => {
     let query: any[] = []
-    let match: any = { name: { $not: /(^(test|hello)-|-(test|hello)$)/i } }
+    let match: any = {}; // { name: { $not: /(^(test|hello)-|-(test|hello)$)/i } }
 
     if (args.name) {
         const name = escapeRegExp(args.name)
