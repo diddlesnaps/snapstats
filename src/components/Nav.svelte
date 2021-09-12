@@ -140,9 +140,9 @@
 		<li>
 			<a class='{segment === undefined ? "selected" : ""}' href='.'>
 				<picture>
-					<source srcset="snapstats@2x.png 2x,
-									snapstats.png 1x" />
-					<img class='logo' src='snapstats.png' alt='snapstats' />
+					<source srcset="/snapstats@2x.png 2x,
+									/snapstats.png 1x" />
+					<img width="132" height="32" class='logo' src='/snapstats.png' alt='snapstats' />
 				</picture>
 			</a>
 		</li>
