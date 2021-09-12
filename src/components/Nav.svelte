@@ -143,7 +143,7 @@
 				<picture>
 					<source srcset="/snapstats@2x.png 2x,
 									/snapstats.png 1x" />
-					<img width="115" height="22" class='logo' src='/snapstats.png' alt='snapstats' />
+					<img width="110" height="21" class='logo' src='/snapstats.png' alt='snapstats' />
 				</picture>
 			</a>
 		</li>
