@@ -76,12 +76,10 @@ const searchSnapsFn = (args: args) => {
     }
 
     if (args.publisherOrDeveloper) {
-        const publisherOrDeveloper: RegExp = new RegExp(`^${escapeRegExp(args.publisherOrDeveloper)}$`, 'i')
-
         let publisherOrDeveloperQuery: FilterQuery<ISnapDocument>[] = []
-        publisherOrDeveloperQuery.push({publisher: publisherOrDeveloper})
-        publisherOrDeveloperQuery.push({publisher_username: publisherOrDeveloper})
-        publisherOrDeveloperQuery.push({developer_name: publisherOrDeveloper})
+        publisherOrDeveloperQuery.push({publisher: args.publisherOrDeveloper})
+        publisherOrDeveloperQuery.push({publisher_username: args.publisherOrDeveloper})
+        publisherOrDeveloperQuery.push({developer_name: args.publisherOrDeveloper})
 
         match = { ...match, $or: publisherOrDeveloperQuery }
     }
