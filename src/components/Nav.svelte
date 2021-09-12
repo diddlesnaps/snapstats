@@ -131,6 +131,7 @@
 
 	img.logo {
 		height: 1.7em;
+		width: auto;
 		margin-bottom: -0.6em;
 	}
 </style>
