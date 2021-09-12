@@ -84,7 +84,7 @@
 <style>
 	main {
 		position: relative;
-		max-width: 56rem;
+		max-width: 960px;
 		background-color: white;
 		padding: 2rem;
 		margin: 0 auto;

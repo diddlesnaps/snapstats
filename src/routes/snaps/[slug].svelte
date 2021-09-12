@@ -351,7 +351,11 @@
         )}
             <picture>
                 <source
-                    media="(min-width: 896px)"
+                    media="(min-width: 960px)"
+                    srcset="https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,w_960/{$result.data?.snapByName.media.find(item => item.type === 'banner').url},
+                        https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,w_1920/{$result.data?.snapByName.media.find(item => item.type === 'banner').url} 2x" />
+                <source
+                    media="(max-width: 896px)"
                     srcset="https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,w_896/{$result.data?.snapByName.media.find(item => item.type === 'banner').url},
                         https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,w_1792/{$result.data?.snapByName.media.find(item => item.type === 'banner').url} 2x" />
                 <source
@@ -512,7 +516,7 @@
 
         <p class='storeButton'>
             <a href="https://snapcraft.io/{$result.data?.snapByName.package_name}">
-                <img alt="Get it from the Snap Store"
+                <img width="182" height="56" alt="Get it from the Snap Store"
                     src="https://snapcraft.io/static/images/badges/en/snap-store-black.svg" />
             </a>
         </p>
