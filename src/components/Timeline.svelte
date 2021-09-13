@@ -92,7 +92,7 @@
                 },
             }
         });
-        legend = timelineChart.generateLegend();
+        // legend = timelineChart.generateLegend();
     });
 </script>
 
