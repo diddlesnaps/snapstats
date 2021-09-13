@@ -180,15 +180,17 @@ label {
 {:else if $result.error}
 	<p>Error...</p>
 {:else}
-    <!-- {#if 'findSnapsByNameCount' in result.data } -->
-        <h2>Search results:</h2>
-        <SnapList snaps={$result.data?.findSnapsByName} />
-        <Pagination count={$result.data?.findSnapsByNameCount.count} {limit} {offset} {getPageUrl} />
-    <!-- {:else}
-        <h2>Newest Snaps: <a href="/snaps/feed.rss"><img class="rssicon" src="/rssfeed.svg" title="Newest Snaps RSS feed" alt="RSS feed"></a></h2>
-        <SnapList snaps={result.data.snapsByDate} />
-        <Pagination count={result.data.snapsByDateCount.count} {limit} {offset} {getPageUrl} />
-    {/if} -->
+    <h2>Search results:</h2>
+    {#if ($result.data?.findSnapsByNameCount?.count ?? 0) > 0}
+        {#if ($result.data?.findSnapsByName?.length ?? 0) > 0}
+            <SnapList snaps={$result.data?.findSnapsByName} />
+        {:else}
+            <p>No more Snap Packages to show</p>
+        {/if}
+        <Pagination count={$result.data?.findSnapsByNameCount?.count ?? 0} {limit} {offset} {getPageUrl} />
+    {:else}
+        <p>No Snap Packages found</p>
+    {/if}
 {/if}
 </div>
 
