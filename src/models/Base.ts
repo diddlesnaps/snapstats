@@ -22,7 +22,7 @@ const BasesSchema = new Schema<IBaseDocument>({
     date: {
         type: Date,
         required: true,
-        default: Date.now,
+        default: () => new Date(),
     },
     isDaily: {
         type: Boolean,

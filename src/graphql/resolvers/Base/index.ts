@@ -2,14 +2,13 @@
 
 import { BasesModel } from "../../../models/Base";
 import { LastUpdatedModel } from '../../../models/LastUpdated';
-import { promisify } from '../../../promisify';
 import { documentCount } from '../documentCount';
 
 export default {
     Query: {
-        base: (_, args) => promisify(BasesModel.findOne(args)),
+        base: (_, args) => BasesModel.findOne(args),
         baseCount: () => documentCount(BasesModel),
-        bases: (_, args) => promisify(BasesModel.find({}).sort({date: 'desc'}).skip(args.query.offset).limit(args.query.limit)),
+        bases: (_, args) => BasesModel.find({}).sort({date: 'desc'}).skip(args.query.offset).limit(args.query.limit),
         basesByDate: async (_, args) => {
             const updated = await LastUpdatedModel.findOne({});
             if (!updated) {
@@ -19,7 +18,7 @@ export default {
             const bases = await BasesModel.find({ date });
             return [{ _id: date, bases }];
         },
-        baseTimeline: (_, args) => promisify(BasesModel.aggregate([
+        baseTimeline: (_, args) => BasesModel.aggregate([
             { $match: {
                 'date': {
                     '$gte': args.from ?
@@ -64,7 +63,7 @@ export default {
                 'counts.count': 1,
                 'counts.date': 1,
             } },
-        ])),
+        ]),
     },
     // Mutation: {
     //     addBase: (_, {name, count}) => {

@@ -25,7 +25,6 @@ export default {
 			replace({
 				'process.browser': true,
 				'process.env.NODE_ENV': JSON.stringify(mode),
-				'__fetch': 'window.fetch',
 				'http://localhost:3000/graphql': dev ? 'http://localhost:3000/graphql' : 'https://snapstats.org/graphql',
 			}),
 			svelte({
@@ -72,12 +71,15 @@ export default {
 
 	server: {
 		input: config.server.input(),
-		output: config.server.output(),
+		output:
+		//  {
+			config.server.output(),
+		// 	format: 'esm',
+		// },
 		plugins: [
 			replace({
 				'process.browser': false,
 				'process.env.NODE_ENV': JSON.stringify(mode),
-				'__fetch': 'require("node-fetch")',
 				'http://localhost:3000/graphql': dev ? 'http://localhost:3000/graphql' : 'https://snapstats.org/graphql',
 			}),
 			replace({

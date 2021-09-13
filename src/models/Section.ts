@@ -22,7 +22,7 @@ const SectionsSchema = new Schema<ISectionDocument>({
     date: {
         type: Date,
         required: true,
-        default: Date.now,
+        default: () => new Date(),
     },
     isDaily: {
         type: Boolean,

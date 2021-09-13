@@ -3,7 +3,6 @@ import { RatingsModel } from "../../../models/Rating"
 import escapeRegExp from 'lodash.escaperegexp'
 import type {FilterQuery, Aggregate} from 'mongoose';
 import type {MongooseDataloaderFactory} from 'graphql-dataloader-mongoose';
-import { promisify } from "../../../promisify";
 
 type args = {
     query: {
@@ -119,15 +118,14 @@ const searchSnapsFn = (args: args) => {
 }
 
 const findSnapsQueryFn = (searchHandlerFn: { (args: args): Aggregate<ISnapDocument[]> }) => (_: any, args: args) => {
-    const agg = searchHandlerFn(args)
+    return searchHandlerFn(args)
         .skip(args.query.offset ?? 0)
         .limit(args.query.limit ?? 6)
-    return promisify(agg)
 }
 
-const findSnapsCountFn = (searchSnapsFn: { (args: args): Aggregate<ISnapDocument[]> }) => async (_: any, args: args) => (await promisify<{count: number}[]>(searchSnapsFn(args).count('count'))).shift()
+const findSnapsCountFn = (searchSnapsFn: { (args: args): Aggregate<ISnapDocument[]> }) => async (_: any, args: args) => (await searchSnapsFn(args).count('count')).shift()
 
-const snapsByDateCount = async () => (await promisify<{count: number}[]>(snapsByDateFn().count('count'))).shift()
+const snapsByDateCount = async () => (await snapsByDateFn().count('count')).shift()
 
 const loadSnap = (key: string, argKey: string) => async (_parent: any, args: args, context: { dataloaderFactory: MongooseDataloaderFactory; }): Promise<ISnapDocument> => {
     const dataloaderFactory: MongooseDataloaderFactory = context.dataloaderFactory;

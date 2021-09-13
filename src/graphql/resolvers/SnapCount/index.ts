@@ -1,6 +1,5 @@
 import { SnapCountsModel, ISnapCountsDocument } from "../../../models/SnapCount";
 import { LastUpdatedModel } from '../../../models/LastUpdated';
-import { promisify } from '../../../promisify';
 import { documentCount } from '../documentCount';
 
 type args = {
@@ -17,9 +16,9 @@ type args = {
 
 export default {
     Query: {
-        snapCount: (_: any, args: args) => promisify<ISnapCountsDocument>(SnapCountsModel.findOne(args)),
+        snapCount: (_: any, args: args) => SnapCountsModel.findOne(args),
         snapCountCount: () => documentCount(SnapCountsModel),
-        snapCounts: (_: any, args: args) => promisify<ISnapCountsDocument[]>(SnapCountsModel.find({}).sort({date: 'desc'}).skip(args.query.offset).limit(args.query.limit)),
+        snapCounts: (_: any, args: args) => SnapCountsModel.find({}).sort({date: 'desc'}).skip(args.query.offset).limit(args.query.limit),
         snapCountsByDate: async (_: any, args: args) => {
             const updated = await LastUpdatedModel.findOne({});
             if (!updated) {
@@ -29,7 +28,7 @@ export default {
             const snapCounts = await SnapCountsModel.find({ date });
             return [{ _id: date, snapCounts }];
         },
-        snapCountTimeline: (_: any, args: args) => promisify<ISnapCountsDocument[]>(SnapCountsModel.aggregate<ISnapCountsDocument>([
+        snapCountTimeline: (_: any, args: args) => SnapCountsModel.aggregate<ISnapCountsDocument>([
             { $match: {
                 'date': {
                     '$gte': args.from ?
@@ -59,6 +58,6 @@ export default {
                 'filtered': 1,
             } },
             { '$sort': { '_id': 1 } },
-        ])),
+        ]),
     },
 };

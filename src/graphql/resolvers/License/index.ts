@@ -2,14 +2,13 @@
 
 import { LicensesModel } from "../../../models/License";
 import { LastUpdatedModel } from '../../../models/LastUpdated';
-import { promisify } from '../../../promisify';
 import { documentCount } from '../documentCount';
 
 export default {
     Query: {
-        license: (_, args) => promisify(LicensesModel.findOne(args)),
+        license: (_, args) => LicensesModel.findOne(args),
         licenseCount: () => documentCount(LicensesModel),
-        licenses: (_, args) => promisify(LicensesModel.find({}).sort({date: 'desc'}).skip(args.query.offset).limit(args.query.limit)),
+        licenses: (_, args) => LicensesModel.find({}).sort({date: 'desc'}).skip(args.query.offset).limit(args.query.limit),
         licensesByDate: async (_, args) => {
             const updated = await LastUpdatedModel.findOne({});
             if (!updated) {
@@ -19,7 +18,7 @@ export default {
             const licenses = await LicensesModel.find({ date });
             return [{ _id: date, licenses }];
         },
-        licenseTimeline: (_, args) => promisify(LicensesModel.aggregate([
+        licenseTimeline: (_, args) => LicensesModel.aggregate([
             { $match: {
                 'date': {
                     '$gte': args.from ?
@@ -64,6 +63,6 @@ export default {
                 'counts.count': 1,
                 'counts.date': 1,
             } },
-        ])),
+        ]),
     },
 };

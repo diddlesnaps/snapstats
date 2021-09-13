@@ -7,7 +7,6 @@ import { ConfinementsModel } from '../../models/Confinement';
 import { DeveloperCountsModel } from '../../models/DeveloperCount';
 import { LicensesModel } from '../../models/License';
 import { SnapCountsModel } from '../../models/SnapCount';
-import { promisify } from '../../promisify';
 import { connectMongoose } from '../../mongodb';
 const denysave = process.env.denysave === 'true' ? true : false;
 /** @type {(context: functions.EventContext) => Promise<void>} */
@@ -17,13 +16,13 @@ export default async (context) => {
         if (!denysave) {
             await connectMongoose();
             let promises = [];
-            promises.push(promisify(ArchitecturesModel.deleteMany({ isDaily: { $ne: true } })));
-            promises.push(promisify(BasesModel.deleteMany({ isDaily: { $ne: true } })));
-            promises.push(promisify(ChannelsModel.deleteMany({ isDaily: { $ne: true } })));
-            promises.push(promisify(ConfinementsModel.deleteMany({ isDaily: { $ne: true } })));
-            promises.push(promisify(DeveloperCountsModel.deleteMany({ isDaily: { $ne: true } })));
-            promises.push(promisify(LicensesModel.deleteMany({ isDaily: { $ne: true } })));
-            promises.push(promisify(SnapCountsModel.deleteMany({ isDaily: { $ne: true } })));
+            promises.push(ArchitecturesModel.deleteMany({ isDaily: { $ne: true } }));
+            promises.push(BasesModel.deleteMany({ isDaily: { $ne: true } }));
+            promises.push(ChannelsModel.deleteMany({ isDaily: { $ne: true } }));
+            promises.push(ConfinementsModel.deleteMany({ isDaily: { $ne: true } }));
+            promises.push(DeveloperCountsModel.deleteMany({ isDaily: { $ne: true } }));
+            promises.push(LicensesModel.deleteMany({ isDaily: { $ne: true } }));
+            promises.push(SnapCountsModel.deleteMany({ isDaily: { $ne: true } }));
             await Promise.all(promises);
         }
         console.log(`Stats thinning completed at ${(new Date()).toLocaleString()}`);

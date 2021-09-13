@@ -2,14 +2,13 @@
 
 import { ChannelsModel } from "../../../models/Channel";
 import { LastUpdatedModel } from '../../../models/LastUpdated';
-import { promisify } from '../../../promisify';
 import { documentCount } from '../documentCount';
 
 export default {
     Query: {
-        channel: (_, args) => promisify(ChannelsModel.findOne(args)),
+        channel: (_, args) => ChannelsModel.findOne(args),
         channelCount: () => documentCount(ChannelsModel),
-        channels: (_, args) => promisify(ChannelsModel.find({}).sort({date: 'desc'}).skip(args.query.offset).limit(args.query.limit)),
+        channels: (_, args) => ChannelsModel.find({}).sort({date: 'desc'}).skip(args.query.offset).limit(args.query.limit),
         channelsByDate: async (_, args) => {
             const updated = await LastUpdatedModel.findOne({});
             if (!updated) {
@@ -19,7 +18,7 @@ export default {
             const channels = await ChannelsModel.find({ date });
             return [{ _id: date, channels }];
         },
-        channelTimeline: (_, args) => promisify(ChannelsModel.aggregate([
+        channelTimeline: (_, args) => ChannelsModel.aggregate([
             { $match: {
                 'date': {
                     '$gte': args.from ?
@@ -64,6 +63,6 @@ export default {
                 'counts.count': 1,
                 'counts.date': 1,
             } },
-        ])),
+        ]),
     },
 };

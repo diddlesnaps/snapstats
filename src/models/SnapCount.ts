@@ -22,7 +22,7 @@ const SnapCountsSchema = new Schema<ISnapCountsDocument>({
     date: {
         type: Date,
         required: true,
-        default: Date.now,
+        default: () => new Date(),
     },
     isDaily: {
         type: Boolean,

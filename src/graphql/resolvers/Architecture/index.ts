@@ -2,14 +2,13 @@
 
 import { ArchitecturesModel } from '../../../models/Architecture';
 import { LastUpdatedModel } from '../../../models/LastUpdated';
-import { promisify } from '../../../promisify';
 import { documentCount } from '../documentCount';
 
 export default {
     Query: {
-        architecture: (_, args) => promisify(ArchitecturesModel.findOne(args)),
+        architecture: (_, args) => ArchitecturesModel.findOne(args),
         architectureCount: () => documentCount(ArchitecturesModel),
-        architectures: (_, args) => promisify(ArchitecturesModel.find({}).sort({date: 'desc'}).skip(args.query.offset).limit(args.query.limit)),
+        architectures: (_, args) => ArchitecturesModel.find({}).sort({date: 'desc'}).skip(args.query.offset).limit(args.query.limit),
         architecturesByDate: async () => {
             const updated = await LastUpdatedModel.findOne({});
             if (!updated) {
@@ -19,7 +18,7 @@ export default {
             const architectures = await ArchitecturesModel.find({ date });
             return [{ _id: date, architectures }];
         },
-        architectureTimeline: (_, args) => promisify(ArchitecturesModel.aggregate([
+        architectureTimeline: (_, args) => ArchitecturesModel.aggregate([
             { $match: {
                 'date': {
                     '$gte': args.from ?
@@ -64,6 +63,6 @@ export default {
                 'counts.count': 1,
                 'counts.date': 1,
             } },
-        ])),
+        ]),
     },
 };

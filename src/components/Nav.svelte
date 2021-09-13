@@ -130,9 +130,9 @@
 	}
 
 	img.logo {
-		height: 1.3125em;
+		height: 1.55em;
 		width: auto;
-		margin-bottom: -0.35em;
+		margin-bottom: -0.48em;
 	}
 </style>
 

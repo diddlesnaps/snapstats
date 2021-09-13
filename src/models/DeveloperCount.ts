@@ -34,7 +34,7 @@ const DeveloperCountsSchema = new Schema<IDeveloperCountsDocument>({
     date: {
         type: Date,
         required: true,
-        default: Date.now,
+        default: () => new Date(),
     },
     isDaily: {
         type: Boolean,

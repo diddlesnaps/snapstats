@@ -32,6 +32,18 @@ type SnapMedia = {
     width: number
 };
 
+type Plug = {
+    plug_name: string
+    interface: string
+    content: string
+    default_provider: string
+}
+
+type Slot = {
+    slot_name: string
+    interface: string
+}
+
 export interface ISnapDocument extends Document {
     aliases: Types.Array<SnapAlias>
     anon_download_url: string
@@ -74,6 +86,11 @@ export interface ISnapDocument extends Document {
     unlisted: boolean
     version: string
     website: string
+
+    plugs: Types.Array<Plug>
+    slots: Types.Array<Slot>
+    snapshot_date: Date
+    snapshotVersion: number
 }
 
 const SnapsSchema = new Schema<ISnapDocument>({
@@ -82,14 +99,12 @@ const SnapsSchema = new Schema<ISnapDocument>({
             name: String,
             target: String,
         }],
-        default: [],
     },
     anon_download_url: {
         type: String,
     },
     apps: {
         type: [String],
-        default: [],
     },
     architecture: { // amd64, arm64, armhf, i386, ppc64el, s390x
         type: [String],
@@ -116,7 +131,7 @@ const SnapsSchema = new Schema<ISnapDocument>({
     date_published: {
         type: Date,
         required: true,
-        default: Date.now,
+        default: () => new Date(),
     },
     description: { // markdown
         type: String
@@ -140,7 +155,7 @@ const SnapsSchema = new Schema<ISnapDocument>({
     last_updated: {
         type: Date,
         required: true,
-        default: Date.now,
+        default: () => new Date(),
     },
     license: { // SPDX text
         type: String,
@@ -152,7 +167,6 @@ const SnapsSchema = new Schema<ISnapDocument>({
             height: { type: Number },
             width: { type: Number },
         }],
-        default: [],
     },
     name: { // namespaced name
         type: String,
@@ -165,10 +179,10 @@ const SnapsSchema = new Schema<ISnapDocument>({
     package_name: { // name
         type: String,
     },
-    prices: {
-        type: Map,
-        of: Number,
-    },
+    // prices: {
+    //     type: Map,
+    //     of: Number,
+    // },
     private: {
         type: Boolean,
         default: false,
@@ -252,7 +266,6 @@ const SnapsSchema = new Schema<ISnapDocument>({
             },
         }],
         required: false,
-        default: [],
     },
     slots: {
         type: [{
@@ -266,12 +279,11 @@ const SnapsSchema = new Schema<ISnapDocument>({
             },
         }],
         required: false,
-        default: [],
     },
     snapshot_date: {
         type: Date,
         required: true,
-        default: Date.now,
+        default: () => new Date(),
     },
     snapshotVersion: {
         type: Number,

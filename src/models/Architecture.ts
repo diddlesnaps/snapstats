@@ -22,7 +22,7 @@ const ArchitecturesSchema = new Schema<IArchitectureDocument>({
     date: {
         type: Date,
         required: true,
-        default: Date.now,
+        default: () => new Date(),
     },
     isDaily: {
         type: Boolean,

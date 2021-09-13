@@ -2,14 +2,13 @@
 
 import { ConfinementsModel } from "../../../models/Confinement";
 import { LastUpdatedModel } from '../../../models/LastUpdated';
-import { promisify } from '../../../promisify';
 import { documentCount } from '../documentCount';
 
 export default {
     Query: {
-        confinement: (_, args) => promisify(ConfinementsModel.findOne(args)),
+        confinement: (_, args) => ConfinementsModel.findOne(args),
         confinementCount: () => documentCount(ConfinementsModel),
-        confinements: (_, args) => promisify(ConfinementsModel.find({}).sort({date: 'desc'}).skip(args.query.offset).limit(args.query.limit)),
+        confinements: (_, args) => ConfinementsModel.find({}).sort({date: 'desc'}).skip(args.query.offset).limit(args.query.limit),
         confinementsByDate: async (_, args) => {
             const updated = await LastUpdatedModel.findOne({});
             if (!updated) {
@@ -19,7 +18,7 @@ export default {
             const confinements = await ConfinementsModel.find({ date });
             return [{ _id: date, confinements }];
         },
-        confinementTimeline: (_, args) => promisify(ConfinementsModel.aggregate([
+        confinementTimeline: (_, args) => ConfinementsModel.aggregate([
             { $match: {
                 'date': {
                     '$gte': args.from ?
@@ -64,6 +63,6 @@ export default {
                 'counts.count': 1,
                 'counts.date': 1,
             } },
-        ])),
+        ]),
     },
 };

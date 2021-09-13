@@ -22,7 +22,7 @@ const LicensesSchema = new Schema<ILicenseDocument>({
     date: {
         type: Date,
         required: true,
-        default: Date.now,
+        default: () => new Date(),
     },
     isDaily: {
         type: Boolean,

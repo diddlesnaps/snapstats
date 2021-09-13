@@ -1,7 +1,8 @@
 <script type="ts">
     import { onMount } from 'svelte';
     import { shuffle, MersenneTwister19937 } from 'random-js';
-    import Chart from 'chart.js';
+    import Chart from 'chart.js/auto';
+    import 'chartjs-adapter-date-fns';
     import Rainbow from 'color-rainbow';
 
     export let getLegendItem: (title: string) => string = (title) => title;
@@ -61,18 +62,18 @@
                 hover: { animationDuration: 0 },
                 responsiveAnimationDuration: 0,
                 scales: {
-                    xAxes: [{
+                    x: {
                         type: 'time',
                         distribution: 'linear',
                         time: {
                             unit: 'day',
                         },
-                    }],
-                    yAxes: [{
+                    },
+                    y: {
                         ticks: {
                             beginAtZero: true
                         }
-                    }]
+                    }
                 },
                 legend: {
                     display: false,

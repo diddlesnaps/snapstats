@@ -3,14 +3,13 @@
 import { DeveloperCountsModel } from "../../../models/DeveloperCount";
 import { SnapsModel } from "../../../models/Snaps";
 import { LastUpdatedModel } from '../../../models/LastUpdated';
-import { promisify } from '../../../promisify';
 import { documentCount } from '../documentCount';
 
 export default {
     Query: {
-        developerCount: (_, args) => promisify(DeveloperCountsModel.findOne(args)),
+        developerCount: (_, args) => DeveloperCountsModel.findOne(args),
         developerCountCount: () => documentCount(DeveloperCountsModel),
-        developerCounts: (_, args) => promisify(DeveloperCountsModel.find({}).sort({date: 'desc'}).skip(args.query.offset).limit(args.query.limit)),
+        developerCounts: (_, args) => DeveloperCountsModel.find({}).sort({date: 'desc'}).skip(args.query.offset).limit(args.query.limit),
         developerCountsByDate: async (_, args) => {
             const updated = await LastUpdatedModel.findOne({});
             if (!updated) {
@@ -20,7 +19,7 @@ export default {
             const developerCounts = await DeveloperCountsModel.find({ date });
             return [{ _id: date, developerCounts }];
         },
-        developerCountTimeline: (_, args) => promisify(DeveloperCountsModel.aggregate([
+        developerCountTimeline: (_, args) => DeveloperCountsModel.aggregate([
             { $match: {
                 'date': {
                     '$gte': args.from ?
@@ -50,10 +49,10 @@ export default {
                 'mean': 1,
             } },
             { '$sort': { '_id': 1 } },
-        ])),
+        ]),
 
         verifiedDevelopers: async () => {
-            return promisify(SnapsModel.aggregate([
+            return SnapsModel.aggregate([
                 { $match: {
                     developer_validation: 'verified',
                 } },
@@ -70,7 +69,7 @@ export default {
                 { $sort: {
                     _id: 1,
                 } },
-            ]))
+            ])
         },
         verifiedDeveloperCount: async (_, args) => {
             const developerCounts = await SnapsModel.aggregate([

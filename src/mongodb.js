@@ -9,9 +9,6 @@ export async function connectMongoose() {
             .connect(
                 mongoUrl,
                 {
-                    useCreateIndex: true,
-                    useNewUrlParser: true,
-                    useUnifiedTopology: true,
                     connectTimeoutMS: 5000,
                     serverSelectionTimeoutMS: 5000,
                 }

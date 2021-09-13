@@ -22,7 +22,7 @@ const ConfinementsSchema = new Schema<IConfinementDocument>({
     date: {
         type: Date,
         required: true,
-        default: Date.now,
+        default: () => new Date(),
     },
     isDaily: {
         type: Boolean,
