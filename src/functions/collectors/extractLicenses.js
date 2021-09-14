@@ -4,7 +4,6 @@ import { connectMongoose } from '../../mongodb.js';
 import {SnapsModel} from '../../models/Snaps.js';
 import {LicensesModel} from '../../models/License.js';
 import { sort, extractCombinedLicenseCounts, mapCounts } from '../../statsHelpers.js';
-import { promisify } from '../../promisify.js';
 
 const getCounts = items => {
     const item_names = new Set(items.map(item => item.name))
@@ -30,7 +29,7 @@ const collector = (isDaily = false) => async (context) => {
 
     await connectMongoose();
 
-    const snap_licenses  = await promisify(SnapsModel.aggregate([
+    const snap_licenses  = await SnapsModel.aggregate([
         { $group: {
             '_id': '$license',
             'count': { $sum: 1 },
@@ -40,7 +39,7 @@ const collector = (isDaily = false) => async (context) => {
             'count': '$count',
             '_id': 0,
         } },
-    ]))
+    ])
 
     const license_counts = extractCombinedLicenseCounts(getCounts(snap_licenses))
     const licenses       = sort(Object.keys(license_counts).map(mapCounts(license_counts)));
