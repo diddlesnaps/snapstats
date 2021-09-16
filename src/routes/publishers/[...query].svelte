@@ -42,7 +42,7 @@
             field,
             order,
             page: parseInt(page),
-            cache: (await data).data,
+            cache: data,
         };
     }
 </script>
@@ -51,7 +51,7 @@
     // @ts-check
 
     import { goto } from '@sapper/app';
-    import { setClient, query } from 'svelte-apollo';
+    import { restore, setClient, query } from 'svelte-apollo';
 	import {advertisingEnabled} from '../../stores.js'
 
     /** @type {string} */
@@ -65,7 +65,7 @@
     export let cache;
 
 	setClient(client);
-    client.writeQuery({query: q, data: cache})
+    restore(q, cache)
 
     let result = query(q, {
         variables: {publisherName, field, order, offset: page*limit, limit}

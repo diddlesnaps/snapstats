@@ -47,7 +47,7 @@
         if (!data.snapByName) {
             this.error(404, `The Snap package '${slug}' is not in the latest snapshot of data from the Snap Store. Perhaps it has been unpublished.. 😭`)
         } else {
-            return { cache: data }
+            return { cache: result }
         }
     }
 </script>
@@ -88,39 +88,51 @@
         }
     })
 
-	import { setClient, query } from 'svelte-apollo'
-
+	import { restore, setClient, query } from 'svelte-apollo'
     export let cache
 
 	setClient(client)
-	client.writeQuery({query: q, data: cache})
+	restore(q, cache)
     let result = query(q, {variables: {slug}})
 
-    let video
+    let video, socialImage
+
+    if ($result.data?.snapByName?.media) {
+        const img = $result.data?.snapByName?.media.filter(m => m.type === 'screenshot').shift()
+        if (img) {
+            socialImage = img
+        }
+
+        video = $result.data.snapByName?.media.filter(m => m.type === 'video').shift()
+        if (typeof video === 'object' && 'url' in video) {
+            if (video.url.match(/youtube/)) {
+                video.url = video.url.replace('watch?v=', 'embed/')
+                video.type = 'youtube'
+            }
+            if (video.url.match(/youtu\.be/)) {
+                video.url = video.url.replace('youtu.be', 'youtube.com/embed/')
+                video.type = 'youtube'
+            }
+            if (video.url.match(/vimeo/)) {
+                video.url = video.url.replace('vimeo.com/', 'player.vimeo.com/video/')
+                video.type = 'vimeo'
+            }
+            if (video.url.match(/asciinema/)) {
+                video.url = video.url + '.js'
+                video.type = 'asciinema'
+            }
+            video.url = video.url.replace('http://', 'https://')
+        }
+    }
+    if (!socialImage) {
+        socialImage = {
+            url: $result.data?.snapByName.icon_url,
+            width: 512,
+            height: 512,
+        }
+    }
 
     onMount(async () => {
-        if ($result.data?.snapByName?.media) {
-            video = $result.data.snapByName.media.filter(m => m.type === 'video').shift()
-            if (typeof video === 'object' && 'url' in video) {
-                if (video.url.match(/youtube/)) {
-                    video.url = video.url.replace('watch?v=', 'embed/')
-                    video.type = 'youtube'
-                }
-                if (video.url.match(/youtu\.be/)) {
-                    video.url = video.url.replace('youtu.be', 'youtube.com/embed/')
-                    video.type = 'youtube'
-                }
-                if (video.url.match(/vimeo/)) {
-                    video.url = video.url.replace('vimeo.com/', 'player.vimeo.com/video/')
-                    video.type = 'vimeo'
-                }
-                if (video.url.match(/asciinema/)) {
-                    video.url = video.url + '.js'
-                    video.type = 'asciinema'
-                }
-                video.url = video.url.replace('http://', 'https://')
-            }
-        }
         await import('fslightbox')
         globalThis.refreshFsLightbox()
     })
@@ -275,25 +287,29 @@
     {:else if $result.error}
         <title>Error...</title>
     {:else}
-        <title>{$result.data?.snapByName.title || $result.data?.snapByName.package_name}</title>
+        <title>{$result.data?.snapByName.title ?? $result.data?.snapByName.package_name}</title>
         <meta name="description" content="{$result.data?.snapByName.summary}" />
 
         <!-- Facebook -->
 	    <meta property="og:type" content="product" />
-        <meta property="og:title" content="{$result.data?.snapByName.title || $result.data?.snapByName.package_name}" />
+        <meta property="og:title" content="{$result.data?.snapByName.title ?? $result.data?.snapByName.package_name}" />
         <meta property="og:description" content="{$result.data?.snapByName.summary}" />
-        <meta property="og:image" content="{$result.data?.snapByName.icon_url}" />
-        <meta property="og:image:secure_url" content="{$result.data?.snapByName.icon_url}" />
-        <meta property="og:image:width" content="512" />
-        <meta property="og:image:height" content="512" />
-        <meta property="og:image:alt" content="Icon of {$result.data?.snapByName.title || $result.data?.snapByName.package_name}" />
+        {#if socialImage}
+            <meta property="og:image" content="{socialImage.url}" />
+            <meta property="og:image:secure_url" content="{socialImage.url}" />
+            <meta property="og:image:width" content="{socialImage.width}" />
+            <meta property="og:image:height" content="{socialImage.height}" />
+            <meta property="og:image:alt" content="Icon of {$result.data?.snapByName.title ?? $result.data?.snapByName.package_name}" />
+        {/if}
 
         <!-- Twitter -->
         <meta name="twitter:card" content="summary" />
-        <meta name="twitter:title" content="{$result.data?.snapByName.title || $result.data?.snapByName.package_name}" />
+        <meta name="twitter:title" content="{$result.data?.snapByName.title ?? $result.data?.snapByName.package_name}" />
         <meta name="twitter:description" content="{$result.data?.snapByName.summary}" />
-        <meta name="twitter:image" content="{$result.data?.snapByName.icon_url}" />
-        <meta name="twitter:image:alt" content="Icon of {$result.data?.snapByName.title || $result.data?.snapByName.package_name}" />
+        {#if socialImage}
+            <meta name="twitter:image" content="{socialImage.url}" />
+            <meta name="twitter:image:alt" content="Icon of {$result.data?.snapByName.title ?? $result.data?.snapByName.package_name}" />
+        {/if}
 
         <!-- Schema.org -->
         {@html `<${'script'} type="application/ld+json">
@@ -301,20 +317,20 @@
                 "@context" : "http://schema.org",
                 "@type" : "SoftwareApplication",
                 "dateModified": new Date($result.data?.snapByName.last_updated).toISOString(),
-                "name" : $result.data?.snapByName.title || $result.data?.snapByName.package_name,
+                "name" : $result.data?.snapByName.title ?? $result.data?.snapByName.package_name,
                 "image" : $result.data?.snapByName.icon_url,
                 "publisher": {
                     "@type": "Person",
-                    "name": $result.data?.snapByName.developer_name || $result.data?.snapByName.publisher,
+                    "name": $result.data?.snapByName.developer_name ?? $result.data?.snapByName.publisher,
                     "url": $result.data?.snapByName.website,
                 },
-                "applicationCategory": $result.data?.snapByName.sections ? $result.data?.snapByName.sections.join(', ') : [],
+                "applicationCategory": $result.data?.snapByName.sections ? $result.data?.snapByName.sections.join(', ') : '',
                 "softwareVersion": $result.data?.snapByName.version,
                 "license": $result.data?.snapByName.license,
                 "description": $result.data?.snapByName.summary,
                 "operatingSystem": "Linux",
                 "softwareRequirements": "Snapd",
-                "processorRequirements": $result.data?.snapByName.architecture ? $result.data?.snapByName.architecture.join(', ') : '',
+                "processorRequirements": $result.data?.snapByName.architecture?.join(', ') ?? '',
                 "screenshot": $result.data?.snapByName.screenshot_urls.filter(
                     url => !url.match(/\/banner(-icon)?_\w{7}.(png|jpg)$/)
                 ),
@@ -327,7 +343,7 @@
                         "bestRating": 5,
                         "worstRating": 0,
                         "name": "User rating",
-                        "description": `Average uer-submitted rating for ${$result.data?.snapByName.title || $result.data?.snapByName.packageName}`,
+                        "description": `Average uer-submitted rating for ${$result.data?.snapByName.title ?? $result.data?.snapByName.packageName}`,
                     },
                 },
             })}
@@ -374,7 +390,7 @@
                     width="{$result.data?.snapByName.media.find(item => item.type === 'banner').width || 1920}"
                     height="{$result.data?.snapByName.media.find(item => item.type === 'banner').height || 640}"
                     src="https://res.cloudinary.com/canonical/image/fetch/{$result.data?.snapByName.media.find(item => item.type === 'banner').url}"
-                    alt="{$result.data?.snapByName.title || $result.data?.snapByName.package_name} banner" />
+                    alt="{$result.data?.snapByName.title ?? $result.data?.snapByName.package_name} banner" />
             </picture>
         {/if}
         <div class='banner'>
@@ -386,11 +402,11 @@
                                 https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,w_256/{$result.data?.snapByName.icon_url} 2x" />
                         <img height="128" width="128" loading="lazy"
                             src="https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,w_128/{$result.data?.snapByName.icon_url}"
-                            alt="Icon for {$result.data?.snapByName.title || $result.data?.snapByName.package_name}" />
+                            alt="Icon for {$result.data?.snapByName.title ?? $result.data?.snapByName.package_name}" />
                     </picture>
                 </p>
             {/if}
-            <h1 class='title'>{$result.data?.snapByName.title || $result.data?.snapByName.package_name}</h1>
+            <h1 class='title'>{$result.data?.snapByName.title ?? $result.data?.snapByName.package_name}</h1>
             <p class='rating'><StarRating
                 style={{
                     styleStarWidth: 25,
@@ -449,7 +465,7 @@
                         <dt>Published to the Snap Store by:</dt>
                         <dd>
                             <a href="/publishers/{$result.data?.snapByName.publisher_username}">
-                                {$result.data?.snapByName.developer_name || $result.data?.snapByName.publisher || $result.data?.snapByName.publisher_username}
+                                {$result.data?.snapByName.developer_name ?? $result.data?.snapByName.publisher ?? $result.data?.snapByName.publisher_username}
                             </a>
                             {#if $result.data?.snapByName.developer_validation === 'verified'}
                                 <span class="verified">(Author is verified)</span>
@@ -506,7 +522,7 @@
                                     https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,h_720/{screenshot.url} 3x" />
                                 <img loading="lazy" width={Math.ceil(screenshot.width * (240 / screenshot.height)) || 'auto'} height={240}
                                     src="https://res.cloudinary.com/canonical/image/fetch/q_auto,f_auto,h_240/{screenshot.url}"
-                                    alt="{$result.data?.snapByName.title || $result.data?.snapByName.package_name} screenshot" />
+                                    alt="{$result.data?.snapByName.title ?? $result.data?.snapByName.package_name} screenshot" />
                             </picture>
                         </a>
                     {/each}

@@ -47,11 +47,11 @@
             order,
             offset,
             limit,
-            cache: (await client.query({
+            cache: await client.query({
                 // query: q ? searchQuery : latestQuery,
                 query: searchQuery,
                 variables: {q, field, order, offset, limit},
-            })).data,
+            }),
         };
     }
 </script>

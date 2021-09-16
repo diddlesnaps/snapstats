@@ -27,19 +27,19 @@
 	`;
 
 	export async function preload(page, session) {
-		return { cache: await (await client.query({ query: q })).data };
+		return { cache: await client.query({ query: q }) };
     }
 </script>
 
 <script>
 	// @ts-check
 
-	import { setClient, query } from 'svelte-apollo';
+	import { restore, setClient, query } from 'svelte-apollo';
 
 	export let cache;
 
 	setClient(client);
-	client.writeQuery({query: q, data: cache})
+	restore(q, cache)
 	let result = query(q);
 </script>
 
