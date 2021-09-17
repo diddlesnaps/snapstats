@@ -162,5 +162,24 @@
 	<p>Cloud Hosting by <a href="https://gcpsignup.page.link/Y1i1">Google Cloud - sign up with this link to get $350 credit</a></p>
 	<p><a href='privacy'>Privacy policy</a></p>
 </footer>
-<GdprBanner cookieName="gdprOptIn" cookieConfig={{sameSite: 'strict'}} choices={{analytics: false, tracking: false}} on:analytics={enableAnalytics} on:tracking={enableAdvertising}
-	description="We use cookies to analyze site traffic. Please review our <a href='/privacy'>privacy policy page</a>. By clicking accept, you consent to our privacy policy &amp; use of cookies" />
+<GdprBanner cookieName="gdprOptIn" cookieConfig={{sameSite: 'strict'}}
+	choices={{
+		necessary: {
+			label: 'Required cookies',
+			description: 'These cookies cannot be turned off as they are used to control the use of other cookies',
+			value: true,
+		},
+		analytics: {
+			label: 'Analytics',
+			description: 'Google Analytics',
+			value: false
+		},
+		tracking: {
+			label: 'Advertising',
+			description: 'Google Adsense tracking cookies',
+			value: false
+		},
+		marketing: false,
+	}}
+	on:analytics={enableAnalytics} on:tracking={enableAdvertising}
+	description="We use cookies to analyze site traffic and help pay for the service with adverts. Please review our <a href='/privacy'>privacy policy page</a>. By clicking accept, you consent to our privacy policy &amp; use of cookies" />
