@@ -1,0 +1,72 @@
+﻿@page "/publishers/{Publisher}"
+@inject IGraphQLClient Client
+@inject NavigationManager NavManager
+
+<div>
+    <h1>Snaps published by @Publisher</h1>
+
+    <SnapList snaps="@Results" />
+    <button @onclick="@FetchMore">Load more...</button>
+</div>
+
+<a href="/">Go back to the homepage</a>
+
+@code {
+    [Parameter]
+    public string Publisher { get; set; }
+
+    public int Offset { get; set; } = 0;
+
+    public int Limit { get; set; } = 20;
+
+    private const string Query = @"
+        query($publisher: String!, $offset: Int, $limit: Int){
+            findSnaps(publisher:$publisher, offset:$offset, limit:$limit){
+                snap_id
+                package_name
+                title
+                summary
+                icon_url
+                ratings_average
+            }
+        }
+    ";
+
+    Snap[] Results = Array.Empty<Snap>();
+
+    bool dirty { get; set; } = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!Results.Any()) Results = await Fetch(true);
+    }
+
+    async Task FetchMore()
+    {
+        Offset += Limit;
+        Results = Results.Concat(await Fetch(false)).ToArray();
+    }
+
+    async Task<Snap[]> Fetch(bool newRequest = false)
+    {
+        if (newRequest && Offset != 0)
+        {
+            Offset = 0;
+        }
+
+        GraphQLRequest request = new GraphQLRequest
+        {
+            Query = Query,
+            Variables = new
+            {
+                publisher = Publisher,
+                offset = Offset,
+                limit = Limit,
+            },
+        };
+        var response = await Client.SendQueryAsync<FindSnaps>(request);
+        
+        dirty = false;
+        return response?.Data?.findSnaps ?? Array.Empty<Snap>();
+    }
+}

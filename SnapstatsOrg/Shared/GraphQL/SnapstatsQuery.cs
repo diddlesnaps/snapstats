@@ -724,7 +724,7 @@ namespace SnapstatsOrg.Shared.GraphQL
 
             var noHelloWorldOrTestRE = new MongoDB.Bson.BsonRegularExpression("(^(test|hello)-|-(test|hello)$)", "i");
 
-            Field<IntGraphType>(
+            Field<ListGraphType<SnapType>>(
                 "findSnaps",
                 arguments: findSnapsArgs,
                 resolve: context => {

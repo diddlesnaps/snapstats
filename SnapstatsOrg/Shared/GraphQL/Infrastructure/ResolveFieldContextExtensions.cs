@@ -40,6 +40,12 @@ namespace SnapstatsOrg.Shared.GraphQL.Infrastructure
                 );
             }
 
+            var publisher = context.GetArgument<string>("publisher");
+            if (!string.IsNullOrWhiteSpace (publisher))
+            {
+                query &= Builders<Snap>.Filter.Eq(e => e.publisher_username, publisher);
+            }
+
             var baseSnap = context.GetArgument<string>("base");
             if (!string.IsNullOrWhiteSpace(baseSnap))
             {
