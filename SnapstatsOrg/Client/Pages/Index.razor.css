@@ -15,7 +15,7 @@ p {
 }
 
 .verified:after {
-    content: '✔️';
+    content: '✓';
     color: #2a2;
 }
 

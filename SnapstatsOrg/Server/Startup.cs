@@ -79,9 +79,10 @@ namespace SnapstatsOrg.Server
                     return new ErrorInfoProvider(new ErrorInfoProviderOptions { ExposeExceptionStackTrace = Environment.IsDevelopment() });
                 });
 
-            services.AddGraphQL(options => {
-                    options.EnableMetrics = true;
-                })
+            services.AddGraphQL(options =>
+            {
+                options.EnableMetrics = true;
+            })
                 .AddGraphTypes(Assembly.GetAssembly(typeof(SnapstatsSchema)), ServiceLifetime.Scoped)
                 .AddSystemTextJson()
                 .AddErrorInfoProvider(opt => opt.ExposeExceptionStackTrace = Environment.IsDevelopment())

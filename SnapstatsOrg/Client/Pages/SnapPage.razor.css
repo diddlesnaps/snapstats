@@ -146,6 +146,6 @@
 }
 
 .verified:before {
-    content: '✔️';
+    content: '✓';
     color: #2a2;
 }

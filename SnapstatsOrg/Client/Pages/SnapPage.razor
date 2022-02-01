@@ -2,6 +2,7 @@
 @inject IGraphQLClient Client
 @inject NavigationManager NavManager
 @using System.Text.RegularExpressions
+@using Microsoft.Extensions.Logging
 
 <div class='snapinfo'>
     @if (snap?.Banner() is not null)
@@ -77,22 +78,19 @@
                 <dt>Snap support contact:</dt>
                 <dd><a href=@snap.contact rel="nofollow ugc help">@snap.contact</a></dd>
             }
-            <dt>Published to the Snap Store by:</dt>
-            <dd>
-                @if (snap?.developer_name is not null and not "")
-                {
-                    <a href="/publishers/@snap.developer_name">@snap.developer_name</a>
-                }
-                else if (snap?.publisher is not null and not "")
-                {
-                    <a href="/publishers/@snap.publisher">@snap.publisher</a>
-                }
-
-                @if (snap?.developer_validation == "verified")
-                {
-                    <span class="verified">(Author is verified)</span>
-                }
-            </dd>
+            @if (snap?.developer_name is not null and not "" || snap?.publisher is not null and not "")
+            {
+                <dt>Published to the Snap Store by:</dt>
+                <dd>
+                    <a href="/publishers/@snap.publisher_username">
+                        @(snap.developer_name ?? snap.publisher ?? snap.publisher_username)
+                    </a>
+                    @if (snap?.developer_validation == "verified")
+                    {
+                        <span class="verified">(Author is verified)</span>
+                    }
+                </dd>
+            }
             @if (snap?.date_published is not null)
             {
                 <dt>Published on:</dt>
@@ -119,13 +117,6 @@
     <h2>Description</h2>
 
     <Markdown Content=@snap?.description />
-
-    <div>
-        @if (snap?.description is not null and not "")
-        {
-            @snap.description
-        }
-    </div>
 
     @if (snap is not null && snap.Screenshots()?.Length > 0 || snap?.Video() is not null)
     {
@@ -179,37 +170,37 @@
 
 @code {
     private const string Query = @"
-        query($slug:String!) {
-            snapByName(name:$slug) {
-                architecture
-                sections
-                contact
-                date_published
-                description
-                developer_name
-                developer_validation
-                icon_url
-                last_updated
-                license
-                media{
-                    url
-                    type
-                    width
-                    height
-                }
-                name
-                package_name
-                publisher
-                publisher_username
-                ratings_average
-                ratings_count
-                screenshot_urls
-                summary
-                title
-                version
-                website
+    query($slug:String!) {
+        snapByName(name:$slug) {
+            architecture
+            sections
+            contact
+            date_published
+            description
+            developer_name
+            developer_validation
+            icon_url
+            last_updated
+            license
+            media{
+                url
+                type
+                width
+                height
             }
+            name
+            package_name
+            publisher
+            publisher_username
+            ratings_average
+            ratings_count
+            screenshot_urls
+            summary
+            title
+            version
+            website
         }
+    }
     ";
 
     [Parameter]
