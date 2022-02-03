@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="GraphQL\Infrastructure\DocumentClientExtensions.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="GraphQL.Server.Core" Version="5.2.0" />
     <PackageReference Include="GraphQL.Server.Transports.AspNetCore" Version="5.2.0" />
     <PackageReference Include="GraphQL.Server.Transports.AspNetCore.SystemTextJson" Version="5.2.0" />
@@ -31,5 +35,9 @@
   <ItemGroup>
     <None Remove="Markdig" />
     <None Remove="HtmlSanitizer" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="GraphQL\Infrastructure\DocumentClientExtensions.cs" />
   </ItemGroup>
 </Project>

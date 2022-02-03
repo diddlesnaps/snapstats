@@ -15,9 +15,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MongoDB.Driver;
-using SnapstatsOrg.Shared.GraphQL;
+using SnapstatsOrg.Server.GraphQL;
 using System;
-using System.Data.Common;
 using System.Reflection;
 using Toolbelt.Blazor.Extensions.DependencyInjection;
 

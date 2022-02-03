@@ -1,5 +1,4 @@
 ﻿using MongoDB.Bson.Serialization.Attributes;
-using SnapstatsOrg.Shared.Models;
 using System;
 using System.Text.Json.Serialization;
 

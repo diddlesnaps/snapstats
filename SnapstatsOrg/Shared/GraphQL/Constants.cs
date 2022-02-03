@@ -1,6 +1,6 @@
 ﻿namespace SnapstatsOrg.Shared.GraphQL
 {
-    class Constants
+    public class Constants
     {
         public const string CONNECTION_STRING_SETTING = "ConnectionStrings";
 

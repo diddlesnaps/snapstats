@@ -1,5 +1,4 @@
-﻿using MongoDB.Driver;
-using SnapstatsOrg.Shared.Models;
+﻿using SnapstatsOrg.Shared.Models;
 
 namespace SnapstatsOrg.Shared.GraphQL.Queries
 {
