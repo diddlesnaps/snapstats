@@ -1,4 +1,7 @@
-﻿using Ganss.XSS;
+﻿using Blazorise;
+using Blazorise.Bootstrap;
+using Blazorise.Icons.FontAwesome;
+using Ganss.XSS;
 using GraphQL.Client.Abstractions;
 using GraphQL.Client.Http;
 using GraphQL.Client.Serializer.SystemTextJson;
@@ -39,6 +42,13 @@ builder.Services.AddGraphQL(options =>
     .AddSystemTextJson()
     .AddDataLoader()
     .AddWebSockets();
+
+builder.Services.AddBlazorise(options =>
+{
+    options.ChangeTextOnKeyPress = true;
+})
+                .AddBootstrapProviders()
+                .AddFontAwesomeIcons();
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
