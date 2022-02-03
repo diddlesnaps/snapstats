@@ -1,5 +1,5 @@
 ﻿<div>
-    @if (snaps.Length > 0)
+    @if (snaps is not null && snaps.Length > 0)
     {
         <ul class='snaps' aria-label="Snap packages">
             @foreach (var snap in snaps)
@@ -18,5 +18,5 @@
 
 @code {
     [Parameter]
-    public Snap[] snaps { get; set; } = Array.Empty<Snap>();
+    public Snap[]? snaps { get; set; }
 }

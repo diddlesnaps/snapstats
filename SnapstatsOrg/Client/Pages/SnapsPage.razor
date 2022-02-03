@@ -2,6 +2,29 @@
 @implements IDisposable
 @inject IGraphQLClient Client
 @inject NavigationManager NavManager
+@inject PersistentComponentState ApplicationState
+
+<PageTitle>Search Snaps in the Snap Store | Snapstats.org</PageTitle>
+<HeadContent>
+	<meta name="description" content="Search Snaps in the Snap Store for Linux" />
+
+	<!-- Facebook -->
+	<meta property="og:type" content="website" />
+	<meta property="og:title" content="Search Snaps in the Snap Store" />
+	<meta property="og:description" content="Search Snaps in the Snap Store for Linux" />
+	<meta property="og:image" content="/favicons/android-icon-512x512.png" />
+	<meta property="og:image:secure_url" content="/favicons/android-icon-512x512.png" />
+	<meta property="og:image:width" content="512" />
+	<meta property="og:image:height" content="512" />
+	<meta property="og:image:alt" content="Icon of Snapstats.org" />
+
+	<!-- Twitter -->
+	<meta name="twitter:card" content="summary" />
+	<meta name="twitter:creator" content="@("@diddledani")" />
+	<meta name="twitter:title" content="Search Snaps in the Snap Store" />
+	<meta name="twitter:description" content="Search Snaps in the Snap Store for Linux" />
+	<meta name="twitter:image" content="/favicons/android-icon-512x512.png" />
+</HeadContent>
 
 <h1>Search the Snap Store</h1>
 <div class='search'>
@@ -14,7 +37,7 @@
 
 <div>
     <h2>Search results:</h2>
-    <SnapList snaps="@Results" />
+    <SnapList snaps="snaps" />
     <button @onclick="@FetchMore">Load more...</button>
 </div>
 
@@ -22,16 +45,16 @@
 
 @code {
     private const string Query = @"
-        query($q: String!, $offset: Int, $limit: Int){
-            findSnapsByName(name:$q, offset:$offset, limit:$limit){
-                snap_id
-                package_name
-                title
-                summary
-                icon_url
-                ratings_average
-            }
+    query($q: String!, $offset: Int, $limit: Int){
+        findSnapsByName(name:$q, offset:$offset, limit:$limit){
+            snap_id
+            package_name
+            title
+            summary
+            icon_url
+            ratings_average
         }
+    }
     ";
 
     protected class SearchModel
@@ -43,9 +66,11 @@
 
     SearchModel searchModel = new();
 
-    Snap[] Results = Array.Empty<Snap>();
+    Snap[]? snaps;
 
     bool dirty { get; set; } = false;
+
+    private PersistingComponentStateSubscription persistingSubscription;
 
     protected override async Task OnInitializedAsync()
     {
@@ -53,7 +78,26 @@
         NavManager.TryGetQueryString<string>("q", out newSearchString, "");
         searchModel.SearchString = newSearchString ?? "";
         NavManager.LocationChanged += HandleLocationChanged;
-        if (!Results.Any()) Results = await Fetch(true);
+
+        persistingSubscription = 
+            ApplicationState.RegisterOnPersisting(PersistSnaps);
+
+        if (ApplicationState.TryTakeFromJson<Snap[]>(
+                    "snaps", out var restored))
+        {
+            snaps = restored!;
+        }
+        else
+        {
+            snaps = await Fetch(true);
+        }
+    }
+
+    private Task PersistSnaps()
+    {
+        ApplicationState.PersistAsJson("snaps", snaps);
+
+        return Task.CompletedTask;
     }
 
     protected async void HandleLocationChanged(object? sender, LocationChangedEventArgs e)
@@ -61,7 +105,7 @@
         NavManager.TryGetQueryString<string>("q", out var newSearchString, "");
         if (searchModel.SearchString == newSearchString || newSearchString is null) return;
 
-        Results = await Fetch(true);
+        snaps = await Fetch(true);
         StateHasChanged();
     }
 
@@ -75,7 +119,7 @@
     {
         if (dirty)
         {
-            Results = await Fetch(true);
+            snaps = await Fetch(true);
             StateHasChanged();
         }
     }
@@ -84,7 +128,7 @@
     {
         if (e.Key == "Enter" && dirty)
         {
-            Results = await Fetch(true);
+            snaps = await Fetch(true);
             StateHasChanged();
         }
     }
@@ -92,7 +136,7 @@
     async Task FetchMore()
     {
         searchModel.Offset += searchModel.Limit;
-        Results = Results.Concat(await Fetch(false)).ToArray();
+        snaps = snaps.Concat(await Fetch(false)).ToArray();
     }
 
     async Task<Snap[]> Fetch(bool newRequest = false)
@@ -120,5 +164,6 @@
     void IDisposable.Dispose()
     {
         NavManager.LocationChanged -= HandleLocationChanged;
+        persistingSubscription.Dispose();
     }
 }

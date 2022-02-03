@@ -1,31 +1,35 @@
 ﻿@page "/architectures"
+@implements IDisposable
 @inject IGraphQLClient Client
+@inject PersistentComponentState ApplicationState
 
-<Title>Snap Store architectures statistics | Snapstats.org</Title>
-<Meta name="description" content="Statistics about Snap Package supported architecture distribution within the Snap Store for Linux" />
+<PageTitle>Snap Store architectures statistics | Snapstats.org</PageTitle>
+<HeadContent>
+    <meta name="description" content="Statistics about Snap Package supported architecture distribution within the Snap Store for Linux" />
 
-@* Facebook *@
-<Meta property="og:type" content="website" />
-<Meta property="og:title" content="Snap Store architectures statistics | Snapstats.org" />
-<Meta property="og:description" content="Statistics about Snap Package supported architecture distribution within the Snap Store for Linux" />
-<Meta property="og:image" content="/favicons/android-icon-512x512.png" />
-<Meta property="og:image:secure_url" content="/favicons/android-icon-512x512.png" />
-<Meta property="og:image:width" content="512" />
-<Meta property="og:image:height" content="512" />
-<Meta property="og:image:alt" content="Icon of Snapstats.org" />
+    @* Facebook *@
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Snap Store architectures statistics | Snapstats.org" />
+    <meta property="og:description" content="Statistics about Snap Package supported architecture distribution within the Snap Store for Linux" />
+    <meta property="og:image" content="/favicons/android-icon-512x512.png" />
+    <meta property="og:image:secure_url" content="/favicons/android-icon-512x512.png" />
+    <meta property="og:image:width" content="512" />
+    <meta property="og:image:height" content="512" />
+    <meta property="og:image:alt" content="Icon of Snapstats.org" />
 
-@* Twitter *@
-<Meta name="twitter:card" content="summary" />
-<Meta name="twitter:creator" content="@("@diddledani")" />
-<Meta name="twitter:image" content="/favicons/android-icon-512x512.png" />
-<Meta name="twitter:title" content="Snap Store architectures statistics | Snapstats.org" />
-<Meta name="twitter:description" content="Statistics about Snap Package supported architecture distribution within the Snap Store for Linux" />
+    @* Twitter *@
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:creator" content="@("@diddledani")" />
+    <meta name="twitter:image" content="/favicons/android-icon-512x512.png" />
+    <meta name="twitter:title" content="Snap Store architectures statistics | Snapstats.org" />
+    <meta name="twitter:description" content="Statistics about Snap Package supported architecture distribution within the Snap Store for Linux" />
+</HeadContent>
 
 <h1>Architectures</h1>
 
 <DonateButton/>
 
-<TimelineChart title="Architectures timeline" data="@timeline" />
+<TimelineChart title="Architectures timeline" data="timeline" />
 
 <a href="/">Go back to the homepage...</a>
 
@@ -44,13 +48,38 @@
 
 	protected Timeline[]? timeline;
 
+    private PersistingComponentStateSubscription persistingSubscription;
+
 	protected override async Task OnInitializedAsync()
     {
-        GraphQLRequest request = new GraphQLRequest
+        persistingSubscription = 
+            ApplicationState.RegisterOnPersisting(PersistTimeline);
+
+        if (ApplicationState.TryTakeFromJson<Timeline[]>(
+                    "timeline", out var restored))
         {
-            Query = Query,
-        };
-        var response = await Client.SendQueryAsync<ArchitectureTimelineQuery>(request).ConfigureAwait(false);
-        timeline = response.Data.architectureTimeline;
+            timeline = restored!;
+        }
+        else
+        {
+            GraphQLRequest request = new GraphQLRequest
+            {
+                Query = Query,
+            };
+            var response = await Client.SendQueryAsync<ArchitectureTimelineQuery>(request).ConfigureAwait(false);
+            timeline = response.Data.architectureTimeline;
+        }
 	}
+
+    private Task PersistTimeline()
+    {
+        ApplicationState.PersistAsJson("timeline", timeline);
+
+        return Task.CompletedTask;
+    }
+
+    void IDisposable.Dispose()
+    {
+        persistingSubscription.Dispose();
+    }
 }

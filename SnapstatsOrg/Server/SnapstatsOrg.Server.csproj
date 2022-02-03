@@ -4,11 +4,8 @@
     <TargetFramework>net6.0</TargetFramework>
     <UserSecretsId>50e9bcba-74a3-4656-9ada-4174b0901044</UserSecretsId>
     <Nullable>enable</Nullable>
+	<ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Remove="GraphQL\Infrastructure\DocumentClientExtensions.cs" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="GraphQL.Server.Core" Version="5.2.0" />
@@ -16,13 +13,12 @@
     <PackageReference Include="GraphQL.Server.Transports.AspNetCore.SystemTextJson" Version="5.2.0" />
     <PackageReference Include="GraphQL.Server.Transports.WebSockets" Version="4.4.1" />
     <PackageReference Include="GraphQL.Server.Ui.Playground" Version="5.2.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="6.0.1" />
+	<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="6.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="MongoDB.Driver" Version="2.14.1" />
-    <PackageReference Include="Toolbelt.Blazor.HeadElement.ServerPrerendering" Version="7.0.0" />
     <PackageReference Include="Markdig" Version="0.27.0" />
     <PackageReference Include="HtmlSanitizer" Version="7.1.475" />
   </ItemGroup>
@@ -35,9 +31,5 @@
   <ItemGroup>
     <None Remove="Markdig" />
     <None Remove="HtmlSanitizer" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="GraphQL\Infrastructure\DocumentClientExtensions.cs" />
   </ItemGroup>
 </Project>

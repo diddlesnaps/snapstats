@@ -1,8 +1,32 @@
 ﻿@page "/snaps/{slug}"
+@implements IDisposable
 @inject IGraphQLClient Client
 @inject NavigationManager NavManager
+@inject PersistentComponentState ApplicationState
 @using System.Text.RegularExpressions
 @using Microsoft.Extensions.Logging
+
+<PageTitle>Snap information for @snap?.SnapTitle() | Snapstats.org</PageTitle>
+<HeadContent>
+	<meta name="description" content="Snap information for @snap?.SnapTitle() in the Snap Store for Linux" />
+
+	<!-- Facebook -->
+	<meta property="og:type" content="website" />
+	<meta property="og:title" content="Snap information for @snap?.SnapTitle()" />
+	<meta property="og:description" content="Snap information for @snap?.SnapTitle() in the Snap Store for Linux" />
+	<meta property="og:image" content="/favicons/android-icon-512x512.png" />
+	<meta property="og:image:secure_url" content="/favicons/android-icon-512x512.png" />
+	<meta property="og:image:width" content="512" />
+	<meta property="og:image:height" content="512" />
+	<meta property="og:image:alt" content="Icon of Snapstats.org" />
+
+	<!-- Twitter -->
+	<meta name="twitter:card" content="summary" />
+	<meta name="twitter:creator" content="@("@diddledani")" />
+	<meta name="twitter:title" content="Snap information for @snap?.SnapTitle()" />
+	<meta name="twitter:description" content="Snap information for @snap?.SnapTitle() in the Snap Store for Linux" />
+	<meta name="twitter:image" content="/favicons/android-icon-512x512.png" />
+</HeadContent>
 
 <div class='snapinfo'>
     @if (snap?.Banner() is not null)
@@ -116,7 +140,7 @@
 
     <h2>Description</h2>
 
-    <Markdown Content=@snap?.description />
+    <Markdown Content="snap?.description" />
 
     @if (snap is not null && snap.Screenshots()?.Length > 0 || snap?.Video() is not null)
     {
@@ -206,21 +230,46 @@
     [Parameter]
     public string? slug { get; set; }
 
-    protected Snap? snap;
+    private Snap? snap;
+
+    private PersistingComponentStateSubscription persistingSubscription;
 
     protected override async Task OnInitializedAsync()
     {
-        if (snap is not null) return;
+        persistingSubscription = 
+            ApplicationState.RegisterOnPersisting(PersistSnap);
 
-        GraphQLRequest request = new GraphQLRequest
+        if (ApplicationState.TryTakeFromJson<Snap>(
+                    "snap", out var restored))
         {
-            Query = Query,
-            Variables = new
+            snap = restored!;
+        }
+        else
+        {
+            GraphQLRequest request = new GraphQLRequest
             {
-                slug = slug,
-            },
-        };
-        var response = await Client.SendQueryAsync<SnapByName>(request).ConfigureAwait(false);
-        snap = response.Data.snapByName ?? new Snap();
+                Query = Query,
+                Variables = new
+                {
+                    slug = slug,
+                },
+            };
+            var response = await Client.SendQueryAsync<SnapByName>(request).ConfigureAwait(false);
+            snap = response.Data.snapByName ?? new Snap();
+        }
+
+        if (snap is not null) return;
+    }
+
+    private Task PersistSnap()
+    {
+        ApplicationState.PersistAsJson("snap", snap);
+
+        return Task.CompletedTask;
+    }
+
+    void IDisposable.Dispose()
+    {
+        persistingSubscription.Dispose();
     }
 }

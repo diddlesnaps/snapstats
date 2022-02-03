@@ -1,35 +1,39 @@
 ﻿@page "/developers"
+@implements IDisposable
 @inject IGraphQLClient Client
+@inject PersistentComponentState ApplicationState
 
-<Title>Snap Store developers statistics | Snapstats.org</Title>
-<Meta name="description" content="Statistics about Snap Package developers within the Snap Store for Linux" />
+<PageTitle>Snap Store developers statistics | Snapstats.org</PageTitle>
+<HeadContent>
+	<meta name="description" content="Statistics about Snap Package developers within the Snap Store for Linux" />
 
-@* Facebook *@
-<Meta property="og:type" content="website" />
-<Meta property="og:title" content="Snap Store developers statistics | Snapstats.org" />
-<Meta property="og:description" content="Statistics about Snap Package developers within the Snap Store for Linux" />
-<Meta property="og:image" content="/favicons/android-icon-512x512.png" />
-<Meta property="og:image:secure_url" content="/favicons/android-icon-512x512.png" />
-<Meta property="og:image:width" content="512" />
-<Meta property="og:image:height" content="512" />
-<Meta property="og:image:alt" content="Icon of Snapstats.org" />
+	@* Facebook *@
+	<meta property="og:type" content="website" />
+	<meta property="og:title" content="Snap Store developers statistics | Snapstats.org" />
+	<meta property="og:description" content="Statistics about Snap Package developers within the Snap Store for Linux" />
+	<meta property="og:image" content="/favicons/android-icon-512x512.png" />
+	<meta property="og:image:secure_url" content="/favicons/android-icon-512x512.png" />
+	<meta property="og:image:width" content="512" />
+	<meta property="og:image:height" content="512" />
+	<meta property="og:image:alt" content="Icon of Snapstats.org" />
 
-@* Twitter *@
-<Meta name="twitter:card" content="summary" />
-<Meta name="twitter:creator" content="@("@diddledani")" />
-<Meta name="twitter:title" content="Snap Store developers statistics | Snapstats.org" />
-<Meta name="twitter:description" content="Statistics about Snap Package developers within the Snap Store for Linux" />
-<Meta name="twitter:image" content="/favicons/android-icon-512x512.png" />
+	@* Twitter *@
+	<meta name="twitter:card" content="summary" />
+	<meta name="twitter:creator" content="@("@diddledani")" />
+	<meta name="twitter:title" content="Snap Store developers statistics | Snapstats.org" />
+	<meta name="twitter:description" content="Statistics about Snap Package developers within the Snap Store for Linux" />
+	<meta name="twitter:image" content="/favicons/android-icon-512x512.png" />
+</HeadContent>
 
 <h1>Developers</h1>
 
-@if (developerCountsByDate is not null && developerCountsByDate.developerCounts.Length > 0)
+@if (state?.developerCountsByDate is not null && state.developerCountsByDate.developerCounts.Length > 0)
 {
-	<p>There are <strong>@developerCountsByDate.developerCounts.First().total</strong> developers who have published at least one snap.</p>
+	<p>There are <strong>@state.developerCountsByDate.developerCounts.First().total</strong> developers who have published at least one snap.</p>
 
 	<p>
-		Developers with published Snaps have each published an average (<a href="https://en.wikipedia.org/wiki/Arithmetic_mean">mean</a>) of <strong>@(developerCountsByDate.developerCounts.First().mean)</strong> Snaps.
-		The most common number of Snaps published per developer (<a href="https://en.wikipedia.org/wiki/Mode_(statistics)">mode</a>) is <strong>@(developerCountsByDate.developerCounts.First().mode)</strong>.
+		Developers with published Snaps have each published an average (<a href="https://en.wikipedia.org/wiki/Arithmetic_mean">mean</a>) of <strong>@(state.developerCountsByDate.developerCounts.First().mean)</strong> Snaps.
+		The most common number of Snaps published per developer (<a href="https://en.wikipedia.org/wiki/Mode_(statistics)">mode</a>) is <strong>@(state.developerCountsByDate.developerCounts.First().mode)</strong>.
 	</p>
 }
 else
@@ -40,12 +44,12 @@ else
 
 <DonateButton/>
 
-@if (verifiedDevelopers is not null && verifiedDevelopers.Length > 0)
+@if (state?.verifiedDevelopers is not null && state.verifiedDevelopers.Length > 0)
 {
 	<h2>Verified Developers</h2>
-	<p>Below is a list of the <strong>@verifiedDevelopers.Length</strong> known <span class='verified'>Verified</span> developers. Between them they have published <strong>@verifiedSnapsCount</strong> Snaps:</p>
+	<p>Below is a list of the <strong>@state.verifiedDevelopers.Length</strong> known <span class='verified'>Verified</span> developers. Between them they have published <strong>@state.verifiedSnapsCount</strong> Snaps:</p>
 	<ul>
-		@foreach (var developer in verifiedDevelopers)
+		@foreach (var developer in state.verifiedDevelopers)
         {
 			<li>@developer</li>
 		}
@@ -54,35 +58,70 @@ else
 
 @code {
 	private const string Query = @"
-		query {
-			developerCountsByDate{
-				_id
-				developerCounts{
-					date
-					total
-					mean
-					mode
-					median
-				}
+	query {
+		developerCountsByDate{
+			_id
+			developerCounts{
+				date
+				total
+				mean
+				mode
+				median
 			}
-			findSnapsCount(developer_validation:VERIFIED)
-			verifiedDevelopers
 		}
+		findSnapsCount(developer_validation:VERIFIED)
+			verifiedDevelopers
+	}
 	";
 
-	protected DeveloperCountByDate developerCountsByDate = new DeveloperCountByDate();
-	protected string[] verifiedDevelopers = Array.Empty<string>();
-	protected int verifiedSnapsCount = 0;
+
+
+	private IndexState? state;
+
+	private class IndexState
+	{
+		public DeveloperCountByDate developerCountsByDate = new DeveloperCountByDate();
+		public string[] verifiedDevelopers = Array.Empty<string>();
+		public int verifiedSnapsCount = 0;
+	}
+
+	private PersistingComponentStateSubscription persistingSubscription;
 
 	protected override async Task OnInitializedAsync()
     {
-        GraphQLRequest request = new GraphQLRequest
-        {
-            Query = Query,
-        };
-        var response = await Client.SendQueryAsync<DevelopersQuery>(request).ConfigureAwait(false);
-		developerCountsByDate = response.Data?.developerCountsByDate ?? new DeveloperCountByDate();
-		verifiedDevelopers = response.Data?.verifiedDevelopers ?? Array.Empty<string>();
-		verifiedSnapsCount = response.Data?.findSnapsCount ?? 0;
+		persistingSubscription = 
+            ApplicationState.RegisterOnPersisting(PersistDevelopers);
+
+		if (ApplicationState.TryTakeFromJson<IndexState>(
+					"savedstate", out var restored))
+		{
+			state = restored!;
+		}
+		else
+		{
+			GraphQLRequest request = new GraphQLRequest
+			{
+				Query = Query,
+			};
+			var response = await Client.SendQueryAsync<DevelopersQuery>(request).ConfigureAwait(false);
+			state = new()
+				{
+					developerCountsByDate = response.Data?.developerCountsByDate ?? new DeveloperCountByDate(),
+					verifiedDevelopers = response.Data?.verifiedDevelopers ?? Array.Empty<string>(),
+					verifiedSnapsCount = response.Data?.findSnapsCount ?? 0,
+				};
+		}
+    }
+
+	private Task PersistDevelopers()
+    {
+        ApplicationState.PersistAsJson("savedstate", state);
+
+        return Task.CompletedTask;
+    }
+
+	void IDisposable.Dispose()
+    {
+        persistingSubscription.Dispose();
     }
 }

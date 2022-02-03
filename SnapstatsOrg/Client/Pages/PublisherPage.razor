@@ -1,11 +1,35 @@
 ﻿@page "/publishers/{Publisher}"
+@implements IDisposable
 @inject IGraphQLClient Client
 @inject NavigationManager NavManager
+@inject PersistentComponentState ApplicationState
+
+<PageTitle>Snaps published by @Publisher | Snapstats.org</PageTitle>
+<HeadContent>
+	<meta name="description" content="Snaps published by @Publisher in the Snap Store for Linux" />
+
+	<!-- Facebook -->
+	<meta property="og:type" content="website" />
+	<meta property="og:title" content="Snaps published by @Publisher" />
+	<meta property="og:description" content="Snaps published by @Publisher in the Snap Store for Linux" />
+	<meta property="og:image" content="/favicons/android-icon-512x512.png" />
+	<meta property="og:image:secure_url" content="/favicons/android-icon-512x512.png" />
+	<meta property="og:image:width" content="512" />
+	<meta property="og:image:height" content="512" />
+	<meta property="og:image:alt" content="Icon of Snapstats.org" />
+
+	<!-- Twitter -->
+	<meta name="twitter:card" content="summary" />
+	<meta name="twitter:creator" content="@("@diddledani")" />
+	<meta name="twitter:title" content="Snaps published by @Publisher" />
+	<meta name="twitter:description" content="Snaps published by @Publisher in the Snap Store for Linux" />
+	<meta name="twitter:image" content="/favicons/android-icon-512x512.png" />
+</HeadContent>
 
 <div>
     <h1>Snaps published by @Publisher</h1>
 
-    <SnapList snaps="@Results" />
+    <SnapList snaps="snaps" />
     <button @onclick="@FetchMore">Load more...</button>
 </div>
 
@@ -13,7 +37,7 @@
 
 @code {
     [Parameter]
-    public string Publisher { get; set; }
+    public string Publisher { get; set; } = "";
 
     public int Offset { get; set; } = 0;
 
@@ -32,19 +56,37 @@
         }
     ";
 
-    Snap[] Results = Array.Empty<Snap>();
+    Snap[]? snaps;
 
-    bool dirty { get; set; } = false;
+    private PersistingComponentStateSubscription persistingSubscription;
 
     protected override async Task OnInitializedAsync()
     {
-        if (!Results.Any()) Results = await Fetch(true);
+        persistingSubscription = 
+            ApplicationState.RegisterOnPersisting(PersistPublisher);
+
+        if (ApplicationState.TryTakeFromJson<Snap[]>(
+                    "snaps", out var restored))
+        {
+            snaps = restored!;
+        }
+        else
+        {
+            snaps = await Fetch(true);
+        }
+    }
+
+    private Task PersistPublisher()
+    {
+        ApplicationState.PersistAsJson("snaps", snaps);
+
+        return Task.CompletedTask;
     }
 
     async Task FetchMore()
     {
         Offset += Limit;
-        Results = Results.Concat(await Fetch(false)).ToArray();
+        snaps = snaps.Concat(await Fetch(false)).ToArray();
     }
 
     async Task<Snap[]> Fetch(bool newRequest = false)
@@ -66,7 +108,11 @@
         };
         var response = await Client.SendQueryAsync<FindSnaps>(request);
         
-        dirty = false;
         return response?.Data?.findSnaps ?? Array.Empty<Snap>();
+    }
+
+    void IDisposable.Dispose()
+    {
+        persistingSubscription.Dispose();
     }
 }
