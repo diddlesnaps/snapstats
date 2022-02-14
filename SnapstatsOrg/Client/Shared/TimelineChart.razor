@@ -1,26 +1,25 @@
 ﻿@using Blazorise.Charts
 
-@if (data is not null)
-{
-	<LineChart @ref="lineChart" TItem="TimelineChartData" OptionsObject="@options" />
-}
+<LineChart @ref="lineChart" TItem="TimelineChartData" OptionsObject="options" />
 
 @code {
     LineChart<TimelineChartData>? lineChart;
-    List<LineChartDataset<TimelineChartData>> chartDatasets = new();
     List<string> lineNames = new();
-    //List<DateTime> dates = new();
+    List<LineChartDataset<TimelineChartData>> chartData = new();
 
-    Timeline[]? _data;
+    Timeline[] _data = Array.Empty<Timeline>();
 
     [Parameter]
-    public Timeline[]? data {
+    public Timeline[] data {
         get => _data;
         set
         {
-            _data = value ?? Array.Empty<Timeline>();
+            if (_data == value)
+            {
+                return;
+            }
+            _data = value;
             lineNames = _data.Select(d => d._id ?? "").ToList();
-            //dates = _data.Select(d => ((DateTimeOffset)d.date).ToUnixTimeSeconds()).Distinct().OrderBy(o => o).ToList();
             foreach (var line in _data)
             {
                 var thisData = line.counts.Select(s => new TimelineChartData()
@@ -33,9 +32,33 @@
                     Data = thisData.ToList(),
                     Label = line._id,
                 };
-                chartDatasets.Add(dataset);
+                chartData.Add(dataset);
             }
-            HandleRedraw();
+            if (chartData.Count != 0)
+            {
+                UpdateChart();
+            }
+        }
+    }
+
+    public async Task UpdateChart()
+    {
+        var i = 0;
+        for (; i < 10; i++)
+        {
+            if (lineChart is not null)
+            {
+                break;
+            }
+            await Task.Delay(100);
+        }
+        if (lineChart is not null)
+        {
+            await lineChart.AddDatasetsAndUpdate(chartData.ToArray());
+        }
+        else
+        {
+            throw new Exception("LineChart didn't become available in time.");
         }
     }
 
@@ -90,24 +113,6 @@
         set
         {
             _title = value ?? "Timeline";
-        }
-    }
-
-    async Task HandleRedraw()
-    {
-        if (lineChart is not null)
-        {
-            await lineChart.Clear();
-
-            @*foreach (var label in dates)
-            {
-                await lineChart.AddLabels(label);
-            }*@
-            foreach (var dataset in chartDatasets)
-            {
-                await lineChart.AddDataSet(dataset);
-            }
-            await lineChart.Update();
         }
     }
 }
