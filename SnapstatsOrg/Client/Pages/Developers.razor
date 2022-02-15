@@ -41,7 +41,6 @@ else
 	<p>There are an unknown number of developers who have published at least one snap.</p>
 }
 
-
 <DonateButton/>
 
 @if (state?.verifiedDevelopers is not null && state.verifiedDevelopers.Length > 0)
@@ -74,23 +73,21 @@ else
 	}
 	";
 
-
-
 	private IndexState? state;
 
 	private class IndexState
 	{
-		public DeveloperCountByDate developerCountsByDate = new DeveloperCountByDate();
-		public string[] verifiedDevelopers = Array.Empty<string>();
-		public int verifiedSnapsCount = 0;
+		public DeveloperCountByDate developerCountsByDate { get; set; } = new DeveloperCountByDate();
+		public string[] verifiedDevelopers { get; set; } = Array.Empty<string>();
+		public int verifiedSnapsCount { get; set; } = 0;
 	}
 
 	private PersistingComponentStateSubscription persistingSubscription;
 
 	protected override async Task OnInitializedAsync()
-    {
+	{
 		persistingSubscription = 
-            ApplicationState.RegisterOnPersisting(PersistDevelopers);
+			ApplicationState.RegisterOnPersisting(PersistDevelopers);
 
 		if (ApplicationState.TryTakeFromJson<IndexState>(
 					"savedstate", out var restored))
