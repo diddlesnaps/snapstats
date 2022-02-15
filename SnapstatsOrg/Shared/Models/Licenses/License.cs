@@ -4,7 +4,7 @@ using System;
 namespace SnapstatsOrg.Shared.Models.Licenses
 {
     [BsonIgnoreExtraElements]
-    public class License
+    public class License : ITimelineable
     {
         public string? name { get; set; }
         public int count { get; set; }

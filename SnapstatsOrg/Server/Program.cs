@@ -69,6 +69,7 @@ else
 
 app.UseHttpsRedirection();
 
+app.UseWebSockets();
 app.UseGraphQL<SnapstatsSchema>();
 app.UseGraphQLPlayground("/ui/playground");
 

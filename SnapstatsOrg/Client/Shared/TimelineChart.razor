@@ -14,25 +14,38 @@
         get => _data;
         set
         {
-            if (_data == value)
+            if (_data == value || value is null)
             {
                 return;
             }
             _data = value;
             lineNames = _data.Select(d => d._id ?? "").ToList();
-            foreach (var line in _data)
+            using (var colors = Rainbow.Create(_data.GetLength(0)).GetEnumerator())
             {
-                var thisData = line.counts.Select(s => new TimelineChartData()
+                foreach (var line in _data)
                 {
-                    X = s.date,
-                    Y = s.count,
-                });
-                var dataset = new LineChartDataset<TimelineChartData>()
-                {
-                    Data = thisData.ToList(),
-                    Label = line._id,
-                };
-                chartData.Add(dataset);
+                    colors.MoveNext();
+                    var thisData = line.counts.Select(s => new TimelineChartData()
+                        {
+                            X = s.date,
+                            Y = s.count,
+                        });
+                    if (thisData is not null)
+                    {
+                        var dataset = new LineChartDataset<TimelineChartData>()
+                            {
+                                Data = thisData.ToList(),
+                                Label = line._id ?? "",
+                                BorderColor = colors.Current ?? "#CCCCCC",
+                                BackgroundColor = colors.Current ?? "#CCCCCC",
+                                PointRadius = 0,
+                                BorderWidth = 2,
+                                LineTension = 0.2f,
+                                Fill = false,
+                            };
+                        chartData.Add(dataset);
+                    }
+                }
             }
             if (chartData.Count != 0)
             {
@@ -54,6 +67,7 @@
         }
         if (lineChart is not null)
         {
+            await lineChart.Clear();
             await lineChart.AddDatasetsAndUpdate(chartData.ToArray());
         }
         else
@@ -76,7 +90,7 @@
                     Distribution = "linear",
                     Time = new
                     {
-                        Unit = "day",
+                        Unit = "month",
                     },
                 },
             },
@@ -103,7 +117,7 @@
         ResponsiveAnimationDuration = 0,
         Legend = new
         {
-            Display = false,
+            Display = true,
         },
     };
 

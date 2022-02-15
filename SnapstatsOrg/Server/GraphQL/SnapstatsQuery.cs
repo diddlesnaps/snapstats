@@ -25,6 +25,7 @@ using SnapstatsOrg.Shared.Models.SnapCounts;
 using System;
 using System.Globalization;
 using System.Linq;
+using SnapstatsOrg.Server.ExtensionMethods;
 
 namespace SnapstatsOrg.Server.GraphQL
 {
@@ -83,46 +84,11 @@ namespace SnapstatsOrg.Server.GraphQL
                     var cal = CultureInfo.InvariantCulture.Calendar;
                     var startWeek = cal.GetWeekOfYear(from, CalendarWeekRule.FirstFullWeek, DayOfWeek.Monday);
 
-                    return db.GetCollection<Architecture>(Constants.ARCHITECTURES_COLLECTION_NAME).Aggregate()
-                        .Match(m => m.date >= from)
-                        .Group(
-                            g => new
-                            {
-                                year = g.date.Year,
-                                month = g.date.Month,
-                                day = g.date.Day,
-                                name = g.name,
-                            },
-                            g => new
-                            {
-                                _id = g.Key,
-                                count = g.Max(m => m.count),
-                            })
-                        .Project(
-                            p => new
-                            {
-                                _id = new DateTime(p._id.year, p._id.month, p._id.day),
-                                p.count,
-                                p._id.name,
-                            })
-                        .SortByDescending(p => p._id)
-                        .Group<Timeline>(new BsonDocument
-                        {
-                            { "_id", "$name" },
-                            {
-                                "counts", new BsonDocument
-                                {
-                                    {
-                                        "$push", new BsonDocument
-                                        {
-                                            { "count", "$count" },
-                                            { "date", "$_id" }
-                                        }
-                                    }
-                                }
-                            }
-                        })
-                        .ToEnumerable();
+                    return db.GetCollection<Architecture>(Constants.ARCHITECTURES_COLLECTION_NAME)
+                        .AsQueryable()
+                        .Where(w => w.date >= from)
+                        .GetTimeline()
+                        .AsEnumerable();
                 }
             );
             #endregion
@@ -178,46 +144,11 @@ namespace SnapstatsOrg.Server.GraphQL
                     var cal = CultureInfo.InvariantCulture.Calendar;
                     var startWeek = cal.GetWeekOfYear(from, CalendarWeekRule.FirstFullWeek, DayOfWeek.Monday);
 
-                    return db.GetCollection<Base>(Constants.BASES_COLLECTION_NAME).Aggregate()
-                        .Match(m => m.date >= from)
-                        .Group(
-                            g => new
-                            {
-                                year = g.date.Year,
-                                month = g.date.Month,
-                                day = g.date.Day,
-                                name = g.name,
-                            },
-                            g => new
-                            {
-                                _id = g.Key,
-                                count = g.Max(m => m.count),
-                            })
-                        .Project(
-                            p => new
-                            {
-                                _id = new DateTime(p._id.year, p._id.month, p._id.day),
-                                p.count,
-                                p._id.name,
-                            })
-                        .SortByDescending(p => p._id)
-                        .Group<Timeline>(new BsonDocument
-                        {
-                            { "_id", "$name" },
-                            {
-                                "counts", new BsonDocument
-                                {
-                                    {
-                                        "$push", new BsonDocument
-                                        {
-                                            { "count", "$count" },
-                                            { "date", "$_id" }
-                                        }
-                                    }
-                                }
-                            }
-                        })
-                        .ToEnumerable();
+                    return db.GetCollection<Base>(Constants.BASES_COLLECTION_NAME)
+                        .AsQueryable()
+                        .Where(w => w.date >= from)
+                        .GetTimeline()
+                        .AsEnumerable();
                 }
             );
             #endregion
@@ -273,46 +204,11 @@ namespace SnapstatsOrg.Server.GraphQL
                     var cal = CultureInfo.InvariantCulture.Calendar;
                     var startWeek = cal.GetWeekOfYear(from, CalendarWeekRule.FirstFullWeek, DayOfWeek.Monday);
 
-                    return db.GetCollection<Channel>(Constants.CHANNELS_COLLECTION_NAME).Aggregate()
-                        .Match(m => m.date >= from)
-                        .Group(
-                            g => new
-                            {
-                                year = g.date.Year,
-                                month = g.date.Month,
-                                day = g.date.Day,
-                                name = g.name,
-                            },
-                            g => new
-                            {
-                                _id = g.Key,
-                                count = g.Max(m => m.count),
-                            })
-                        .Project(
-                            p => new
-                            {
-                                _id = new DateTime(p._id.year, p._id.month, p._id.day),
-                                p.count,
-                                p._id.name,
-                            })
-                        .SortByDescending(p => p._id)
-                        .Group<Timeline>(new BsonDocument
-                        {
-                            { "_id", "$name" },
-                            {
-                                "counts", new BsonDocument
-                                {
-                                    {
-                                        "$push", new BsonDocument
-                                        {
-                                            { "count", "$count" },
-                                            { "date", "$_id" }
-                                        }
-                                    }
-                                }
-                            }
-                        })
-                        .ToEnumerable();
+                    return db.GetCollection<Channel>(Constants.CHANNELS_COLLECTION_NAME)
+                        .AsQueryable()
+                        .Where(w => w.date >= from)
+                        .GetTimeline()
+                        .AsEnumerable();
                 }
             );
             #endregion
@@ -368,46 +264,11 @@ namespace SnapstatsOrg.Server.GraphQL
                     var cal = CultureInfo.InvariantCulture.Calendar;
                     var startWeek = cal.GetWeekOfYear(from, CalendarWeekRule.FirstFullWeek, DayOfWeek.Monday);
 
-                    return db.GetCollection<Confinement>(Constants.CONFINEMENTS_COLLECTION_NAME).Aggregate()
-                        .Match(m => m.date >= from)
-                        .Group(
-                            g => new
-                            {
-                                year = g.date.Year,
-                                month = g.date.Month,
-                                day = g.date.Day,
-                                name = g.name,
-                            },
-                            g => new
-                            {
-                                _id = g.Key,
-                                count = g.Max(m => m.count),
-                            })
-                        .Project(
-                            p => new
-                            {
-                                _id = new DateTime(p._id.year, p._id.month, p._id.day),
-                                p.count,
-                                p._id.name,
-                            })
-                        .SortByDescending(p => p._id)
-                        .Group<Timeline>(new BsonDocument
-                        {
-                            { "_id", "$name" },
-                            {
-                                "counts", new BsonDocument
-                                {
-                                    {
-                                        "$push", new BsonDocument
-                                        {
-                                            { "count", "$count" },
-                                            { "date", "$_id" }
-                                        }
-                                    }
-                                }
-                            }
-                        })
-                        .ToEnumerable();
+                    return db.GetCollection<Confinement>(Constants.CONFINEMENTS_COLLECTION_NAME)
+                        .AsQueryable()
+                        .Where(w => w.date >= from)
+                        .GetTimeline()
+                        .AsEnumerable();
                 }
             );
             #endregion
@@ -565,46 +426,11 @@ namespace SnapstatsOrg.Server.GraphQL
                         from = lastYear;
                     }
 
-                    return db.GetCollection<License>(Constants.LICENSES_COLLECTION_NAME).Aggregate()
-                        .Match(m => m.date >= from)
-                        .Group(
-                            g => new
-                            {
-                                year = g.date.Year,
-                                month = g.date.Month,
-                                day = g.date.Day,
-                                name = g.name,
-                            },
-                            g => new
-                            {
-                                _id = g.Key,
-                                count = g.Max(m => m.count),
-                            })
-                        .Project(
-                            p => new
-                            {
-                                _id = new DateTime(p._id.year, p._id.month, p._id.day),
-                                p.count,
-                                p._id.name,
-                            })
-                        .SortByDescending(p => p._id)
-                        .Group<Timeline>(new BsonDocument
-                        {
-                            { "_id", "$name" },
-                            {
-                                "counts", new BsonDocument
-                                {
-                                    {
-                                        "$push", new BsonDocument
-                                        {
-                                            { "count", "$count" },
-                                            { "date", "$_id" }
-                                        }
-                                    }
-                                }
-                            }
-                        })
-                        .ToEnumerable();
+                    return db.GetCollection<License>(Constants.LICENSES_COLLECTION_NAME)
+                        .AsQueryable()
+                        .Where(w => w.date >= from)
+                        .GetTimeline()
+                        .AsEnumerable();
                 }
             );
             #endregion
@@ -660,46 +486,11 @@ namespace SnapstatsOrg.Server.GraphQL
                     var cal = CultureInfo.InvariantCulture.Calendar;
                     var startWeek = cal.GetWeekOfYear(from, CalendarWeekRule.FirstFullWeek, DayOfWeek.Monday);
 
-                    return db.GetCollection<Section>(Constants.SECTIONS_COLLECTION_NAME).Aggregate()
-                        .Match(m => m.date >= from)
-                        .Group(
-                            g => new
-                            {
-                                year = g.date.Year,
-                                month = g.date.Month,
-                                day = g.date.Day,
-                                name = g.name,
-                            },
-                            g => new
-                            {
-                                _id = g.Key,
-                                count = g.Max(m => m.count),
-                            })
-                        .Project(
-                            p => new
-                            {
-                                _id = new DateTime(p._id.year, p._id.month, p._id.day),
-                                p.count,
-                                p._id.name,
-                            })
-                        .SortByDescending(p => p._id)
-                        .Group<Timeline>(new BsonDocument
-                        {
-                            { "_id", "$name" },
-                            {
-                                "counts", new BsonDocument
-                                {
-                                    {
-                                        "$push", new BsonDocument
-                                        {
-                                            { "count", "$count" },
-                                            { "date", "$_id" }
-                                        }
-                                    }
-                                }
-                            }
-                        })
-                        .ToEnumerable();
+                    return db.GetCollection<Section>(Constants.SECTIONS_COLLECTION_NAME)
+                        .AsQueryable()
+                        .Where(w => w.date >= from)
+                        .GetTimeline()
+                        .AsEnumerable();
                 }
             );
             #endregion

@@ -4,7 +4,7 @@ using System;
 namespace SnapstatsOrg.Shared.Models.Confinements
 {
     [BsonIgnoreExtraElements]
-    public class Confinement
+    public class Confinement : ITimelineable
     {
         public string? name { get; set; }
         public int count { get; set; }

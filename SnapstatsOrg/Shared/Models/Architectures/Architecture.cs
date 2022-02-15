@@ -4,7 +4,7 @@ using System;
 namespace SnapstatsOrg.Shared.Models.Architectures
 {
     [BsonIgnoreExtraElements]
-    public class Architecture
+    public class Architecture: ITimelineable
     {
         public string? name { get; set; }
         public int count { get; set; }
