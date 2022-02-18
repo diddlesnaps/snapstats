@@ -50,6 +50,13 @@ builder.Services.AddBlazorise(options =>
                 .AddBootstrapProviders()
                 .AddFontAwesomeIcons();
 
+builder.Services.AddScoped<IHtmlSanitizer, HtmlSanitizer>(x =>
+{
+    var sanitizer = new HtmlSanitizer();
+    //sanitizer.AllowedAttributes.Add("class");
+    return sanitizer;
+});
+
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
