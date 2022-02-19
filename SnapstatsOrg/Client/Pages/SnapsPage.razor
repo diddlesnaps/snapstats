@@ -126,7 +126,7 @@
 
     private async Task OnSearchTyping(KeyboardEventArgs e)
     {
-        if (e.Key == "Enter" && dirty)
+        if (e.Key == "Enter")
         {
             snaps = await Fetch(true);
             StateHasChanged();
