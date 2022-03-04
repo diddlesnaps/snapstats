@@ -1,54 +1,7 @@
 {
-  "emulators": {
-    "functions": {
-      "port": 5001
-    },
-    "hosting": {
-      "port": 5000
-    },
-    "pubsub": {
-      "port": 8085
-    }
-  },
   "functions": {
-    "source": "__sapper__/build",
-    "ignore": [
-      ".package*.json",
-      ".runtimeconfig.json"
-    ]
-  },
-  "hosting": {
-    "public": "static",
-    "rewrites": [
-      {
-        "source": "/graphql",
-        "function": "graphql"
-      },
-      {
-        "source": "/sitemap.xml",
-        "function": "sitemap"
-      },
-      {
-        "source": "**",
-        "function": "server"
-      }
-    ],
-    "redirects": [
-      {
-        "source": "/snapstatsorg/us-central1/server/client/:asset",
-        "destination": "/client/:asset",
-        "type": "302"
-      },
-      {
-        "source": "/snapstatsorg/us-central1/server/favicons/:asset",
-        "destination": "/favicons/:asset",
-        "type": "301"
-      },
-      {
-        "source": "/snapstatsorg/us-central1/server/:asset",
-        "destination": "/:asset",
-        "type": "301"
-      }
+    "predeploy": [
+      "npm --prefix \"$RESOURCE_DIR\" run build"
     ]
   }
 }

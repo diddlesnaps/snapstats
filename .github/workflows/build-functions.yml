@@ -7,10 +7,9 @@ on:
       - .github/workflows/build-functions.yml
       - .firebaserc
       - firebase.json
-      - index.js
-      - package*.json
-      - rollup.config.js
-      - src/**
+      - functions/package*.json
+      - functions/src/**
+      - functions/tsconfig.json
 
 jobs:
   build:
