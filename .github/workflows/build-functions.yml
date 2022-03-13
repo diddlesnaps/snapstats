@@ -25,10 +25,6 @@ jobs:
         run: npm i -g npm
       - name: Install Dependencies
         run: npm install
-      - name: Build
-        run: npm run build
-        env:
-          NODE_ENV: production
       - name: Deploy to Firebase
         uses: diddledan/firebase-action@master
         with:
@@ -39,4 +35,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: dist
-          path: __sapper__/build
+          path: functions/lib
