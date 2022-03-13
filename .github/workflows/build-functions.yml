@@ -24,7 +24,7 @@ jobs:
       - name: Update npm
         run: npm i -g npm
       - name: Install Dependencies
-        run: npm install
+        run: npm --prefix functions install
       - name: Deploy to Firebase
         uses: diddledan/firebase-action@master
         with:
