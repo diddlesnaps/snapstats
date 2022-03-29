@@ -69,6 +69,10 @@ namespace SnapstatsOrg.Server.GraphQL.Infrastructure
             {
                 query &= Builders<Snap>.Filter.Eq(e => e.developer_validation, "verified");
             }
+            else if (validation == Validation.unproven)
+            {
+                query &= Builders<Snap>.Filter.Eq(e => e.developer_validation, "unproven");
+            }
 
             return db.GetCollection<Snap>(Constants.SNAPS_COLLECTION_NAME)
                 .Find(query);
