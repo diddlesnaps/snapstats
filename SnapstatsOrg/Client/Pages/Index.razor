@@ -37,7 +37,7 @@
 @if (state?.snapCounts?.snapCounts is not null)
 {
 	<p>There are <strong>@(state.snapCounts.snapCounts.FirstOrDefault()?.total ?? 0)</strong> Snaps currently in the Store, of which <strong>@((state.snapCounts.snapCounts.FirstOrDefault()?.total - state.snapCounts.snapCounts.FirstOrDefault()?.filtered) ?? 0)</strong> appear to be test or hello-world Snaps. Test and hello-world Snaps are identified by a name that begins with <code>hello-</code> or <code>test-</code>, or a name that ends with <code>-hello</code> or <code>-test</code>. All other statistics on this site exclude those test or hello-world Snaps.</p>
-	<p><span class="verified">Verified</span> developers, a total of <strong>@state.verifiedDeveloperCount</strong> developers, have published <strong>@state.verifiedSnapCount</strong> Snaps.</p>
+	<p><strong>@state.verifiedDeveloperCount</strong> <span class="verified">Verified</span> developers have published <strong>@state.verifiedSnapCount</strong> Snaps.</p>
 }
 else
 {
@@ -101,7 +101,7 @@ else
 			ratings_average
 		}
 		findSnapsCount(developer_validation:VERIFIED)
-			verifiedDeveloperCount
+		verifiedDeveloperCount
 	}
 	";
 
