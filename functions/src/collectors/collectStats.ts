@@ -154,16 +154,15 @@ const collector = (isDaily = false) => async () => {
 
       promises = snaps
           .map(addDate("snapshot_date"))
-          .map(addIsDaily)
           .map((data) => ({...data, prevSnapshotDate: prevSnapshotDateTimestamp}))
           .filter(({snap: {last_updated, date_published}, prevSnapshotDate}) =>
             Date.parse(last_updated) > prevSnapshotDate ||
                     Date.parse(date_published) > prevSnapshotDate)
-          .map(async (data) => {
-            console.debug(`collectors/collectStats.js: New or Updated Snap, Publishing to pubsub: ${data.snap.package_name}`);
-            const dataBuffer = Buffer.from(JSON.stringify(data), "utf8");
+          .map(async (dataOobj) => {
+            console.debug(`collectors/collectStats.js: New or Updated Snap, Publishing to pubsub: ${dataOobj.snap.package_name}`);
+            const data = Buffer.from(JSON.stringify(dataOobj), "utf8");
             try {
-              await snapsSnapshotPubsubTopic.publish(dataBuffer);
+              await snapsSnapshotPubsubTopic.publishMessage({data});
             } catch (e) {
               return console.error(`pubsub/snapsSnapshot.js: Error: New or Updated Snap PubSub publish: ${e}`);
             }
