@@ -373,7 +373,7 @@ namespace SnapstatsOrg.Server.GraphQL
                     )
                     .Count()
                     .FirstOrDefault();
-                    return r;
+                    return r.Count;
                 }
             );
             #endregion
