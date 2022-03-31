@@ -151,13 +151,16 @@ const collector = (isDaily = false) => async () => {
       const snapsSnapshotPubsubTopic = pubsub.topic(functions.config().pubsub.snaps_snapshot_topic);
       const {date: prevSnapshotDateObj} = await LastUpdatedModel.findOne() || {date: new Date()};
       const prevSnapshotDateTimestamp = prevSnapshotDateObj.getTime();
+      const existingSnaps = new Set((await SnapsModel.find()).map(snap => snap.package_name));
 
       promises = snaps
           .map(addDate("snapshot_date"))
           .map((data) => ({...data, prevSnapshotDate: prevSnapshotDateTimestamp}))
-          .filter(({snap: {last_updated, date_published}, prevSnapshotDate}) =>
+          .filter(({snap: {package_name, last_updated, date_published}, prevSnapshotDate}) =>
             Date.parse(last_updated) > prevSnapshotDate ||
-                    Date.parse(date_published) > prevSnapshotDate)
+            Date.parse(date_published) > prevSnapshotDate ||
+            !existingSnaps.has(package_name)
+          )
           .map(async (dataOobj) => {
             console.debug(`collectors/collectStats.js: New or Updated Snap, Publishing to pubsub: ${dataOobj.snap.package_name}`);
             const data = Buffer.from(JSON.stringify(dataOobj), "utf8");
