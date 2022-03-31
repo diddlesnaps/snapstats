@@ -38,9 +38,7 @@ export const getStats = () => {
     });
 
     const non_hello_or_test_snaps = snaps.map(({snap}) => snap)
-        .filter((snap) => "package_name" in snap &&
-                !snap.package_name.match(/^(hello|test)-/) &&
-                !snap.package_name.match(/-test$/));
+        .filter((snap) => !snap.package_name.match(/^(hello|test)-/) && !snap.package_name.match(/-(hello|test)$/));
 
     console.debug("snapstore-api/index.js: Extracting counts");
     const section_counts = getCounts("sections.name", non_hello_or_test_snaps);
