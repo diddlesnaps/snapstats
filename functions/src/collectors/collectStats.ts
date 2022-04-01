@@ -156,8 +156,8 @@ const collector = (isDaily = false) => async () => {
       promises = snaps
           .map(addDate("snapshot_date"))
           .filter(({snap: {package_name, last_updated, date_published}}) =>
-            Date.parse(last_updated) > prevSnapshotDateTimestamp ||
-            Date.parse(date_published) > prevSnapshotDateTimestamp ||
+            last_updated.getTime() > prevSnapshotDateTimestamp ||
+            date_published.getTime() > prevSnapshotDateTimestamp ||
             !existingSnaps.has(package_name)
           )
           .map(async (dataOobj) => {
