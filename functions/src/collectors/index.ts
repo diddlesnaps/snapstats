@@ -19,5 +19,5 @@ export const dailyRatings = functions.runWith({
 }).pubsub.schedule("every 24 hours").onRun(async (context) => (await import("./collectRatings")).default());
 export const dailyThinStats = functions.runWith({
   timeoutSeconds: 300,
-  memory: "256MB",
+  memory: "128MB",
 }).pubsub.schedule("every 24 hours").onRun(async (context) => (await import("./thinStats")).default());
