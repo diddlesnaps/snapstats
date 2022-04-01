@@ -26,8 +26,8 @@ export interface SnapApiSnap {
     snapshotVersion: number | null
     publisher_username: string | null
     developer_validation: string | null
-    last_updated: Date
-    date_published: Date
+    last_updated: string
+    date_published: string
     title: string
     base_snap: string
 }

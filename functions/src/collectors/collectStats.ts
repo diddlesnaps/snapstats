@@ -114,8 +114,8 @@ const collector = (isDaily = false) => async () => {
       const prevSnapshotDateTimestamp = prevSnapshotDateObj.getTime();
 
       for (let snapData of snaps) {
-        if (snapData.snap.last_updated.getTime() > prevSnapshotDateTimestamp ||
-            snapData.snap.date_published.getTime() > prevSnapshotDateTimestamp ||
+        if (Date.parse(snapData.snap.last_updated) > prevSnapshotDateTimestamp ||
+            Date.parse(snapData.snap.date_published) > prevSnapshotDateTimestamp ||
             !(await SnapsModel.exists({package_name: snapData.snap.package_name}))) {
 
           const data = Buffer.from(JSON.stringify(addDate('snapshot_date')(snapData)), "utf8");
