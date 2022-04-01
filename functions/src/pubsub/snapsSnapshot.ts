@@ -5,13 +5,13 @@ import {getDetails} from "../snapstore-api";
 import {connectMongoose} from "../mongodb";
 
 import snapshotVersion from "../snapshotVersion";
-import {SnapApiPublisher, SnapApiSnapResult} from "../snapstore-api/types";
+import {SnapApiPublisher, SnapApiSnap, SnapApiSnapResult} from "../snapstore-api/types";
 import {SnapsModel} from "../models/Snaps";
 
 export default async (message: functions.pubsub.Message) => {
   if (message.json && message.json.snap) {
     const {prevSnapshotDate, details_api_url} = message.json;
-    let {snap} = message.json;
+    let snap: SnapApiSnap = message.json.snap;
 
     console.debug(`pubsub/snapsSnapshot.js: Running for Snap: ${snap.package_name}`);
 
@@ -66,11 +66,18 @@ export default async (message: functions.pubsub.Message) => {
       developer_validation: publisher.validation,
     };
 
+    snap.architecture = [...new Set(snap.architecture)];
+    snap.sections = [...new Set(
+        (snap.sections as unknown as {name: string}[]).map(
+            (section) => section.name
+        )
+    )];
+
     try {
-      connectMongoose();
+      await connectMongoose();
       const s = await SnapsModel.findOne({package_name: snap.package_name});
       if (s) {
-        await s.updateOne(snap);
+        await s.updateOne(snap as any);
       } else {
         await new SnapsModel(snap).save();
       }
@@ -78,7 +85,7 @@ export default async (message: functions.pubsub.Message) => {
       return console.error(`pubsub/snapsSnapshot.js: Error: Save Snap data: ${e}`, snap);
     }
 
-    if (!snap.package_name.match(/(^(test|hello)-|-test$)/i) && new Date(snap.date_published).getTime() > prevSnapshotDate) {
+    if (!snap.package_name.match(/(^(test|hello)-|-(-hello|test)$)/i) && new Date(snap.date_published).getTime() > prevSnapshotDate) {
       console.debug(`pubsub/snapsSnapshot.js: New Snap, Publishing to PubSub: ${snap.package_name}`);
 
       const pubsub = new PubSub();
