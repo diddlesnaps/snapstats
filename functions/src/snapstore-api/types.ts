@@ -26,9 +26,44 @@ export interface SnapApiSnap {
     snapshotVersion: number | null
     publisher_username: string | null
     developer_validation: string | null
-    date_published: Date
+    last_updated: string
+    date_published: string
     title: string
     base_snap: string
+}
+
+export interface TStats {
+    snaps: SnapApiSnapResult[]
+    sections: {
+        name: string
+        count: number
+    }[]
+    architectures: {
+        name: string
+        count: number
+    }[]
+    bases: {
+        name: string
+        count: number
+    }[]
+    channels: {
+        name: string
+        count: number
+    }[]
+    confinements: {
+        name: string;
+        count: number;
+    }[]
+    developer_counts: {
+        mean: number;
+        mode: number;
+        median: number;
+        total: number;
+    }
+    snap_counts: {
+        total: number;
+        filtered: number;
+    }
 }
 
 export interface SnapApiData {

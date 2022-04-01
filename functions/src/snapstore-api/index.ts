@@ -2,7 +2,7 @@ import fetch from "node-fetch";
 import {spider} from "./config.js";
 import SnapApi from "./api.js";
 import {sort, getCounts, mapCounts, computeMean, computeMode, computeMedian} from "../statsHelpers.js";
-import {SnapApiSnapResult, SnapApiSnap} from "./types";
+import {SnapApiSnapResult, SnapApiSnap, TStats} from "./types";
 
 export const getDetails = async (url: string): Promise<SnapApiSnapResult> => {
   const headers = {
@@ -23,7 +23,7 @@ interface IArgs {
     details_api_url: string
 }
 
-export const getStats = () => {
+export const getStats: () => Promise<TStats[]> = () => {
   return Promise.all(spider.snaps.stores.map(async (store) => {
     const api = new SnapApi(store);
     const snaps = (await api.list()).map((args: IArgs) => {

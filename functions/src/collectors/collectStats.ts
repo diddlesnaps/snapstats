@@ -79,11 +79,11 @@ const collector = (isDaily = false) => async () => {
       };
     });
 
-    const addDate = (dateKey: string | null = null) => (data: any) => {
+    const addDate = (dateKey: string | null = null) => <T>(data: T): (T & { [x: string]: number; }) => {
       const key = dateKey || "date";
       return {...data, [key]: date};
     };
-    const addIsDaily = (data: any) => {
+    const addIsDaily = <T>(data: T & {isDaily: boolean}) => {
       return {...data, isDaily};
     };
 
@@ -155,10 +155,9 @@ const collector = (isDaily = false) => async () => {
 
       promises = snaps
           .map(addDate("snapshot_date"))
-          .map((data) => ({...data, prevSnapshotDate: prevSnapshotDateTimestamp}))
-          .filter(({snap: {package_name, last_updated, date_published}, prevSnapshotDate}) =>
-            Date.parse(last_updated) > prevSnapshotDate ||
-            Date.parse(date_published) > prevSnapshotDate ||
+          .filter(({snap: {package_name, last_updated, date_published}}) =>
+            Date.parse(last_updated) > prevSnapshotDateTimestamp ||
+            Date.parse(date_published) > prevSnapshotDateTimestamp ||
             !existingSnaps.has(package_name)
           )
           .map(async (dataOobj) => {
