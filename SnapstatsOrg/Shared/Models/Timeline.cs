@@ -4,7 +4,7 @@ namespace SnapstatsOrg.Shared.Models
 {
     public interface ITimelineable {
         DateTime date { get; set; }
-        string name { get; set; }
+        string? name { get; set; }
         int count { get; set; }
     }
 

@@ -18,7 +18,6 @@ using SnapstatsOrg.Shared.Models.DeveloperCounts;
 using SnapstatsOrg.Shared.Models.Licenses;
 using SnapstatsOrg.Shared.Models.Sections;
 using SnapstatsOrg.Shared.Models.SnapCounts;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace SnapstatsOrg.Server.GraphQL
 {

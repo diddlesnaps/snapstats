@@ -27,10 +27,7 @@ builder.Services.AddScoped<IGraphQLClient>(provider => {
     return graphQlClient;
 });
 
-builder.Services.AddBlazorise(options =>
-{
-    options.ChangeTextOnKeyPress = true;
-})
+builder.Services.AddBlazorise()
                 .AddBootstrapProviders()
                 .AddFontAwesomeIcons();
 

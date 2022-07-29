@@ -2,15 +2,23 @@
 using Blazorise.Bootstrap;
 using Blazorise.Icons.FontAwesome;
 using Ganss.XSS;
+using GraphQL;
 using GraphQL.Client.Abstractions;
 using GraphQL.Client.Http;
 using GraphQL.Client.Serializer.SystemTextJson;
+using GraphQL.DataLoader;
+using GraphQL.MicrosoftDI;
 using GraphQL.Server;
+using GraphQL.SystemTextJson;
+using GraphQL.Types;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using SnapstatsOrg.Server.GraphQL;
-using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,19 +42,15 @@ builder.Services.AddScoped<SnapstatsSchema>();
 var mongoUrl = builder.Configuration["MongoUrl"];
 builder.Services.AddSingleton(new MongoClient(mongoUrl).GetDatabase("snapstats"));
 
-builder.Services.AddGraphQL(options =>
-{
-    options.EnableMetrics = true;
-})
-    .AddGraphTypes(Assembly.GetAssembly(typeof(SnapstatsSchema)), ServiceLifetime.Scoped)
+builder.Services.AddGraphQL(builder => builder
+    .AddHttpMiddleware<SnapstatsSchema>()
     .AddSystemTextJson()
-    .AddDataLoader()
-    .AddWebSockets();
+    .AddErrorInfoProvider(opt => opt.ExposeExceptionStackTrace = true)
+    .AddApolloTracing()
+    .AddSchema<SnapstatsSchema>()
+    .AddGraphTypes(typeof(SnapstatsSchema).Assembly));
 
-builder.Services.AddBlazorise(options =>
-{
-    options.ChangeTextOnKeyPress = true;
-})
+builder.Services.AddBlazorise()
                 .AddBootstrapProviders()
                 .AddFontAwesomeIcons();
 
@@ -60,12 +64,14 @@ builder.Services.AddScoped<IHtmlSanitizer, HtmlSanitizer>(x =>
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
+builder.Services.AddLogging(builder => builder.AddConsole());
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseWebAssemblyDebugging();
+    //app.UseWebAssemblyDebugging();
 }
 else
 {

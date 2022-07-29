@@ -9,19 +9,19 @@
     <ExternalConsole>true</ExternalConsole>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Blazorise" Version="0.9.5.5" />
-    <PackageReference Include="Blazorise.Bootstrap" Version="0.9.5.5" />
-    <PackageReference Include="Blazorise.Charts" Version="0.9.5.5" />
-    <PackageReference Include="Blazorise.Icons.FontAwesome" Version="0.9.5.5" />
-    <PackageReference Include="GraphQL.Client" Version="4.0.2" />
-    <PackageReference Include="GraphQL.Client.Serializer.SystemTextJson" Version="4.0.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.2" PrivateAssets="all" />
+    <PackageReference Include="Blazorise" Version="1.0.6" />
+    <PackageReference Include="Blazorise.Bootstrap" Version="1.0.6" />
+    <PackageReference Include="Blazorise.Charts" Version="1.0.6" />
+    <PackageReference Include="Blazorise.Icons.FontAwesome" Version="1.0.6" />
+    <PackageReference Include="GraphQL.Client" Version="5.0.2" />
+    <PackageReference Include="GraphQL.Client.Serializer.SystemTextJson" Version="5.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.7" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.7" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.7" PrivateAssets="all" />
     <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="2.2.0" />
     <PackageReference Include="System.Net.Http.Json" Version="6.0.0" />
-    <PackageReference Include="Markdig" Version="0.27.0" />
-    <PackageReference Include="HtmlSanitizer" Version="7.1.475" />
+    <PackageReference Include="Markdig" Version="0.30.2" />
+    <PackageReference Include="HtmlSanitizer" Version="7.1.542" />
   </ItemGroup>
 
   <ItemGroup>

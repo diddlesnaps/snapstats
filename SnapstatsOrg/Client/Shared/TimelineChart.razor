@@ -40,7 +40,7 @@
                                 BackgroundColor = colors.Current ?? "#CCCCCC",
                                 PointRadius = 0,
                                 BorderWidth = 2,
-                                LineTension = 0.2f,
+                                Tension = 0.2f,
                                 Fill = false,
                             };
                         chartData.Add(dataset);
@@ -49,7 +49,7 @@
             }
             if (chartData.Count != 0)
             {
-                UpdateChart();
+                UpdateChart().ConfigureAwait(false);
             }
         }
     }

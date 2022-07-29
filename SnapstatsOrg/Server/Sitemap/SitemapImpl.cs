@@ -171,7 +171,7 @@ namespace SnapstatsOrg.Server.Sitemap
         public static string AbsoluteRouteUrl(
             this IUrlHelper urlHelper,
             string routeName,
-            object routeValues = null)
+            object? routeValues = null)
         {
             string scheme = urlHelper.ActionContext.HttpContext.Request.Scheme;
             string host = urlHelper.ActionContext.HttpContext.Request.Host.ToString();

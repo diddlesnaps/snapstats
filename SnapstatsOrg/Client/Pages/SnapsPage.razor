@@ -136,7 +136,8 @@
     async Task FetchMore()
     {
         searchModel.Offset += searchModel.Limit;
-        snaps = snaps.Concat(await Fetch(false)).ToArray();
+        var newSnaps = await Fetch(false);
+        snaps = (snaps?.Concat(newSnaps) ?? newSnaps).ToArray();
     }
 
     async Task<Snap[]> Fetch(bool newRequest = false)

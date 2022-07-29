@@ -7,7 +7,7 @@ namespace SnapstatsOrg.Server.GraphQL.Infrastructure
 {
     internal static class ResolveFieldContextExtensions
     {
-        public static IFindFluent<Snap, Snap> FindSnaps(this IResolveFieldContext<object> context, IMongoDatabase db)
+        public static IFindFluent<Snap, Snap> FindSnaps(this IResolveFieldContext<object?> context, IMongoDatabase db)
         {
             var query = Builders<Snap>.Filter.Empty;
 
