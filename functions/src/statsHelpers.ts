@@ -24,7 +24,7 @@ export const extractCombinedLicenseCounts = (cnts: {[key: string]: number}): {[k
 
 export const getCounts = (field: string, json: any): {[key: string]: number} => {
   const [parentField, childField] = field.split(".", 2);
-  const items: string[] = json.reduce((carry: string[], snap: {[key: string]: any;}) => {
+  const items: (string|object)[] = json.reduce((carry: string[], snap: {[key: string]: any;}) => {
     let newCarry = carry || [];
     if (parentField in snap) {
       let item = snap[parentField];
@@ -36,11 +36,11 @@ export const getCounts = (field: string, json: any): {[key: string]: number} => 
     return newCarry;
   }, []);
 
-  const item_names = [...new Set(items.map((item) => childField && typeof item === "object" && childField in item ? item[childField] : item))];
+  const item_names: string[] = [...new Set(items.map((item) => (childField && typeof item === "object" && item[childField]) || item as string))];
 
   const item_counts: {[key: string]: number} = {};
   for (const name of item_names) {
-    const this_item = items.reduce((carry: boolean[], item: string) => {
+    const this_item: boolean[] = items.reduce<boolean[]>((carry: boolean[], item: string) => {
       let newCarry = carry || [];
       if (item === name) {
         newCarry = [...newCarry, true];
