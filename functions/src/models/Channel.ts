@@ -31,4 +31,6 @@ const ChannelsSchema = new Schema<IChannelDocument>({
 });
 
 export type IChannelModel = Model<IChannelDocument>
-export const ChannelsModel = model<IChannelDocument, IChannelModel>("Channels", ChannelsSchema);
+export const ChannelsModel =
+  model<IChannelDocument, IChannelModel>(
+      "Channels", ChannelsSchema);

@@ -31,4 +31,6 @@ const ConfinementsSchema = new Schema<IConfinementDocument>({
 });
 
 export type IConfinementModel = Model<IConfinementDocument>
-export const ConfinementsModel = model<IConfinementDocument, IConfinementModel>("Confinements", ConfinementsSchema);
+export const ConfinementsModel =
+  model<IConfinementDocument, IConfinementModel>(
+      "Confinements", ConfinementsSchema);

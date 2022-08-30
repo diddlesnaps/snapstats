@@ -56,4 +56,6 @@ const RatingsSchema = new Schema<IRatingDocument>({
 });
 
 export type IRatingModel = Model<IRatingDocument>
-export const RatingsModel = model<IRatingDocument, IRatingModel>("Ratings", RatingsSchema);
+export const RatingsModel =
+  model<IRatingDocument, IRatingModel>(
+      "Ratings", RatingsSchema);

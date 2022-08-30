@@ -7,7 +7,7 @@ import {LastUpdatedModel} from "../models/LastUpdated.js";
 
 import snapshotVersion from "../snapshotVersion.js";
 import {connectMongoose} from "../mongodb.js";
-import { SnapsModel } from "../models/Snaps.js";
+import {SnapsModel} from "../models/Snaps.js";
 
 const denysave = process.env.denysave === "true" ? true : false;
 
@@ -28,12 +28,13 @@ const collector = (isDaily = false) => async () => {
       sections,
       snap_counts,
     } = stats;
-    let {snaps} = stats;
+    const {snaps} = stats;
 
-    const addDate = (dateKey: string | null = null) => <T>(data: T): (T & { [x: string]: number; }) => {
-      const key = dateKey || "date";
-      return {...data, [key]: date};
-    };
+    const addDate = (dateKey?: string) =>
+      <T>(data: T): (T & { [x: string]: number; }) => {
+        const key = dateKey || "date";
+        return {...data, [key]: date};
+      };
     const addIsDaily = <T>(data: T): (T & {isDaily: boolean}) => {
       return {...data, isDaily};
     };
@@ -44,85 +45,122 @@ const collector = (isDaily = false) => async () => {
       console.debug("collectors/collectStats.js: Saving stats");
       const pubsub = new PubSub();
       const snapshotTopics = {
-        snapsSnapshotTopic: pubsub.topic(functions.config().pubsub.snaps_snapshot_topic),
-        architecturesSnapshotTopic: pubsub.topic(functions.config().pubsub.architectures_snapshot_topic),
-        basesSnapshotTopic: pubsub.topic(functions.config().pubsub.bases_snapshot_topic),
-        channelsSnapshotTopic: pubsub.topic(functions.config().pubsub.channels_snapshot_topic),
-        confinementsSnapshotTopic: pubsub.topic(functions.config().pubsub.confinements_snapshot_topic),
-        developerCountsSnapshotTopic: pubsub.topic(functions.config().pubsub.developer_counts_snapshot_topic),
-        sectionsSnapshotTopic: pubsub.topic(functions.config().pubsub.sections_snapshot_topic),
-        snapCountsSnapshotTopic: pubsub.topic(functions.config().pubsub.snap_counts_snapshot_topic),
+        snapsSnapshotTopic: pubsub.topic(
+            functions.config().pubsub.snaps_snapshot_topic),
+        architecturesSnapshotTopic: pubsub.topic(
+            functions.config().pubsub.architectures_snapshot_topic),
+        basesSnapshotTopic: pubsub.topic(
+            functions.config().pubsub.bases_snapshot_topic),
+        channelsSnapshotTopic: pubsub.topic(
+            functions.config().pubsub.channels_snapshot_topic),
+        confinementsSnapshotTopic: pubsub.topic(
+            functions.config().pubsub.confinements_snapshot_topic),
+        developerCountsSnapshotTopic: pubsub.topic(
+            functions.config().pubsub.developer_counts_snapshot_topic),
+        sectionsSnapshotTopic: pubsub.topic(
+            functions.config().pubsub.sections_snapshot_topic),
+        snapCountsSnapshotTopic: pubsub.topic(
+            functions.config().pubsub.snap_counts_snapshot_topic),
       };
 
       await connectMongoose();
 
       let data: Buffer;
-      data = Buffer.from(JSON.stringify(architectures.map(addDate()).map(addIsDaily)), "utf8");
+      data = Buffer.from(
+          JSON.stringify(architectures.map(addDate()).map(addIsDaily)), "utf8");
       try {
-        await snapshotTopics.architecturesSnapshotTopic.publishMessage({data});
+        await snapshotTopics.architecturesSnapshotTopic
+            .publishMessage({data});
       } catch (e) {
-        console.error(`pubsub/snapsSnapshot.js: Error: Architectures PubSub publish: ${e}`);
+        console.error("pubsub/snapsSnapshot.js: " +
+            `Error: Architectures PubSub publish: ${e}`);
       }
 
-      data = Buffer.from(JSON.stringify(bases.map(addDate()).map(addIsDaily)), "utf8");
+      data = Buffer.from(
+          JSON.stringify(bases.map(addDate()).map(addIsDaily)), "utf8");
       try {
-        await snapshotTopics.basesSnapshotTopic.publishMessage({data});
+        await snapshotTopics.basesSnapshotTopic
+            .publishMessage({data});
       } catch (e) {
-        console.error(`pubsub/snapsSnapshot.js: Error: Bases PubSub publish: ${e}`);
+        console.error("pubsub/snapsSnapshot.js:" +
+            `Error: Bases PubSub publish: ${e}`);
       }
 
-      data = Buffer.from(JSON.stringify(channels.map(addDate()).map(addIsDaily)), "utf8");
+      data = Buffer.from(
+          JSON.stringify(channels.map(addDate()).map(addIsDaily)), "utf8");
       try {
-        await snapshotTopics.basesSnapshotTopic.publishMessage({data});
+        await snapshotTopics.basesSnapshotTopic
+            .publishMessage({data});
       } catch (e) {
-        console.error(`pubsub/snapsSnapshot.js: Error: Channels PubSub publish: ${e}`);
+        console.error("pubsub/snapsSnapshot.js:" +
+            `Error: Channels PubSub publish: ${e}`);
       }
 
-      data = Buffer.from(JSON.stringify(confinements.map(addDate()).map(addIsDaily)), "utf8");
+      data = Buffer.from(
+          JSON.stringify(confinements.map(addDate()).map(addIsDaily)), "utf8");
       try {
-        await snapshotTopics.confinementsSnapshotTopic.publishMessage({data});
+        await snapshotTopics.confinementsSnapshotTopic
+            .publishMessage({data});
       } catch (e) {
-        console.error(`pubsub/snapsSnapshot.js: Error: Confinements PubSub publish: ${e}`);
+        console.error("pubsub/snapsSnapshot.js:" +
+            `Error: Confinements PubSub publish: ${e}`);
       }
 
-      data = Buffer.from(JSON.stringify([addIsDaily(addDate()(developer_counts))]), "utf8");
+      data = Buffer.from(
+          JSON.stringify([addIsDaily(addDate()(developer_counts))]), "utf8");
       try {
-        await snapshotTopics.developerCountsSnapshotTopic.publishMessage({data});
+        await snapshotTopics.developerCountsSnapshotTopic
+            .publishMessage({data});
       } catch (e) {
-        console.error(`pubsub/snapsSnapshot.js: Error: DeveloperCounts PubSub publish: ${e}`);
+        console.error("pubsub/snapsSnapshot.js:" +
+            `Error: DeveloperCounts PubSub publish: ${e}`);
       }
 
-      data = Buffer.from(JSON.stringify(sections.map(addDate()).map(addIsDaily)), "utf8");
+      data = Buffer.from(
+          JSON.stringify(sections.map(addDate()).map(addIsDaily)), "utf8");
       try {
-        await snapshotTopics.sectionsSnapshotTopic.publishMessage({data});
+        await snapshotTopics.sectionsSnapshotTopic
+            .publishMessage({data});
       } catch (e) {
-        console.error(`pubsub/snapsSnapshot.js: Error: Sections PubSub publish: ${e}`);
+        console.error("pubsub/snapsSnapshot.js:" +
+            `Error: Sections PubSub publish: ${e}`);
       }
 
-      data = Buffer.from(JSON.stringify([addIsDaily(addDate()(snap_counts))]), "utf8");
+      data = Buffer.from(
+          JSON.stringify([addIsDaily(addDate()(snap_counts))]), "utf8");
       try {
-        await snapshotTopics.snapCountsSnapshotTopic.publishMessage({data});
+        await snapshotTopics.snapCountsSnapshotTopic
+            .publishMessage({data});
       } catch (e) {
-        console.error(`pubsub/snapsSnapshot.js: Error: SnapCounts PubSub publish: ${e}`);
+        console.error("pubsub/snapsSnapshot.js:" +
+            `Error: SnapCounts PubSub publish: ${e}`);
       }
 
-      console.debug("collectors/collectStats.js: Publishing Snaps to snapshot PubSub topic");
+      console.debug("collectors/collectStats.js: " +
+          "Publishing Snaps to snapshot PubSub topic");
 
       const snapNames = new Set(snaps.map(({snap}) => snap.package_name));
 
-      const {date: prevSnapshotDateObj} = await LastUpdatedModel.findOne() || {date: new Date()};
+      const {date: prevSnapshotDateObj} =
+          await LastUpdatedModel.findOne() ?? {date: new Date()};
       const prevSnapshotDateTimestamp = prevSnapshotDateObj.getTime();
 
-      for (let snapData of snaps) {
-        if (Date.parse(snapData.snap.last_updated) > prevSnapshotDateTimestamp ||
-            Date.parse(snapData.snap.date_published) > prevSnapshotDateTimestamp ||
-            !(await SnapsModel.exists({package_name: snapData.snap.package_name}))) {
-
-          const data = Buffer.from(JSON.stringify(addDate('snapshot_date')(snapData)), "utf8");
+      for (const snapData of snaps) {
+        if (Date.parse(snapData.snap.last_updated) >
+            prevSnapshotDateTimestamp ||
+            Date.parse(snapData.snap.date_published) >
+            prevSnapshotDateTimestamp ||
+            !(await SnapsModel.exists({
+              package_name: snapData.snap.package_name,
+            }))) {
+          const data = Buffer.from(
+              JSON.stringify(addDate("snapshot_date")(snapData)), "utf8");
           try {
-            await snapshotTopics.snapsSnapshotTopic.publishMessage({data});
+            await snapshotTopics.snapsSnapshotTopic
+                .publishMessage({data});
           } catch (e) {
-            console.error(`pubsub/snapsSnapshot.js: Error: Snap '${snapData.snap.package_name}' PubSub publish: ${e}`);
+            console.error("collectors/collectStats.js: Error: " +
+                `Snap '${snapData.snap.package_name}' PubSub publish: ${e}`);
           }
         }
       }

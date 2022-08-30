@@ -31,4 +31,6 @@ const SnapCountsSchema = new Schema<ISnapCountsDocument>({
 });
 
 export type ISnapCountsModel = Model<ISnapCountsDocument>
-export const SnapCountsModel = model<ISnapCountsDocument, ISnapCountsModel>("SnapCount", SnapCountsSchema);
+export const SnapCountsModel =
+  model<ISnapCountsDocument, ISnapCountsModel>(
+      "SnapCount", SnapCountsSchema);

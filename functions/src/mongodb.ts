@@ -1,7 +1,7 @@
 import * as functions from "firebase-functions";
 import mongoose from "mongoose";
 
-export async function connectMongoose() {
+export async function connectMongoose(): Promise<typeof mongoose> {
   // Connect to MongoDB with Mongoose.
   const mongoUrl = process.env.MONGO_URL || functions.config().mongo.url || "mongodb://localhost/snapstats";
   try {

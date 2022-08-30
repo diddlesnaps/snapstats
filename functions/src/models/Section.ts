@@ -31,4 +31,6 @@ const SectionsSchema = new Schema<ISectionDocument>({
 });
 
 export type ISectionModel = Model<ISectionDocument>
-export const SectionsModel = model<ISectionDocument, ISectionModel>("Sections", SectionsSchema);
+export const SectionsModel =
+  model<ISectionDocument, ISectionModel>(
+      "Sections", SectionsSchema);

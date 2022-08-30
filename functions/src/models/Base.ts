@@ -31,4 +31,6 @@ const BasesSchema = new Schema<IBaseDocument>({
 });
 
 export type IBaseModel = Model<IBaseDocument>
-export const BasesModel = model<IBaseDocument, IBaseModel>("Bases", BasesSchema);
+export const BasesModel =
+  model<IBaseDocument, IBaseModel>(
+      "Bases", BasesSchema);

@@ -31,4 +31,6 @@ const ArchitecturesSchema = new Schema<IArchitectureDocument>({
 });
 
 export type IArchitectureModel = Model<IArchitectureDocument>
-export const ArchitecturesModel = model<IArchitectureDocument, IArchitectureModel>("Architecture", ArchitecturesSchema);
+export const ArchitecturesModel =
+  model<IArchitectureDocument, IArchitectureModel>(
+      "Architecture", ArchitecturesSchema);

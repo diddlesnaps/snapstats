@@ -1,23 +1,32 @@
 import * as functions from "firebase-functions";
-// import {URLSearchParams} from 'url';
 
 import Twitter from "twitter-lite";
 
-// const fb_app_id = process.env.FB_APP_ID || functions.config().facebook.app_id
-// const fb_app_secret = process.env.FB_APP_SECRET || functions.config().facebook.app_secret
-// const fb_page_id = process.env.FB_PAGE_ID || functions.config().facebook.page_id
-// const fb_page_token = process.env.FB_PAGE_TOKEN || functions.config().facebook.page_token
+// const fb_app_id =
+//     process.env.FB_APP_ID ?? functions.config().facebook.app_id
+// const fb_app_secret =
+//     process.env.FB_APP_SECRET ?? functions.config().facebook.app_secret
+// const fb_page_id =
+//     process.env.FB_PAGE_ID ?? functions.config().facebook.page_id
+// const fb_page_token =
+//     process.env.FB_PAGE_TOKEN ?? functions.config().facebook.page_token
 
-const twitter_consumer_key = process.env.TWIT_APP_ID || functions.config().twitter.consumer_key;
-const twitter_consumer_secret = process.env.TWIT_APP_SECRET || functions.config().twitter.consumer_secret;
-const twitter_access_token = process.env.TWIT_APP_ID || functions.config().twitter.access_token;
-const twitter_access_secret = process.env.TWIT_APP_SECRET || functions.config().twitter.access_secret;
+const twitter_consumer_key =
+    process.env.TWIT_APP_ID ?? functions.config().twitter.consumer_key;
+const twitter_consumer_secret =
+    process.env.TWIT_APP_SECRET ?? functions.config().twitter.consumer_secret;
+const twitter_access_token =
+    process.env.TWIT_APP_ID ?? functions.config().twitter.access_token;
+const twitter_access_secret =
+    process.env.TWIT_APP_SECRET ?? functions.config().twitter.access_secret;
 
-export default async (message: functions.pubsub.Message) => {
+export default async (message: functions.pubsub.Message): Promise<void> => {
   if (message.json.name && message.json.slug) {
-    console.log(`Publishing new snap: ${message.json.name} (${message.json.slug})`);
+    console.log("Publishing new snap: " +
+        `${message.json.name} (${message.json.slug})`);
     const url = `https://snapstats.org/snaps/${message.json.slug}`;
-    let body = `${message.json.name} has just been added to the Linux Snap Store`;
+    let body = `${message.json.name} has just been added to the Linux` +
+      "Snap Store";
 
     const promises = [];
 
@@ -36,7 +45,8 @@ export default async (message: functions.pubsub.Message) => {
         twitter_access_token && twitter_access_secret) {
       const slug = message.json.slug.replace(/-/g, "");
 
-      body = `${message.json.name} has just been added to the #Linux #Snap Store. #Snapcraft #${slug}`;
+      body = `${message.json.name} has just been added to the #Linux ` +
+          `#Snap Store. #Snapcraft #${slug}`;
 
       const twitter = new Twitter({
         consumer_key: twitter_consumer_key,

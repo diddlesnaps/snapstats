@@ -31,4 +31,6 @@ const LicensesSchema = new Schema<ILicenseDocument>({
 });
 
 export type ILicenseModel = Model<ILicenseDocument>
-export const LicensesModel = model<ILicenseDocument, ILicenseModel>("Licenses", LicensesSchema);
+export const LicensesModel =
+  model<ILicenseDocument, ILicenseModel>(
+      "Licenses", LicensesSchema);

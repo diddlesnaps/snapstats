@@ -5,28 +5,38 @@ import {getDetails} from "../snapstore-api";
 import {connectMongoose} from "../mongodb";
 
 import snapshotVersion from "../snapshotVersion";
-import {SnapApiPublisher, SnapApiSnap, SnapApiSnapResult} from "../snapstore-api/types";
+import {
+  SnapApiPublisher,
+  SnapApiSnap,
+  SnapApiSnapResult,
+} from "../snapstore-api/types";
 import {SnapsModel} from "../models/Snaps";
 
-export default async (message: functions.pubsub.Message) => {
+export default async (message: functions.pubsub.Message): Promise<void> => {
   if (message.json && message.json.snap) {
     const {prevSnapshotDate, details_api_url} = message.json;
     let snap: SnapApiSnap = message.json.snap;
 
-    console.debug(`pubsub/snapsSnapshot.js: Running for Snap: ${snap.package_name}`);
+    console.debug("pubsub/snapsSnapshot.js: " +
+        `Running for Snap: ${snap.package_name}`);
 
     let details: SnapApiSnapResult;
     try {
       details = (await getDetails(details_api_url));
       if (!details?.snap?.publisher) {
-        throw new Error(`snap publisher is undefined (${snap.package_name} from ${details_api_url})`);
+        throw new Error(
+            "pubsub/snapsSnapshot.js: snap publisher is undefined" +
+            `(${snap.package_name} from ${details_api_url})`
+        );
       }
     } catch (e) {
-      return console.error(`pubsub/snapsSnapshot.js: Error: Unable to load Snap data from store API: ${e}`);
+      return console.error("pubsub/snapsSnapshot.js: Error: " +
+        `Unable to load Snap data from store API: ${e}`);
     }
 
     const snapDetails = details.snap;
-    const publisher: SnapApiPublisher = details.snap.publisher as SnapApiPublisher;
+    const publisher: SnapApiPublisher =
+      details.snap.publisher as SnapApiPublisher;
 
     // let plugs = {}, slots = {}
     // try {
@@ -77,19 +87,24 @@ export default async (message: functions.pubsub.Message) => {
       await connectMongoose();
       const s = await SnapsModel.findOne({package_name: snap.package_name});
       if (s) {
-        await s.updateOne(snap as any);
+        await s.updateOne(snap);
       } else {
         await new SnapsModel(snap).save();
       }
     } catch (e) {
-      return console.error(`pubsub/snapsSnapshot.js: Error: Save Snap data: ${e}`, snap);
+      return console.error("pubsub/snapsSnapshot.js: Error: " +
+        `Save Snap data: ${e}`, snap);
     }
 
-    if (!snap.package_name.match(/(^(test|hello)-|-(-hello|test)$)/i) && new Date(snap.date_published).getTime() > prevSnapshotDate) {
-      console.debug(`pubsub/snapsSnapshot.js: New Snap, Publishing to PubSub: ${snap.package_name}`);
+    if (!snap.package_name.match(/(^(test|hello)-|-(-hello|test)$)/i) &&
+        new Date(snap.date_published).getTime() > prevSnapshotDate
+    ) {
+      console.debug("pubsub/snapsSnapshot.js: " +
+        `New Snap, Publishing to PubSub: ${snap.package_name}`);
 
       const pubsub = new PubSub();
-      const newSnapsPubsubTopic = pubsub.topic(functions.config().pubsub.newsnaps_topic);
+      const newSnapsPubsubTopic =
+        pubsub.topic(functions.config().pubsub.newsnaps_topic);
 
       const data = {
         name: snap.title,
@@ -99,10 +114,12 @@ export default async (message: functions.pubsub.Message) => {
       try {
         await newSnapsPubsubTopic.publish(dataBuffer);
       } catch (e) {
-        return console.error(`pubsub/snapsSnapshot.js: Error: New Snap PubSub publish: ${e}`);
+        return console.error("pubsub/snapsSnapshot.js: Error: " +
+          `New Snap PubSub publish: ${e}`);
       }
     }
 
-    console.debug(`pubsub/snapsSnapshot.js: Finished: ${snap.package_name}`);
+    console.debug("pubsub/snapsSnapshot.js: " +
+      `Finished: ${snap.package_name}`);
   }
 };

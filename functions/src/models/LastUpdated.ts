@@ -14,4 +14,6 @@ const LastUpdatedSchema = new Schema<ILastUpdatedDocument>({
 });
 
 export type ILastUpdatedModel = Model<ILastUpdatedDocument>
-export const LastUpdatedModel = model<ILastUpdatedDocument, ILastUpdatedModel>("LastUpdated", LastUpdatedSchema);
+export const LastUpdatedModel =
+  model<ILastUpdatedDocument, ILastUpdatedModel>(
+      "LastUpdated", LastUpdatedSchema);

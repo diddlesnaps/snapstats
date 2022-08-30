@@ -293,4 +293,6 @@ const SnapsSchema = new Schema<ISnapDocument>({
 });
 
 export type ISnapModel = Model<ISnapDocument>
-export const SnapsModel = model<ISnapDocument, ISnapModel>("Snaps", SnapsSchema);
+export const SnapsModel =
+  model<ISnapDocument, ISnapModel>(
+      "Snaps", SnapsSchema);

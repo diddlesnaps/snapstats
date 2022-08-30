@@ -42,5 +42,7 @@ const DeveloperCountsSchema = new Schema<IDeveloperCountsDocument>({
   },
 });
 
-export const DeveloperCountsModel = model<IDeveloperCountsDocument, ILastUpdatedModel>("DeveloperCounts", DeveloperCountsSchema);
 export type ILastUpdatedModel = Model<IDeveloperCountsDocument>
+export const DeveloperCountsModel =
+  model<IDeveloperCountsDocument, ILastUpdatedModel>(
+      "DeveloperCounts", DeveloperCountsSchema);
