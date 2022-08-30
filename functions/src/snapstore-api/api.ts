@@ -1,4 +1,5 @@
 /* eslint-disable camelcase */
+import crypto from "crypto";
 import fetch from "node-fetch";
 
 import {spider} from "./config.js";
@@ -68,16 +69,11 @@ class SnapApi {
 
   async listArch(
       url: string,
-      arch: string | null,
-      section: string | null,
       previousResults: SnapApiSnap[] | null
   ): Promise<SnapApiSnap[]> {
     let results: SnapApiSnap[] = previousResults ?? [];
 
     const headers: HeadersInit = {"User-Agent": spider.snaps.user_agent};
-    if (arch) {
-      headers["X-Ubuntu-Architecture"] = arch;
-    }
 
     const res = await fetch(url, {
       method: "GET",
@@ -96,7 +92,8 @@ class SnapApi {
       nextUrl = nextUrl.replace("http://snapdevicegw_cached", this.domain);
       nextUrl = nextUrl.replace("https://snapdevicegw_cached", this.domain);
 
-      return this.listArch(nextUrl, arch, section, results);
+      // return this.listArch(nextUrl, arch, section, results);
+      return this.listArch(nextUrl, results);
     } else {
       return results;
     }
@@ -110,64 +107,53 @@ class SnapApi {
         "confinement=strict,devmode,classic&" +
         "scope=wide&" +
         `fields=${searchfields}&` +
-        `cachebuster=${Math.random()}`;
-    const promises: {arch: string, snaps: Promise<SnapApiSnap[]>}[] =
-        spider.snaps.architectures.map((architecture) => ({
-          arch: architecture,
-          snaps: this.listArch(url, architecture, null, null),
-        }));
-    promises.unshift({
-      arch: "all",
-      snaps: this.listArch(url, null, null, null),
-    });
+        `request=${crypto.randomUUID()}`;
 
     // eslint-disable-next-line camelcase
     const snapMap: Map<string, {snap: SnapApiSnap; details_api_url: string;}> =
         new Map();
-    for (const {arch, snaps} of promises) {
-      const results = await snaps;
-      console.debug(`total packages (${arch}): ${results.length}`);
-      for (const snap of results) {
-        if (!snap.package_name) {
-          console.debug("No packge_name, skipping");
-          continue;
+
+    for (const snap of await this.listArch(url, null)) {
+      if (!snap.package_name) {
+        console.debug("No packge_name, skipping");
+        continue;
+      }
+
+      // snap.architecture ??= [arch];
+      const name = snap.package_name;
+
+      // eslint-disable-next-line camelcase
+      const details_api_url =
+          `${this.details_url}/${name}?fields=${detailsfields}`;
+      if (!snapMap.has(name)) {
+        snapMap.set(name, {
+          snap,
+          details_api_url,
+        });
+      } else {
+        const oldSnap = snapMap.get(name).snap;
+
+        let arches = snap.architecture.concat(oldSnap.architecture ?? []);
+        arches = [...new Set(arches)];
+
+        if (arches.includes("all")) {
+          arches = ["all"];
         }
 
-        snap.architecture ??= [arch];
-        const name = snap.package_name;
-
-        // eslint-disable-next-line camelcase
-        const details_api_url =
-            `${this.details_url}/${name}?fields=${detailsfields}`;
-        if (!snapMap.has(name)) {
-          snapMap.set(name, {
-            snap,
-            details_api_url,
-          });
-        } else {
-          const oldSnap = snapMap.get(name).snap;
-
-          let arches = snap.architecture.concat(oldSnap.architecture ?? []);
-          arches = [...new Set(arches)];
-
-          if (arches.includes("all")) {
-            arches = ["all"];
-          }
-
-          let newSnap = oldSnap;
-          if (snap.revision > oldSnap.revision) {
-            newSnap = snap;
-          }
-
-          newSnap.architecture = arches;
-
-          snapMap.set(name, {
-            snap: newSnap,
-            details_api_url,
-          });
+        let newSnap = oldSnap;
+        if (snap.revision > oldSnap.revision) {
+          newSnap = snap;
         }
+
+        newSnap.architecture = arches;
+
+        snapMap.set(name, {
+          snap: newSnap,
+          details_api_url,
+        });
       }
     }
+    // }
 
     console.debug(`total packages: ${snapMap.size}`);
     return [...snapMap.values()];
