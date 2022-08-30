@@ -74,7 +74,8 @@ export interface SnapApiData {
         next: {
             href: string
         }
-    }
+    },
+    total: number,
 }
 
 export interface SnapApiSectionsData {

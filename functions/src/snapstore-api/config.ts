@@ -14,7 +14,15 @@ export const spider = {
   snaps: {
     rate_limit: 100,
     page_size: 1000,
-    architectures: ["i386", "amd64", "armhf", "arm64", "ppc64el", "s390x"],
+    architectures: [
+      "i386",
+      "amd64",
+      "armhf",
+      "arm64",
+      "ppc64el",
+      // "riscv64",
+      "s390x",
+    ],
     user_agent: "https://snapstats.org/ spider: run by Dani Llewellyn: https://launchpad.net/~diddledani",
     stores: [
       {

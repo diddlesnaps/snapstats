@@ -1,7 +1,12 @@
+/* eslint-disable camelcase */
 import fetch from "node-fetch";
 
 import {spider} from "./config.js";
-import {SnapApiData, SnapApiResults, SnapApiSectionsData, SnapApiSnap} from "./types";
+import {
+  SnapApiData,
+  SnapApiSectionsData,
+  SnapApiSnap,
+} from "./types";
 
 const searchfields = [
   "aliases",
@@ -51,161 +56,156 @@ const detailsfields = [
 ].join(",");
 
 class SnapApi {
-    url: string;
-    details_url: string;
-    domain: string;
+  url: string;
+  details_url: string;
+  domain: string;
 
-    constructor(props: { url: string; details_url: string; domain: string; }) {
-      this.url = props.url;
-      this.details_url = props.details_url;
-      this.domain = props.domain;
+  constructor(props: {url: string; details_url: string; domain: string;}) {
+    this.url = props.url;
+    this.details_url = props.details_url;
+    this.domain = props.domain;
+  }
+
+  async listArch(
+      url: string,
+      arch: string | null,
+      section: string | null,
+      previousResults: SnapApiSnap[] | null
+  ): Promise<SnapApiSnap[]> {
+    let results: SnapApiSnap[] = previousResults ?? [];
+
+    const headers: HeadersInit = {"User-Agent": spider.snaps.user_agent};
+    if (arch) {
+      headers["X-Ubuntu-Architecture"] = arch;
     }
 
-    async listArch(url: string, arch: string | null, section: string | null, previousResults: SnapApiSnap[] | null): Promise<SnapApiSnap[]> {
-      let results: SnapApiSnap[] = previousResults || [];
+    const res = await fetch(url, {
+      method: "GET",
+      headers,
+    });
 
-      const headers: HeadersInit = {"User-Agent": spider.snaps.user_agent};
-      if (arch) {
-        headers["X-Ubuntu-Architecture"] = arch;
-      }
-
-      const res = await fetch(url, {
-        method: "GET",
-        headers,
-      });
-
-      const data = await res.json() as SnapApiData;
-
-      // console.debug(`got package list page: ${url} (${arch}, ${section})`);
-
-      if (data?._embedded?.["clickindex:package"]) {
-        results = results.concat(data._embedded["clickindex:package"]);
-      }
-
-      if (data?._links?.next?.href) {
-        let nextUrl = data._links.next.href;
-
-        // Not sure why these links are coming back so weird, but this fixes it
-        nextUrl = nextUrl.replace("http://snapdevicegw_cached", this.domain);
-        nextUrl = nextUrl.replace("https://snapdevicegw_cached", this.domain);
-
-        return this.listArch(nextUrl, arch, section, results);
-      } else {
-        return results;
-      }
+    const data = await res.json() as SnapApiData;
+    if (data?._embedded?.["clickindex:package"]) {
+      results = results.concat(data._embedded["clickindex:package"]);
     }
 
-    async searchList(): Promise<{snap: SnapApiSnap, details_api_url: string}[]> {
-      const url = `${this.url}/search?size=${spider.snaps.page_size}&confinement=strict,devmode,classic&scope=wide&fields=${searchfields}`;
-      const promises: Promise<SnapApiSnap[]>[] = spider.snaps.architectures.map((architecture) => this.listArch(url, architecture, null, null));
-      promises.unshift(this.listArch(url, null, null, null));
+    if (data?._links?.next?.href) {
+      let nextUrl = data._links.next.href;
 
-      const results = await Promise.all(promises);
-      const snapMap: { [key: string]: { snap: SnapApiSnap; details_api_url: string; }; } = {};
-      let arch = "all";
-      let index = 0;
-      for (const result of results) {
-        // console.debug(`total packages (${arch}): ${snaps.length}`);
-        for (const snap of result) {
-          if (!snap.package_name) {
-            continue;
-          }
+      // Not sure why these links are coming back so weird, but this fixes it
+      nextUrl = nextUrl.replace("http://snapdevicegw_cached", this.domain);
+      nextUrl = nextUrl.replace("https://snapdevicegw_cached", this.domain);
 
-          snap.architecture = (snap.architecture) ? snap.architecture : [arch];
-          const name = snap.package_name;
-
-          const details_api_url = `${this.details_url}/${name}?fields=${detailsfields}`;
-          if (!snapMap[name]) {
-            snapMap[name] = {
-              snap,
-              details_api_url,
-            };
-          } else {
-            const oldSnap = snapMap[name].snap;
-
-            let arches = snap.architecture.concat(oldSnap.architecture ?? []);
-            arches = arches.filter((value, index_1, self) => {
-              return self.indexOf(value) === index_1;
-            });
-
-            if (arches.indexOf("all") > -1) {
-              arches = ["all"];
-            }
-
-            if (!oldSnap.revision || !snap.revision || snap.revision > oldSnap.revision) {
-              snapMap[name].snap = snap;
-            }
-
-            snapMap[name].snap.architecture = arches;
-            snapMap[name].details_api_url = `${this.details_url}/${name}?fields=${detailsfields}`;
-          }
-        }
-        if (index < spider.snaps.architectures.length) {
-          arch = spider.snaps.architectures[index];
-          index++;
-        }
-      }
-
-      console.debug(`total packages: ${Object.keys(snapMap).length}`);
-      return Object.values(snapMap);
-    }
-
-    async list() {
-      const results = await this.searchList();
-      console.debug("snapstore-api/api.js: : Returning package results");
+      return this.listArch(nextUrl, arch, section, results);
+    } else {
       return results;
     }
+  }
 
-    async detailsArch(url: string, arch: string | null, series: string | null) {
-      const headers: HeadersInit = {
-        "User-Agent": spider.snaps.user_agent,
-        "Snap-Device-Series": series ?? "16",
-      };
+  async searchList(): Promise<{
+    snap: SnapApiSnap, details_api_url: string
+  }[]> {
+    const url =
+        `${this.url}/search?size=${spider.snaps.page_size}&` +
+        "confinement=strict,devmode,classic&" +
+        "scope=wide&" +
+        `fields=${searchfields}&` +
+        `cachebuster=${Math.random()}`;
+    const promises: {arch: string, snaps: Promise<SnapApiSnap[]>}[] =
+        spider.snaps.architectures.map((architecture) => ({
+          arch: architecture,
+          snaps: this.listArch(url, architecture, null, null),
+        }));
+    promises.unshift({
+      arch: "all",
+      snaps: this.listArch(url, null, null, null),
+    });
 
-      if (arch && arch !== "all") {
-        headers["X-Ubuntu-Architecture"] = arch;
+    // eslint-disable-next-line camelcase
+    const snapMap: Map<string, {snap: SnapApiSnap; details_api_url: string;}> =
+        new Map();
+    for (const {arch, snaps} of promises) {
+      const results = await snaps;
+      console.debug(`total packages (${arch}): ${results.length}`);
+      for (const snap of results) {
+        if (!snap.package_name) {
+          console.debug("No packge_name, skipping");
+          continue;
+        }
+
+        snap.architecture ??= [arch];
+        const name = snap.package_name;
+
+        // eslint-disable-next-line camelcase
+        const details_api_url =
+            `${this.details_url}/${name}?fields=${detailsfields}`;
+        if (!snapMap.has(name)) {
+          snapMap.set(name, {
+            snap,
+            details_api_url,
+          });
+        } else {
+          const oldSnap = snapMap.get(name).snap;
+
+          let arches = snap.architecture.concat(oldSnap.architecture ?? []);
+          arches = [...new Set(arches)];
+
+          if (arches.includes("all")) {
+            arches = ["all"];
+          }
+
+          let newSnap = oldSnap;
+          if (snap.revision > oldSnap.revision) {
+            newSnap = snap;
+          }
+
+          newSnap.architecture = arches;
+
+          snapMap.set(name, {
+            snap: newSnap,
+            details_api_url,
+          });
+        }
       }
-
-      const res = await fetch(url, {
-        method: "GET",
-        headers,
-      });
-
-      return await res.json();
     }
 
-    async details(packageName: string, arches: string[], section: string, series: string) {
-      // console.debug('snapstore-api/api.js: : getting details for ' + packageName);
+    console.debug(`total packages: ${snapMap.size}`);
+    return [...snapMap.values()];
+  }
 
-      const url = `${this.details_url}/${packageName}?fields=${detailsfields}`;
+  async list(): Promise<{snap: SnapApiSnap, details_api_url: string}[]> {
+    const results = await this.searchList();
+    console.debug("snapstore-api/api.js: : Returning package results");
+    return results;
+  }
 
-      return await this.detailsArch(url, "all", "16");
+  async detailsArch(url: string, arch: string | null, series: string | null):
+      Promise<SnapApiSectionsData> {
+    const headers: HeadersInit = {
+      "User-Agent": spider.snaps.user_agent,
+      "Snap-Device-Series": series ?? "16",
+    };
+
+    if (arch && arch !== "all") {
+      headers["X-Ubuntu-Architecture"] = arch;
     }
 
-    async sections() {
-      const url = `${this.url}/sections`;
-      const headers: HeadersInit = {
-        "User-Agent": spider.snaps.user_agent,
-      };
+    const res = await fetch(url, {
+      method: "GET",
+      headers,
+    });
 
-      const res = await fetch(url, {
-        method: "GET",
-        headers,
-      });
+    return await res.json();
+  }
 
-      const data = await res.json() as SnapApiSectionsData;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async details(packageName: string, _arches: string[],
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      _section: string, _series: string): Promise<SnapApiSectionsData> {
+    const url = `${this.details_url}/${packageName}?fields=${detailsfields}`;
 
-      return data._embedded["clickindex:sections"];
-    }
-
-    async searchSectionList() {
-      const sections = await this.sections();
-      const sectionResults = await Promise.all(sections.map((section) => {
-        return this.listArch(`${this.url}/search?size=${spider.snaps.page_size}&confinement=strict,devmode,classic&section=${section.name}&scope=wide&fields=${searchfields}`, null, section.name, []);
-      }));
-      const results: SnapApiResults[] = [];
-      return results.concat(sectionResults.map((sectionResult) => ({snap: sectionResult})));
-    }
+    return await this.detailsArch(url, "all", "16");
+  }
 }
 
 export default SnapApi;
