@@ -5,6 +5,8 @@
     <UserSecretsId>50e9bcba-74a3-4656-9ada-4174b0901044</UserSecretsId>
     <Nullable>enable</Nullable>
 	<ImplicitUsings>enable</ImplicitUsings>
+	<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+	<DockerfileContext>..\..</DockerfileContext>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,6 +19,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.0" />
     <PackageReference Include="MongoDB.Driver" Version="2.17.0" />
     <PackageReference Include="GraphQL.SystemTextJson" Version="5.3.3" />
   </ItemGroup>
